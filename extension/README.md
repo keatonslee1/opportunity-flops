@@ -13,7 +13,11 @@ this directory are loaded by Chrome exactly as they are committed.
 2. Turn on **Developer mode** (top right).
 3. Click **Load unpacked** and select this `extension/` directory.
 4. Pin **Opportunity FLOPs** to the toolbar, then click it to open the side
-   panel. The panel stays open as you browse and change tabs.
+   panel — or press **Ctrl+Shift+F** (**Cmd+Shift+F** on macOS). The panel
+   stays open as you browse and change tabs.
+
+   Chrome silently drops a suggested shortcut if another extension already
+   claims it; rebind it at `chrome://extensions/shortcuts`.
 
 Requires Chrome 114 or newer, which is when `chrome.sidePanel` shipped.
 
@@ -115,9 +119,11 @@ panel makes exactly one kind of network request, for `model.js`.
 | `manifest.json` | MV3 manifest: side panel, action, sandbox and permissions |
 | `background.js` | Service worker; opens the panel on toolbar click |
 | `sidepanel.html` / `.css` / `.js` | The panel itself — presentation only |
+| `chart.js` | Compact SVG line chart; plots numbers, holds no economic logic |
 | `model-bridge.js` | Fetches and caches `model.js`; owns the sandbox transport |
 | `model-host.html` / `model-host.js` | Sandboxed frame that evaluates the model |
 | `icons/` | 16/32/48/128 px, downscaled from the site's `public/favicon-512.png` |
+| `fonts/` | Barlow 400/500/600/700 plus the OFL notice |
 
 `sidepanel.js` keeps a `read` adapter that is deliberately identical to the one
 in `public/app.js`. It is the only place that knows the shape of `runModel()`'s
@@ -130,14 +136,25 @@ This directory is self-contained. The extension reads nothing from `public/` at
 runtime and changes nothing outside `extension/` — the icons are the only thing
 derived from the site, and they are committed copies.
 
-Not included yet, in rough priority order:
+Deliberately not included:
 
-- **Charts.** The site's `charts.js` renders trajectory plots; the panel shows a
-  numeric readout only. Sharing that renderer needs a decision about how
-  `extension/` consumes site modules, which is the same question the model
-  bridge answers — worth solving once, deliberately.
-- **Barlow.** The panel declares the project's font stack but does not bundle
-  the TTFs, so it renders in Trebuchet MS unless Barlow is installed locally.
-  Bundling means copying four font files and the OFL notice into `extension/`.
-- **Page context.** Capturing the title or DOI of the paper being read alongside
-  a saved assumption set.
+- **A separate options page.** The only setting is the model source origin, and
+  it already lives one click away in the panel header. A second place to change
+  it would be a second place for it to disagree with itself.
+- **A toolbar badge.** Nothing the panel knows is worth a persistent glyph on
+  the toolbar; model status is already the first line of the panel.
+- **A mirror of the current inputs.** The closed PR #3 had a readout block
+  repeating the slider values beside the charts. In a column this narrow the
+  sliders are already on screen, so it would be the same numbers twice.
+- **Illustrative geometry while the model is pending.** See the charts note
+  above — an empty frame instead.
+
+Genuinely open:
+
+- **Firm A / firm B traces.** The adapter's `values()` reader already accepts a
+  `firm` argument, matching the shape PR #5 documents, but the panel plots only
+  baseline against projection. Splitting the two firms needs a call on whether
+  two more traces are legible at this width.
+- **The model is still a stub.** `runModel()` returns
+  `status: "pending-model"`, so every number here is an empty state today. The
+  panel fills in on its own once the real model lands — no change needed here.

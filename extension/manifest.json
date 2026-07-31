@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "Opportunity FLOPs",
+  "version": "0.1.0",
+  "description": "Keep the Opportunity FLOPs compute-reallocation calculator in the Chrome side panel while you read papers and policy announcements.",
+  "minimum_chrome_version": "114",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open Opportunity FLOPs",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": ["sidePanel", "storage"],
+  "host_permissions": [
+    "https://flops.keatonlee.org/*",
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "sandbox": {
+    "pages": ["model-host.html"]
+  },
+  "content_security_policy": {
+    "sandbox": "sandbox allow-scripts; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data:; object-src 'none'"
+  }
+}

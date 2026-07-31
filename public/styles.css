@@ -19,7 +19,7 @@ main {
 /* Uppercase monospace is reserved for values, legends and readouts — never
    for narrative. Descriptive labels use Barlow small-caps instead. */
 .headline-output span,
-.chart-heading output,
+.plate-readout output,
 .comparison-strip span,
 .control output,
 .parameter-readout {
@@ -31,8 +31,7 @@ main {
 }
 
 .model-readiness dt,
-.legend,
-.chart-heading p {
+.legend {
   font-family: var(--font-body);
   font-size: var(--t-label);
   font-weight: 600;
@@ -124,9 +123,23 @@ main {
   border-right: 1px solid var(--ink);
 }
 
+/* The margin keeps its full-height ivory; only the contents travel. Capped to
+   the viewport with its own scroll so a short window can still reach the
+   calibration note at the bottom of the rack. */
+@media (min-width: 761px) {
+  .rack-inner {
+    position: sticky;
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding-block: var(--s2);
+  }
+}
+
 .rack-heading,
-.results-header,
-.chart-heading {
+.results-header {
   display: flex;
   justify-content: space-between;
   gap: 24px;
@@ -543,36 +556,71 @@ main {
   line-height: 1.4;
 }
 
-.chart-block {
-  margin-top: 12px;
-  padding-top: 18px;
-  border-top: 1px solid var(--rule);
-}
-
-.chart-heading {
-  align-items: baseline;
-}
-
-.chart-heading h3 {
+/*
+ * Each plot is a numbered plate. The live readout sits on a rule above it so
+ * the current value is visible on arrival, and the caption sits below in the
+ * printed convention — figure number, title, then the quantity being plotted.
+ */
+.plate {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.08rem;
-  font-weight: 500;
+  padding-top: var(--s4);
 }
 
-.chart-heading p {
-  margin: 5px 0 0;
-  color: var(--muted);
+.plate + .plate {
+  margin-top: var(--s5);
 }
 
-.chart-heading output {
+.plate-readout {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.plate-readout output {
   color: var(--muted);
 }
 
 .chart-frame {
   min-width: 0;
-  margin-top: 8px;
+  margin-top: var(--s2);
   overflow: hidden;
+}
+
+.plate figcaption {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--s3);
+  align-items: baseline;
+  padding-top: var(--s2);
+  border-top: 1px solid var(--ink);
+}
+
+.fig-no {
+  margin: 0;
+  color: var(--orange-text);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+  white-space: nowrap;
+}
+
+.plate figcaption h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 500;
+}
+
+.fig-sub {
+  grid-column: 2;
+  max-width: 62ch;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: var(--t-small);
+  line-height: 1.45;
 }
 
 /* ==========================================================================

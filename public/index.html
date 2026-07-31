@@ -61,52 +61,59 @@
 
       <section class="calculator" id="calculator" aria-label="Compute tradeoff calculator">
         <aside class="control-rack" aria-labelledby="assumptions-title">
-          <div class="rack-heading">
-            <div>
-              <h2 id="assumptions-title">Policy assumptions</h2>
+          <!--
+            The inner wrapper is what sticks. Four plates make the results
+            column far taller than the controls, so without this you would have
+            to scroll back up to change an assumption you are looking at.
+          -->
+          <div class="rack-inner">
+            <div class="rack-heading">
+              <div>
+                <h2 id="assumptions-title">Policy assumptions</h2>
+              </div>
+              <div class="rack-actions">
+                <button class="reset-button" id="copy-link" type="button">Copy link</button>
+                <button class="reset-button" id="reset-controls" type="button">Reset</button>
+              </div>
             </div>
-            <div class="rack-actions">
-              <button class="reset-button" id="copy-link" type="button">Copy link</button>
-              <button class="reset-button" id="reset-controls" type="button">Reset</button>
+
+            <fieldset class="scenario-control">
+              <legend>Participation</legend>
+              <label>
+                <input type="radio" name="scenario" value="baseline" />
+                <span><strong>None</strong><small>No firm reallocates</small></span>
+              </label>
+              <label>
+                <input type="radio" name="scenario" value="unilateral" />
+                <span><strong>One firm</strong><small>Firm A reallocates</small></span>
+              </label>
+              <label>
+                <input type="radio" name="scenario" value="coordinated" checked />
+                <span><strong>Both firms</strong><small>Common commitment</small></span>
+              </label>
+            </fieldset>
+
+            <div id="assumption-controls"></div>
+
+            <section class="parameter-readout" aria-labelledby="active-preset-title">
+              <div>
+                <h3 id="active-preset-title">Active sensitivity</h3>
+                <span id="preset-name">P50 parameter bundle</span>
+              </div>
+              <dl>
+                <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.313</dd></div>
+                <div><dt>Feedback · γ</dt><dd id="gamma-value">0.400</dd></div>
+                <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.701</dd></div>
+              </dl>
+            </section>
+
+            <div class="rack-note">
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <circle cx="10" cy="10" r="8.25"></circle>
+                <path d="M10 8v5M10 5.5v.5"></path>
+              </svg>
+              <p>Each elasticity is calibrated from 10,000 seeded triangular draws. Low, Medium, and High select marginal P10, P50, and P90 bundles; the triangular inputs remain working assumptions.</p>
             </div>
-          </div>
-
-          <fieldset class="scenario-control">
-            <legend>Participation</legend>
-            <label>
-              <input type="radio" name="scenario" value="baseline" />
-              <span><strong>None</strong><small>No firm reallocates</small></span>
-            </label>
-            <label>
-              <input type="radio" name="scenario" value="unilateral" />
-              <span><strong>One firm</strong><small>Firm A reallocates</small></span>
-            </label>
-            <label>
-              <input type="radio" name="scenario" value="coordinated" checked />
-              <span><strong>Both firms</strong><small>Common commitment</small></span>
-            </label>
-          </fieldset>
-
-          <div id="assumption-controls"></div>
-
-          <section class="parameter-readout" aria-labelledby="active-preset-title">
-            <div>
-              <h3 id="active-preset-title">Active sensitivity</h3>
-              <span id="preset-name">P50 parameter bundle</span>
-            </div>
-            <dl>
-              <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.313</dd></div>
-              <div><dt>Feedback · γ</dt><dd id="gamma-value">0.400</dd></div>
-              <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.701</dd></div>
-            </dl>
-          </section>
-
-          <div class="rack-note">
-            <svg viewBox="0 0 20 20" aria-hidden="true">
-              <circle cx="10" cy="10" r="8.25"></circle>
-              <path d="M10 8v5M10 5.5v.5"></path>
-            </svg>
-            <p>Each elasticity is calibrated from 10,000 seeded triangular draws. Low, Medium, and High select marginal P10, P50, and P90 bundles; the triangular inputs remain working assumptions.</p>
           </div>
         </aside>
 
@@ -130,12 +137,8 @@
 
           <p class="model-error" id="model-error" role="alert" hidden></p>
 
-          <article class="chart-block" aria-labelledby="software-chart-title">
-            <div class="chart-heading">
-              <div>
-                <h3 id="software-chart-title">Software efficiency level</h3>
-                <p>Software-efficiency level index · 2026 = 100</p>
-              </div>
+          <figure class="plate" aria-labelledby="software-chart-title">
+            <div class="plate-readout">
               <output id="software-gap">Running model</output>
             </div>
             <div class="chart-frame">
@@ -153,14 +156,15 @@
                 </g>
               </svg>
             </div>
-          </article>
+            <figcaption>
+              <p class="fig-no">Fig. 1</p>
+              <h3 id="software-chart-title">Software efficiency level</h3>
+              <p class="fig-sub">Software-efficiency level index · 2026 = 100</p>
+            </figcaption>
+          </figure>
 
-          <article class="chart-block" aria-labelledby="slowdown-chart-title">
-            <div class="chart-heading">
-              <div>
-                <h3 id="slowdown-chart-title">Software progress slowdown</h3>
-                <p><i>SS</i>(<i>t</i>) = 1 − <i>Ṡ</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>Ṡ</i><sub>B</sub>(<i>t</i>) · percent</p>
-              </div>
+          <figure class="plate" aria-labelledby="slowdown-chart-title">
+            <div class="plate-readout">
               <output id="slowdown-gap">Running model</output>
             </div>
             <div class="chart-frame">
@@ -178,14 +182,15 @@
                 </g>
               </svg>
             </div>
-          </article>
+            <figcaption>
+              <p class="fig-no">Fig. 2</p>
+              <h3 id="slowdown-chart-title">Software progress slowdown</h3>
+              <p class="fig-sub"><i>SS</i>(<i>t</i>) = 1 − <i>Ṡ</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>Ṡ</i><sub>B</sub>(<i>t</i>) · percent</p>
+            </figcaption>
+          </figure>
 
-          <article class="chart-block" aria-labelledby="capability-chart-title">
-            <div class="chart-heading">
-              <div>
-                <h3 id="capability-chart-title">Frontier capability</h3>
-                <p>Training-compute-normalized index · 2026 = 100</p>
-              </div>
+          <figure class="plate" aria-labelledby="capability-chart-title">
+            <div class="plate-readout">
               <output id="capability-gap">Running model</output>
             </div>
             <div class="chart-frame">
@@ -203,14 +208,15 @@
                 </g>
               </svg>
             </div>
-          </article>
+            <figcaption>
+              <p class="fig-no">Fig. 3</p>
+              <h3 id="capability-chart-title">Frontier capability</h3>
+              <p class="fig-sub">Training-compute-normalized index · 2026 = 100</p>
+            </figcaption>
+          </figure>
 
-          <article class="chart-block" aria-labelledby="capability-gap-chart-title">
-            <div class="chart-heading">
-              <div>
-                <h3 id="capability-gap-chart-title">AI capability gap</h3>
-                <p><i>CG</i>(<i>t</i>) = 1 − <i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>M</i><sub>B</sub>(<i>t</i>) · percent</p>
-              </div>
+          <figure class="plate" aria-labelledby="capability-gap-chart-title">
+            <div class="plate-readout">
               <output id="capability-gap-series-output">Running model</output>
             </div>
             <div class="chart-frame">
@@ -228,7 +234,12 @@
                 </g>
               </svg>
             </div>
-          </article>
+            <figcaption>
+              <p class="fig-no">Fig. 4</p>
+              <h3 id="capability-gap-chart-title">AI capability gap</h3>
+              <p class="fig-sub"><i>CG</i>(<i>t</i>) = 1 − <i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>M</i><sub>B</sub>(<i>t</i>) · percent</p>
+            </figcaption>
+          </figure>
 
           <div class="comparison-strip" aria-label="Scenario comparison status">
             <div data-scenario="baseline">

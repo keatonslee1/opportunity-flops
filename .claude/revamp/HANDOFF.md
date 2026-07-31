@@ -51,7 +51,7 @@ devices out of them and never defines a parallel set.
 - [x] **B — Task 2** · methodology page set on A's primitives
 - [x] **B — Task 2b** · section devices + colophon device
 - [x] **B — Task 3** · `print.css`
-- [ ] **B — Task 4** · adversarial audit → `PUNCHLIST.md`
+- [x] **B — Task 4** · adversarial audit → `PUNCHLIST.md`
 - [ ] **A — Phase 2** · punchlist cleared, cross-page consistency, Studio Test, `DESIGN.md` reconciled
 
 ---
@@ -490,3 +490,45 @@ Phase 2, once you report Task 4: your `## For A` punchlist, cross-page reconcili
 `.running-head` margin override in `methodology.css` I flagged in the Phase 0 block is still
 there — it is yours, and it makes the running head start at x=0 and clip while the masthead
 below it starts at the gutter.
+
+## B — TASK 4 DONE · 2026-07-31 · punchlist is ready
+
+All of B's tasks are complete. `npm test` 46/46, `npm run build` clean.
+
+**The audit is on `PUNCHLIST.md` under `# TASK 4`.** Two new items for you, A16 and A17, and
+both are on the calculator's first viewport — which is the one the Studio Test screenshots.
+
+- **A16 — fluoro is carrying a plate ordinal.** `span.plate-device` is an 18×15px solid
+  fluoro `background-color`, not drawn vector — I queried the DOM to be sure. The Loud Ink
+  Rule confines fluoro to drawn imagery, and a plate ordinal is apparatus. It is also the
+  only loud thing in the first viewport, spending that energy on the least important element
+  on screen, and it leaves the page numbering its plates in two inks: fluoro here, `.fig-no`
+  orange two lines below.
+- **A17 — orange means two things across the two pages.** The masthead keys its 80 solid
+  marks to "capability R&D" in oxidized orange, but the ink table gives orange one job,
+  capability *cost*, and that is how Fig. 1–4, `.fig-no` and the whole paper use it. Compute
+  spent on capability and the cost of not spending it are different quantities — one an
+  input, one an output. A reader who learns the mapping on the masthead reads every trace
+  below it wrong. Suggested fix on the punchlist: key the masthead to verdigris = alignment
+  and ink = capability R&D, which frees orange to mean cost everywhere and makes the marks
+  flip *into* the ink that means safety, which is a stronger picture anyway.
+
+Clean, and worth saying so: the banlist grep has **zero** violations — all five hits are
+zero-blur hairlines, a zero `border-radius` stripping a UA default, or `print.css` removing
+shadows, each already commented. No emoji, no raster imagery, no external URLs. No
+page-level horizontal scroll on either page at 1440 / 1020 / 760 / 360. All 25 focusables
+reachable with a correct 3px cobalt ring at 2px offset, no traps, and the six plates are
+keyboard-reachable so the signature moment is not mouse-only.
+
+One near-miss I nearly filed against you: every ring measured 2.4px against a 3px spec. It is
+not a defect — a control element with a literal `outline: 3px` also reported 2.4px, because
+the browser sat at 80% zoom and `getComputedStyle` returns used values. Worth knowing before
+you measure anything yourself.
+
+Three defects of my own that the audit caught, now fixed: the section devices were inflating
+the margin-column row and opening a gap under every heading; an inline SVG's baseline is its
+bottom edge, so the device floated above the § mark at narrow widths; and the imprint line
+was held to the prose measure and broke across two lines.
+
+Still open from earlier and still yours: **A2 (the `ch` measure — the calculator still fails
+the 62–72 cap)**, A3, A4, A5 (`--font-math` has no Greek), A7, A8, A10, A11, A12, A13.

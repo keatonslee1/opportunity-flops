@@ -170,6 +170,7 @@ const state = {
   modelReady: false,
   lastResult: null,
   lastPending: true,
+  pageContext: null,
   /** Source text currently loaded in the sandbox, for change detection. */
   modelSource: null,
   lastCheckedAt: 0,
@@ -202,6 +203,8 @@ const nodes = {
   reset: document.querySelector("#reset-assumptions"),
   openSite: document.querySelector("#open-site"),
   copySummary: document.querySelector("#copy-summary"),
+  pageContext: document.querySelector("#page-context"),
+  pageContextTitle: document.querySelector("#page-context-title"),
 };
 
 // ── Persistence ────────────────────────────────────────────────────────
@@ -526,8 +529,54 @@ function summaryText() {
     }
   }
 
+  if (state.pageContext) {
+    lines.push("", `Reading: ${state.pageContext.title || state.pageContext.url}`);
+    if (state.pageContext.title) lines.push(state.pageContext.url);
+  }
+
   lines.push("", `Model source: ${state.origin}`, `Captured: ${formatTime(Date.now())}`);
   return lines.join("\n");
+}
+
+// ── Page context ───────────────────────────────────────────────────────
+
+/** Pages that are never the thing someone is "reading". */
+const OPAQUE_SCHEMES = /^(chrome|chrome-extension|edge|about|devtools|view-source):/;
+
+/**
+ * Tracks the active tab so a copied summary can record what prompted it.
+ *
+ * Read-only and local: the title and URL are shown in the panel and included
+ * in a summary you explicitly copy. Nothing is stored or transmitted.
+ */
+async function refreshPageContext() {
+  let tab = null;
+  try {
+    [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  } catch {
+    // No tabs permission, or nothing queryable — the feature just stays off.
+  }
+
+  const usable = tab?.url && !OPAQUE_SCHEMES.test(tab.url);
+  state.pageContext = usable ? { title: tab.title ?? "", url: tab.url } : null;
+
+  nodes.pageContext.hidden = !state.pageContext;
+  if (state.pageContext) {
+    const { title, url } = state.pageContext;
+    nodes.pageContextTitle.textContent = title || url;
+    nodes.pageContext.title = url;
+  }
+}
+
+function watchPageContext() {
+  if (!chrome.tabs?.onActivated) return;
+  chrome.tabs.onActivated.addListener(refreshPageContext);
+  chrome.tabs.onUpdated.addListener((_id, change, tab) => {
+    // Only the active tab's own title/URL changes matter here.
+    if (tab.active && (change.title || change.url)) refreshPageContext();
+  });
+  chrome.windows?.onFocusChanged?.addListener(refreshPageContext);
+  refreshPageContext();
 }
 
 async function copySummary() {
@@ -724,6 +773,8 @@ async function boot() {
   paint({}, true);
 
   await connectModel();
+
+  watchPageContext();
 
   setInterval(revalidate, REVALIDATE_MS);
   window.addEventListener("focus", () => {

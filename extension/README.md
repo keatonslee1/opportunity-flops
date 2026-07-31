@@ -88,6 +88,26 @@ from the repository root. The choice persists.
   reading. While the model is pending it says so rather than emitting blank
   rows, and assumptions the interface supplied are marked as such.
 
+- **Reading** — the title of the page in the active tab, shown at the foot of
+  the panel and included in a copied summary so a pasted note carries its
+  source. Browser-internal pages (`chrome://`, extension pages, blank tabs) are
+  ignored.
+
+## Permissions
+
+| Permission | Why |
+| --- | --- |
+| `sidePanel` | Open the panel |
+| `storage` | Cache the model source; remember your inputs and source origin |
+| `clipboardWrite` | The Copy button |
+| `tabs` | Read the active tab's title and URL for the Reading line |
+| `host_permissions` | Fetch `model.js` from the deployed site or localhost |
+
+The `tabs` permission is the broadest of these. It is used read-only, for the
+active tab only, to display the title and to include it in a summary **you**
+explicitly copy. Nothing about your browsing is stored or transmitted — the
+panel makes exactly one kind of network request, for `model.js`.
+
 ## Files
 
 | File | Role |

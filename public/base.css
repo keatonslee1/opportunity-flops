@@ -394,6 +394,33 @@ footer p:nth-child(2) {
   outline-offset: 2px;
 }
 
+/* --- Entrance ------------------------------------------------------------
+   One orchestrated page-load reveal, not scattered micro-interactions. Only
+   opacity and transform are animated. Each page stages its own sequence from
+   these keyframes; the reduced-motion block at the bottom of this file
+   neutralises all of it.
+   ------------------------------------------------------------------------ */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.topbar {
+  animation: fade 520ms var(--ease-out) both;
+}
+
 /* --- Responsive ---------------------------------------------------------- */
 
 @media (max-width: 1020px) {

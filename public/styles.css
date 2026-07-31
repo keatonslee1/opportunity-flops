@@ -764,6 +764,28 @@ main {
   font-size: 0.84rem;
 }
 
+/* --- Entrance ------------------------------------------------------------
+   The first viewport arrives in reading order: title, lead, status rule, then
+   the apparatus. The apparatus fades without translating — a transform on it
+   would create a containing block and break the sticky rack inside.
+   ------------------------------------------------------------------------ */
+
+.intro h1 {
+  animation: rise 640ms var(--ease-out) 60ms both;
+}
+
+.intro > div > p {
+  animation: rise 640ms var(--ease-out) 140ms both;
+}
+
+.model-readiness {
+  animation: rise 640ms var(--ease-out) 210ms both;
+}
+
+.calculator {
+  animation: fade 720ms var(--ease-out) 280ms both;
+}
+
 /* --- Responsive ---------------------------------------------------------- */
 
 @media (max-width: 1020px) {
@@ -807,12 +829,16 @@ main {
   }
 
   .headline-output {
-    max-width: 120px;
+    text-align: left;
   }
 
   .legend-disclaimer {
     width: 100%;
     margin-left: 0;
+  }
+
+  .plate-readout {
+    justify-content: flex-start;
   }
 
   .chart-frame {
@@ -835,5 +861,33 @@ main {
     padding-left: 0;
     border-top: 1px solid var(--rule);
     border-left: 0;
+  }
+}
+
+/* Three columns of status stop being readable once each one wraps to two
+   lines; below this the strip becomes a stacked list of rules. */
+@media (max-width: 560px) {
+  .model-readiness {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .model-readiness div {
+    padding-right: 0;
+  }
+
+  .model-readiness div + div {
+    padding-left: 0;
+    border-top: 1px solid var(--rule);
+    border-left: 0;
+  }
+
+  .results-header {
+    flex-wrap: wrap;
+    gap: var(--s3);
+  }
+
+  .rack-heading h2,
+  .results-header h2 {
+    font-size: 1.2rem;
   }
 }

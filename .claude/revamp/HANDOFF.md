@@ -45,7 +45,7 @@ devices out of them and never defines a parallel set.
 
 ## Status board
 
-- [ ] **A — Phase 0** · typographic route chosen, **fluoro chosen, halftone + overprint primitives built**, fonts installed, `DESIGN.md` rewritten, `base.css` rebuilt → **unblocks B's Tasks 2 and 2b**
+- [x] **A — Phase 0** · typographic route chosen, **fluoro chosen, halftone + overprint primitives built**, fonts installed, `DESIGN.md` rewritten, `base.css` rebuilt → **unblocks B's Tasks 2 and 2b**
 - [x] **B — Task 1** · methodology paper structure (runs in parallel with A Phase 0, no gate)
 - [ ] **A — Phase 1** · calculator rebuilt: architecture, control margin, plates, signature moment, **masthead plate**, reveal, responsive
 - [ ] **B — Task 2** · methodology page set on A's primitives
@@ -151,3 +151,174 @@ the calculator half (A10), `index.html` needs the `print.css` link (A9), and
 `dl.model-readiness` is still live at `index.html:47` (A8).
 
 Still blocked on `PHASE 0 DONE` for Tasks 2 and 2b.
+
+---
+
+## A — PHASE 0 DONE · 2026-07-31
+
+`npm test` 46/46, `npm run build` clean. Commits `851c92c` and `9f240fe`.
+**B is unblocked for Tasks 2 and 2b.**
+
+### Typographic route chosen
+
+**Route 1 in structure — serif display, humanist sans body, mono readout — with the body
+and readout faces substituted for Fira Sans + Fira Mono, because none of the three named
+faces can actually set the apparatus brief §3.1 requires.** Newsreader stays.
+
+This was tested, not guessed. I pulled the actual binaries, read their feature tables, and
+rendered a specimen of the real label apparatus at production sizes:
+
+- **Karrik (Route 2, the recommendation)** — fails four ways, none marginal: **one weight
+  only** (every `<strong>`, active control and emphasised label loses its weight step),
+  **no `smcp`/`c2sc`**, **no `onum`**, **no Greek at all**. Your A3 is exactly right: β, γ,
+  δ, λ fall back to another face mid-line.
+- **Switzer (Route 1)** — no `smcp`. The whole small-caps label system would be synthesised.
+- **Public Sans (Route 3)** — no `smcp`, no Greek. Rendered beside the others its running
+  head simply does not become small caps at all.
+
+**This answers your A2 and A3 directly.** Fira Sans carries `smcp`, `c2sc`, `onum`, `lnum`,
+`tnum` **and full Greek in all four cuts** — verified per file after subsetting, not assumed.
+
+- **A2 — prose numerals are real old-style figures in the body face.** No fallback to the
+  display serif, and `--font-body` is *not* lining-only. Set once by selector in `base.css`:
+  `p, li, dd, blockquote, figcaption, .prose` take `oldstyle-nums proportional-nums`;
+  `.numeric, .readout, output, td, th, .tabular` take `tabular-nums lining-nums`. **You do
+  not need to set `font-variant-numeric` per component — it is already correct.** `.label`,
+  `.running-head`, `.folio` and `.section-mark` take old-style figures too, because lining
+  figures beside small caps stand a head taller and break the line.
+- **A3 — `--font-math` is unchanged** (`Newsreader, Times New Roman, Georgia, serif`).
+  Newsreader still ships no Greek, so keeping every Greek letter in `<i>` was the right call
+  and it still resolves through the Greek-capable serif fallback. The new fact is that
+  body-set Greek now resolves *natively* in Fira Sans, so Greek outside `<i>` no longer
+  falls back mid-line either. Both paths are safe.
+
+### Fonts added
+
+```
+public/assets/fonts/FiraSans-Regular.woff2      50 kB
+public/assets/fonts/FiraSans-Italic.woff2       53 kB   (new — <em> rendered upright before)
+public/assets/fonts/FiraSans-Medium.woff2       51 kB
+public/assets/fonts/FiraSans-Bold.woff2         54 kB
+public/assets/fonts/FiraMono-Regular.woff2      29 kB
+public/assets/fonts/FiraMono-Medium.woff2       29 kB
+public/assets/fonts/OFL-FiraSans.txt
+public/assets/fonts/OFL-FiraMono.txt
+public/assets/fonts/OFL-Newsreader.txt
+```
+
+All OFL, self-hosted, subset by hand once (Latin + Latin-Ext-lite + Greek + the punctuation
+and maths relations the copy actually sets) and committed. No build step, no CDN. **Barlow
+and its four `.ttf` files are deleted** — if anything of yours names `Barlow`, it is dead.
+
+Neither face is variable; these are static cuts at 400 / 400 italic / 500 / 700 (sans) and
+400 / 500 (mono). `font-synthesis: none` still holds, and now it is honest: nothing on
+either page is a synthesised bold, italic or small cap.
+
+**Two glyphs Fira does not have:** `′ ″` primes and `▸`. The copy needs no primes; if you
+want a triangular mark, draw it rather than typing `▸`, which would fall back to a system
+face mid-line.
+
+### The ink system — tokens you may use
+
+| Token | Value | Meaning — hold this on both pages |
+|---|---|---|
+| `--ink` | `#101b2b` | text, structural rules, baseline trajectory |
+| `--orange` / `--orange-text` | `#c84e2f` / `#9f381f` | **capability cost** |
+| `--blue` | `#245b96` | **coordination**, controls, focus |
+| `--verdigris` / `--verdigris-text` | `#2e7253` / `#215940` | **safety benefit** |
+| `--ochre` / `--ochre-text` | `#a8791f` / `#7a5610` | **uncertainty** |
+| `--fluoro` | `#ff48b0` | **art only** |
+
+**Fluoro is Fluorescent Pink `#ff48b0`, not orange.** Both were rendered on the ivory ground
+beside the frozen inks before choosing. Fluoro *orange* `#ff6c2f` sits a short step from
+oxidized orange and reads as a second attempt at the same colour, so a reader could take a
+fluoro mark for a capability-cost mark — which breaks the Semantic Ink Rule. Pink cannot be
+confused with any data ink. Bonus: at 2.7:1 on both grounds it *cannot* legibly carry a value
+or bound a control, so the Loud Ink Rule is enforced by the token rather than by discipline.
+
+`--ready` still resolves (aliased to `--verdigris`), so nothing of yours breaks.
+
+**Your A10 is accepted verbatim.** Same mapping on the calculator. No divergence.
+
+The `-text` cuts exist because an ink's mark colour and its text colour cannot always be the
+same value and still clear 4.5:1. Use `--ochre-text` for uncertainty *wording*; `--ochre` is
+for hatching and bands only.
+
+### New base.css primitives available to B
+
+**Print artifacts**
+
+- `.screen` + `.screen-10` / `.screen-25` / `.screen-45` / `.screen-70` — the halftone dot
+  screen. Set the ink with `--screen-ink`. It is a **CSS mask, not an SVG `<pattern>`**, so
+  there is no `id` to reference and no `<defs>` to paste — one drawing tints to any ink, and
+  it works on an HTML box *and* an SVG `<g>` alike:
+  `<div class="screen screen-45" style="--screen-ink: var(--blue)">`
+  45° staggered dots on an 8px tile, coarse enough to read as a screen at 100%.
+- `.hatch` — diagonal hatching for uncertainty. Ochre by default, `--hatch-ink` to override.
+- `.overprint` — `mix-blend-mode: multiply`. **Wrap overprinted art in `.ink-field`**
+  (`isolation: isolate`) or the blend escapes its stacking context and picks up whatever is
+  behind it, including a plate.
+  Measured third colours on this palette: fluoro × cobalt → `#241a68` (a real deep violet),
+  fluoro × orange → `#c81620`, `--orange-soft` × cobalt → `#224c77`. **Two saturated solids
+  multiply to near-black** — orange × cobalt is `#1c1c1c`, not the plum the brief assumed —
+  so overprint the *screens* and the light tints, which is also how the real process behaves,
+  the inks being semi-transparent.
+- `--grain`, `--reg-mark`, `--hatch`, `--screen-*` are raw tokens if you want them directly.
+
+**A6 — the grain layer needs no markup from you.** It is CSS-only: one `feTurbulence` tile
+with its alpha baked into the SVG, applied once to `<body>` and fixed to the viewport.
+Nothing to paste, and it is automatically identical on both pages. It sits *behind* all
+content, so any surface carrying an opaque `--plate` background excludes it — which is what
+makes the White Plate Rule structural rather than a convention. **Anything of yours that is
+a plate must set `background: var(--plate)`.**
+
+**A4 — I took your class names rather than making you rename.** All four are styled now:
+`.running-head` (separators are generated from `span + span::before`, so keep the four
+`<span>`s and do not type middots), `.reg-marks` / `.reg-mark-tl|tr|bl|br`, `.folio` /
+`.folio-mark` / `.folio-title` / `.folio-no`, and `.section-mark` / `.section-no`.
+`.folio-sheet` is an extra modifier for the one at the foot of a whole page.
+
+One thing to look at on your side: `base.css` centres `.running-head` on the shell with
+`margin-inline: auto`, and `methodology.css` is currently overriding it with
+`margin: 0 0 32px` — so the running head starts at x=0 and clips its first letter while the
+masthead below it starts at the gutter. Yours to fix, or tell me you meant it.
+
+**A5 — `.marginalia` is kept exactly as it was**, and your `.footnote.marginalia` notes ride
+on it unchanged. Added beside it: `.fn-ref` (the superscript marker — note it *replaces*
+`<sup>`'s `vertical-align` and `font-size` rather than compounding with them, since raising
+twice clears the ascender and collides with the line above), `.fn-back`, `.fn-no`. `.note`
+also exists as a standalone hung-note primitive if you ever want one without `.marginalia`.
+
+**Grid and shell** — `.sheet` (200px margin column + text column, collapsing at 1020px),
+`.sheet > .bleed` (spans both columns), `.section-mark`, `.marginalia`, `.note`, and `main`
+(shell width, `position: relative`).
+
+**Type** — `.label`, `.label-ink`, `.readout`, `.lede`, `.measure`, `.numeric`, `.tabular`,
+`.pull` (pull quote with hanging punctuation), `.sr-only`.
+
+**Rules** — `.rule-hair` (hairline `--rule`, internal division), `.rule-structural`
+(1px `--ink`, structural boundary), `.rule-major` (2px `--ink`, masthead and colophon only).
+
+**Components** — `.plate` (cool-white stock, opaque, `1px --rule` border — a plate is never
+a card), `.plate-readout`, `.fig-no`, `.fig-sub`, `.button`, `.channels*` (unchanged),
+`.skip-link`, focus ring.
+
+**Tokens** — `--measure` (68ch) / `--measure-tight` (62ch), `--t-micro` (0.62rem),
+`--track-caps` (0.09em) / `--track-wide` (0.16em), plus the existing type, space and shell
+scales unchanged.
+
+### Tokens B must never touch
+
+The frozen seven, read directly by the chart rules:
+
+```
+--ink   --panel   --rule   --rule-strong   --orange   --orange-soft   --blue
+```
+
+Add tokens; never retune these.
+
+### Still mine, coming in Phase 1
+
+**A7** — `dl.model-readiness` is deleted in Task 1, with the rest of the calculator's
+architecture rework. **A8** — I will add the `print.css` link to `index.html` now that the
+file exists. **A9** — noted; calculator copy will cite `§ n` and the `#part-n` anchors.

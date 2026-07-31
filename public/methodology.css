@@ -485,7 +485,13 @@ main {
 }
 
 /* Numbers are set in the mono face so columns align optically as well as
-   metrically; the row stubs stay in Barlow so they read as words. */
+   metrically; the row stubs stay in Barlow so they read as words.
+
+   No `text-transform: uppercase` here, unlike every other mono readout in the
+   system. These tables are keyed by symbols, and uppercasing a symbol changes
+   what it means: it was rendering β, γ and δ as Β, Γ and Δ, and the impact
+   level z as Z. Word headers get small caps instead, which changes the
+   glyphs' case without changing the characters. */
 .preset-matrix {
   min-width: 420px;
   max-width: 620px;
@@ -493,7 +499,6 @@ main {
   font-size: var(--t-label);
   letter-spacing: 0.055em;
   text-align: right;
-  text-transform: uppercase;
 }
 
 .preset-matrix th,
@@ -517,12 +522,11 @@ main {
   border-top: 1px solid var(--rule-strong);
   border-bottom: 1px solid var(--rule-strong);
   color: var(--muted);
-  font-weight: 500;
-}
-
-.preset-matrix thead th i,
-.preset-matrix thead th {
+  font-family: var(--font-body);
   font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
 }
 
 .preset-matrix tbody th {
@@ -530,7 +534,18 @@ main {
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: normal;
-  text-transform: none;
+}
+
+/* Cells whose content is a symbol rather than a word. Set in the serif italic
+   the equations use, at their own case, so β in Table 2 is the same mark as
+   β in equation (2.1). */
+.preset-matrix .sym {
+  font-family: var(--font-math);
+  font-size: 1rem;
+  font-style: italic;
+  font-variant-caps: normal;
+  font-weight: 500;
+  letter-spacing: normal;
 }
 
 .preset-matrix tbody tr:last-child th,
@@ -736,14 +751,22 @@ main {
     grid-template-columns: 4rem minmax(0, 1fr);
   }
 
-  .contents li {
-    flex-wrap: wrap;
-    padding-bottom: var(--s2);
+  /* The entry stays on one line: the leader is a flexible spacer, so it
+     simply shrinks to nothing when the title and the status stamp need the
+     room. Wrapping the stamp onto its own line doubled the height of every
+     entry and buried the numbering. */
+  .contents li a {
+    gap: 0.5em;
+    font-size: 1rem;
   }
 
-  .contents li a {
-    flex: 1 1 100%;
-    padding-bottom: var(--s1);
+  .contents li a::after {
+    margin-inline: 0.15em;
+  }
+
+  .contents .status {
+    padding: 2px 5px 1px;
+    letter-spacing: 0.05em;
   }
 
   .part {

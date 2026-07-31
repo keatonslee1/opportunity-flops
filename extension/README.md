@@ -83,6 +83,11 @@ from the repository root. The choice persists.
   The labels are view copy — what each level means numerically is the model's to
   define.
 
+- **Copy** — puts the current scenario, result, assumptions and metrics on the
+  clipboard as plain text, for pasting into notes next to whatever you are
+  reading. While the model is pending it says so rather than emitting blank
+  rows, and assumptions the interface supplied are marked as such.
+
 ## Files
 
 | File | Role |

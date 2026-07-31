@@ -234,6 +234,18 @@ input {
   font-weight: 500;
 }
 
+.head-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.head-right .icon-button {
+  height: 24px;
+  padding: 0 7px;
+  font-size: 0.6rem;
+}
+
 /* ── Results ─────────────────────────────────────────────────────────── */
 
 .headline {

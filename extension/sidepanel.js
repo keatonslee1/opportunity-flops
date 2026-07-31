@@ -168,6 +168,8 @@ const state = {
   assumptions: {},
   scenario: null,
   modelReady: false,
+  lastResult: null,
+  lastPending: true,
   /** Source text currently loaded in the sandbox, for change detection. */
   modelSource: null,
   lastCheckedAt: 0,
@@ -199,6 +201,7 @@ const nodes = {
   reloadModel: document.querySelector("#reload-model"),
   reset: document.querySelector("#reset-assumptions"),
   openSite: document.querySelector("#open-site"),
+  copySummary: document.querySelector("#copy-summary"),
 };
 
 // ── Persistence ────────────────────────────────────────────────────────
@@ -483,8 +486,62 @@ function renderCharts(result, pending) {
 
 /** Single entry point for every view, so no caller can update one and not the other. */
 function paint(result, pending) {
+  state.lastResult = result;
+  state.lastPending = pending;
   renderResult(result, pending);
   renderCharts(result, pending);
+}
+
+/**
+ * Plain-text summary for pasting into notes alongside whatever is being read.
+ * Reports the pending state honestly rather than emitting blank rows.
+ */
+function summaryText() {
+  const result = state.lastResult ?? {};
+  const pending = state.lastPending;
+  const scenario = state.scenarios.find((s) => s.key === state.scenario);
+  const lines = [];
+
+  lines.push(`Opportunity FLOPs — ${scenario?.label ?? "scenario"}`);
+  lines.push(
+    pending
+      ? "Result: awaiting economic model (runModel() has not returned results)"
+      : `Result: ${read.headline(result) ?? EMPTY}`,
+  );
+  const explanation = pending ? null : read.explanation(result);
+  if (explanation) lines.push(explanation);
+
+  lines.push("", "Assumptions");
+  for (const definition of state.definitions) {
+    const value = displayValue(definition, state.assumptions[definition.key]);
+    const suffix = definition.suppliedByUi ? "  (supplied by the interface)" : "";
+    lines.push(`- ${definition.label}: ${value}${suffix}`);
+  }
+
+  const metrics = pending ? [] : read.metrics(result);
+  if (metrics.length) {
+    lines.push("", "Metrics");
+    for (const metric of metrics) {
+      lines.push(`- ${metric.label}: ${metric.value}${metric.sub ? ` (${metric.sub})` : ""}`);
+    }
+  }
+
+  lines.push("", `Model source: ${state.origin}`, `Captured: ${formatTime(Date.now())}`);
+  return lines.join("\n");
+}
+
+async function copySummary() {
+  const button = nodes.copySummary;
+  try {
+    await navigator.clipboard.writeText(summaryText());
+    button.textContent = "Copied";
+  } catch (error) {
+    console.error("clipboard write failed", error);
+    button.textContent = "Failed";
+  }
+  setTimeout(() => {
+    button.textContent = "Copy";
+  }, 1600);
 }
 
 async function render() {
@@ -650,6 +707,8 @@ async function boot() {
     await writeSettings({ origin: state.origin });
     await connectModel();
   });
+
+  nodes.copySummary.addEventListener("click", copySummary);
 
   nodes.reset.addEventListener("click", () => {
     for (const definition of state.definitions) {

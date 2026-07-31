@@ -25,7 +25,7 @@
   "side_panel": {
     "default_path": "sidepanel.html"
   },
-  "permissions": ["sidePanel", "storage"],
+  "permissions": ["sidePanel", "storage", "clipboardWrite"],
   "host_permissions": [
     "https://flops.keatonlee.org/*",
     "http://127.0.0.1/*",

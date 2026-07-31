@@ -20,7 +20,58 @@ halftone screen's SVG `id` and the class that applies it, and the overprint
 (`mix-blend-mode: multiply`) primitive's class name. B builds the section devices and the
 colophon device out of exactly those and will not define a parallel set.
 
-### A2 — Four characters resolve to a system fallback, five more fall out of `--font-math`
+### A2 — `--measure: 68ch` renders as 83 characters, on both pages (blocking the acceptance bar)
+
+`base.css` sets `--measure: 68ch` under the comment "62–72 characters. Never wider." A `ch`
+is the advance width of `0`, and in both Fira Sans and Newsreader the digits are noticeably
+wider than the average lowercase letter. Measured on the built page — a 72-character
+reference string set in each element's own computed font, compared against that element's
+content box:
+
+| Surface | Was | Cap |
+|---|---|---|
+| Body prose | **83** | 72 |
+| Abstract | **84** | 72 |
+| Limitations standfirst | **90** | 72 |
+| Plate caption | **89** | 72 |
+| Byline | **100** | 72 |
+
+Brief §3.1 calls the cap hard and Studio Test item 3 checks it, so as it stands **both pages
+fail on measure**. Solved values: `--measure: 56ch` lands body prose at 68 characters and
+`--measure-tight: 50ch` lands the display-serif abstract at 68. Display italic at lead size
+needs about `42ch` for the same line — the ratio is per-face, so a single token cannot serve
+every surface and the tighter surfaces need their own caps.
+
+B has scoped the corrected values to `.paper` so the methodology page is correct now, and
+left a comment saying to delete that block once the token is retuned. **The calculator has
+the identical defect** — please fix `--measure` upstream and B will drop the override.
+
+Two cascade traps that come with it, both of which bit B: a bare `.byline` (0,1,0) loses to
+`.paper p` (0,1,1), so a per-surface cap silently does nothing unless its specificity beats
+the generic prose rule; and `.plate figcaption` needs its cap set on the caption's *text*
+column, not the whole grid, or the hanging index inflates the measured line.
+
+### A3 — `.section-mark` stays stacked below 1020px
+
+`base.css`'s collapse rule re-declares `display: flex` on `.section-mark` but never clears
+the `flex-direction: column` set at full width. Below 1020px the mark and its status stamp
+stay stacked, and the stamp lands hard against the heading with no space between them —
+visible at 360px, where `§ 4` / `IMPLEMENTED` / `AI risk` come out as three cramped lines.
+B has restated `flex-direction: row` in `methodology.css`; the calculator's section marks
+collapse through the same rule and need the same fix at source.
+
+### A4 — Verdigris is carrying "Implemented", which is not a model quantity
+
+`--ready: var(--verdigris)` survives as an alias, and the status stamps were reading it. The
+Semantic Ink Rule gives verdigris one job — SAFETY BENEFIT. "Implemented" is a fact about
+the build, not a quantity in the model, so colouring it verdigris makes the ink mean two
+things and weakens the mapping the reader is supposed to learn from the calculator.
+
+B's stamps are now `--ink`, with the single caveat stamp in `--ochre-text` because that one
+really is marking uncertainty. Status stays legible from the words either way, so nothing is
+carried by colour alone. **Check anywhere `--ready` is still read on the calculator.**
+
+### A5 — Four characters resolve to a system fallback, five more fall out of `--font-math`
 
 **This is the highest-value thing on the list and it is cheapest to fix while you are still
 choosing fonts.**
@@ -67,7 +118,7 @@ Options, in B's order of preference:
 
 Tell B which, and B will sweep the document to match.
 
-### A3 — Fira Sans and Fira Mono are a good route — confirmed, not assumed
+### A6 — Fira Sans and Fira Mono are a good route — confirmed, not assumed
 
 Same method. Recording it so the decision is documented rather than folk knowledge:
 
@@ -82,7 +133,7 @@ no `onum`, and Fira Sans has all three plus Greek. Brief §3.1's old-style-figur
 requirement is satisfiable with the faces you have installed. Note Newsreader has **no
 `onum`** — so if prose is set in the display serif anywhere, its numerals will be lining.
 
-### A4 — `.plate figcaption` is a two-child contract, and it broke on contact
+### A7 — `.plate figcaption` is a two-child contract, and it broke on contact
 
 Your new `base.css` rule:
 
@@ -100,7 +151,7 @@ calculator plates need the same discipline** — any caption with an inline link
 it will break the same way. Either keep the two-child contract and enforce it in the markup,
 or make the rule robust (hanging indent via `text-indent`, or `.caption-index { float: left }`).
 
-### A5 — Shared chrome B has marked up but cannot style
+### A8 — Shared chrome B has marked up but cannot style
 
 `methodology.html` carries the apparatus markup below. It is inert until `base.css` styles
 it, and it must appear on the calculator page too or the two pages stop being one
@@ -129,13 +180,13 @@ analogue of a printed page, and it is already the best-looking thing on the prin
 If these are not the class names you want, say so and B will rename; B needs one vocabulary,
 not two.
 
-### A6 — Keep the `.marginalia` hanging primitive through the `base.css` rebuild
+### A9 — Keep the `.marginalia` hanging primitive through the `base.css` rebuild
 
 Nine footnotes hang in the margin column with reciprocal back-references, riding on
 `.sheet` + `.marginalia` (`grid-column: 1`, inline aside below 1020px). If the rebuild
 renames or drops it, name the replacement. Brief §3.1: notes are *never* dropped.
 
-### A7 — Paper grain layer is A's to place
+### A10 — Paper grain layer is A's to place
 
 Brief §3.3 wants **one** fixed `feTurbulence` layer, ≤4% opacity, over the ivory ground
 only. B deliberately did not add the SVG to `methodology.html`: an inline `<svg>` with no
@@ -143,13 +194,13 @@ CSS renders as a visible block, and the layer must be identical on both pages. P
 markup and B will paste it verbatim. `print.css` already hides `.grain` and `.paper-grain`
 speculatively — tell B the real class name.
 
-### A8 — Banlist item still live on the calculator
+### A11 — Banlist item still live on the calculator
 
 `public/index.html` line 47, `<dl class="model-readiness">` — brief §2 names this by hand
 ("this includes the current `dl.model-readiness` — delete it"). Three `<dt>`/`<dd>` pairs
 reading Equations / Calibration / Outputs is a KPI chip row.
 
-### A9 — Add the `print.css` link to `index.html`
+### A12 — Add the `print.css` link to `index.html`
 
 `public/print.css` now exists and is linked from `methodology.html`. Add to `index.html`:
 
@@ -157,7 +208,7 @@ reading Equations / Calibration / Outputs is a KPI chip row.
 <link rel="stylesheet" href="/print.css" media="print" />
 ```
 
-### A10 — `print.css` needs the calculator's final class names
+### A13 — `print.css` needs the calculator's final class names
 
 The print sheet hides `input`, `select`, `button`, `[role="tablist"]`, `.controls` and
 `.control-margin` defensively, but those last two are guesses. Once Phase 1 settles the
@@ -165,14 +216,14 @@ calculator's architecture, give B the class names for the control margin, the pl
 wrapper, the readout lines and the masthead plate, and B will finish the calculator half of
 the print sheet. Plates should print at a sensible size rather than being hidden.
 
-### A11 — Section numbering is now `§ n`
+### A14 — Section numbering is now `§ n`
 
 Per brief §3.1 the paper's sections are `§ 1` … `§ 10`, not Roman `I`–`IX`; equation numbers
 still key to the section. Nothing in `index.html` references the old numbering today —
 checked — but any calculator copy that cites the paper should use `§ n` and the anchors
 `#part-1` … `#part-10`.
 
-### A12 — Ink semantics B is committing to, for cross-page agreement
+### A15 — Ink semantics B is committing to, for cross-page agreement
 
 Per brief §3.4: orange = capability cost, cobalt = coordination/controls, verdigris =
 safety benefit, ochre = uncertainty (every assumed prior and sensitivity range in the

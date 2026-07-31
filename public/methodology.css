@@ -1,75 +1,92 @@
 /* ==========================================================================
    Opportunity FLOPs — /methodology
    Loaded after base.css. Owns everything inside <main> on the methodology
-   page and nothing else: the masthead and colophon come from base.css and
-   must stay identical to the calculator page.
+   page and nothing else: the running head, masthead, registration marks,
+   folio, sheet grid, footnote apparatus and colophon all come from base.css
+   and must stay byte-identical to the calculator page.
 
    This route is the paper the calculator is the instrument for, so it is set
-   as one: a title page, numbered parts, display equations numbered in the
-   right margin, caveats hung in the left margin, and numbered plates. There
-   are no cards and no fills. Every division on the page is a rule or a change
-   of type.
+   as one: a title page, an abstract, numbered sections marked in the margin,
+   display equations numbered flush right, notes hung beside the paragraph
+   that cites them, and ruled plates with the caption below.
 
-   Structure comes from base.css's `.sheet`: a fixed margin column for hanging
-   notes and part numbers, then the text column. Each <section class="part">
-   is its own sheet so the margin column stays in register down the whole
-   document. A `.marginalia` or `.section-mark` is placed immediately BEFORE
-   the block it annotates, which is what puts it on that block's first line.
+   Nothing here defines a parallel system. Every colour is an ink token, every
+   space is on the 8/12/16/24/32/48/72/96/144 scale, every division is a rule
+   or a change of type. There are no cards, no fills, no shadows and no radii
+   in this document.
    ========================================================================== */
 
-/* Newsreader ships no Greek, and this page is now full of β, γ, δ and λ. The
-   shared stack in base.css resolves them through Times New Roman, whose small
-   x-height and light stroke make a lone β in a Newsreader equation read as a
-   footnote marker rather than a variable. Georgia is the closer match on both
-   counts, so it leads the fallback here — Newsreader still sets every Latin
-   glyph, so nothing else on the page changes. Scoped to this route rather
-   than edited into base.css, which the calculator page also loads. */
-main {
-  --font-math: "Newsreader", Georgia, "Times New Roman", serif;
+/* --- Measure -------------------------------------------------------------
+   The measure is the whole point of the layout. Prose never runs wider than
+   --measure even though the sheet's text column is far wider — the extra
+   width belongs to plates, tables and equations, not to running text.
+
+   THE `ch` TRAP. base.css sets --measure: 68ch with the comment "62–72
+   characters. Never wider." A `ch` is the advance width of "0", and in both
+   Fira Sans and Newsreader the digits are appreciably wider than the average
+   lowercase letter — so 68ch renders as **83 characters** of body prose, not
+   68. Measured on the built page, not estimated: a 72-character reference
+   string set in the paragraph's own computed font is 528px wide, and the
+   paragraph box was 607px. Every prose surface on the page ran 83–90
+   characters, against a brief that caps it at 72 and calls the cap hard.
+
+   The values below are solved from that measurement — 56ch lands body prose
+   at ~68 characters and 50ch lands the display-serif abstract at ~68. They
+   are scoped to .paper rather than edited into base.css, which is Worker A's
+   file, and the calculator has the same defect for the same reason. Filed as
+   PUNCHLIST A2. When the token is retuned upstream, delete this block.
+   ------------------------------------------------------------------------ */
+
+.paper {
+  --measure: 56ch;
+  --measure-tight: 50ch;
 }
 
-/* The measure is the point of the whole layout. Prose never runs wider than
-   --measure even though the sheet's text column is far wider — the extra
-   width belongs to plates and equations, not to running text. */
 .paper p,
 .paper li,
 .paper dd {
   max-width: var(--measure);
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  border: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  clip-path: inset(50%);
+/* The folio is a structural rule that happens to be marked up as a paragraph.
+   It carries the section mark, the short title and the ordinal across the
+   foot of the text column, so it takes the column's width, not the prose
+   measure — a folio rule that stops two thirds of the way across reads as a
+   broken underline rather than as the foot of a page. */
+.paper .folio {
+  max-width: none;
 }
 
-/* --- Title page ---------------------------------------------------------- */
+/* --- Title page ----------------------------------------------------------
+   A working paper opens with its own number, then the title, then who it is
+   after and what state it is in. The reader should know it is a draft with
+   unvalidated priors before reading a single equation.
+   ------------------------------------------------------------------------ */
 
 .frontmatter {
-  padding: clamp(var(--s6), 9vw, var(--s9)) 0 var(--s7);
+  padding: clamp(var(--s6), 8vw, var(--s8)) 0 var(--s7);
 }
 
-.running-head {
+.paper-number {
   margin: 0 0 var(--s5);
+  color: var(--ink);
+  letter-spacing: var(--track-wide);
 }
 
 .frontmatter h1 {
-  max-width: 14ch;
+  max-width: 15ch;
   margin: 0;
   font-size: var(--t-display);
   font-weight: 300;
   line-height: 0.98;
   letter-spacing: -0.028em;
-  text-wrap: balance;
 }
 
-.byline {
+.paper .byline {
+  /* Newsreader italic at lead size fits ~1.6 characters per ch, so even the
+     tight measure runs to 82 here. Solved for the same ~68-character line the
+     rest of the page holds; see the measure note at the head of this file. */
+  max-width: 42ch;
   margin: var(--s4) 0 0;
   color: var(--muted);
   font-family: var(--font-display);
@@ -78,11 +95,20 @@ main {
   line-height: 1.45;
 }
 
-/* The research question is the abstract. The title rule sits on this heading
-   rather than under the byline so it spans the whole text column: it divides
-   the page, and prose measure has no business setting the width of a
-   structural rule. */
-.question-heading {
+/* The imprint line is apparatus, not prose: it sets in the body face at label
+   size so it reads as a stamp on the title page rather than as a sentence. */
+.imprint {
+  margin: var(--s2) 0 0;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-small);
+}
+
+/* Section headings that name a piece of apparatus rather than an argument —
+   Abstract, Contents, where, Monte Carlo protocol. Small caps on a rule, so
+   they read as labels on the page's structure and never compete with the
+   numbered section headings. */
+.apparatus-heading {
   margin: var(--s7) 0 var(--s3);
   padding-top: var(--s3);
   border-top: 2px solid var(--ink);
@@ -91,35 +117,59 @@ main {
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--track-caps);
 }
 
-.lede {
-  margin: 0;
+/* The abstract carries the paper. It is set larger than body text, in the
+   display serif, on the tight measure — 62 characters rather than 68, because
+   a longer line at this size makes the return sweep hard to track. */
+.abstract p {
+  max-width: var(--measure-tight);
+  margin: 0 0 var(--s4);
   font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2.1vw, 1.7rem);
-  line-height: 1.34;
+  font-size: clamp(1.14rem, 1.7vw, 1.4rem);
+  line-height: 1.42;
   text-wrap: pretty;
+}
+
+.abstract p:last-child {
+  margin-bottom: 0;
+}
+
+.abstract em {
+  font-style: italic;
+}
+
+.keywords {
+  max-width: var(--measure);
+  margin: var(--s5) 0 0;
+  padding-top: var(--s2);
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+.keywords .label {
+  margin-right: var(--s2);
+  color: var(--ink);
 }
 
 /* --- Contents ------------------------------------------------------------ */
 
 .contents {
   margin-top: var(--s7);
-  padding-top: var(--s3);
-  border-top: 1px solid var(--ink);
 }
 
-.contents h2 {
-  margin: 0 0 var(--s3);
+.contents .apparatus-heading {
+  margin-top: 0;
+  border-top-width: 1px;
 }
 
 .contents ol {
+  max-width: var(--measure);
   margin: 0;
   padding: 0;
-  max-width: var(--measure);
   list-style: none;
-  counter-reset: none;
 }
 
 .contents li {
@@ -130,7 +180,7 @@ main {
   border-bottom: 1px solid var(--rule);
 }
 
-/* The leader is the classic table-of-contents dotted rule, drawn as a
+/* The dotted leader is the classic table-of-contents rule, drawn as a
    flexible spacer so it fills whatever gap the title leaves. */
 .contents li a {
   flex: 1 1 auto;
@@ -154,22 +204,30 @@ main {
 
 .contents li a:hover,
 .contents li a:focus-visible {
-  color: var(--orange-text);
+  color: var(--blue);
 }
 
-.contents .section-no,
 .contents .numeric {
-  flex: 0 0 3.6ch;
+  flex: 0 0 3.8ch;
   color: var(--muted);
   font-family: var(--font-body);
   font-size: var(--t-small);
-  letter-spacing: 0.06em;
+  font-variant-numeric: lining-nums;
+  letter-spacing: 0.04em;
 }
 
 /* --- Status marks --------------------------------------------------------
    Implementation status is never implied by placement or omission — every
-   part carries it in words. An outlined small-caps stamp reads as an
+   section carries it in words. An outlined small-caps stamp reads as an
    editorial mark rather than a UI chip, which keeps the fill count at zero.
+
+   THE SEMANTIC INK RULE, applied. The status stamp is deliberately set in
+   --ink and not in verdigris. Verdigris means SAFETY BENEFIT; "Implemented"
+   is a fact about the build, not a quantity in the model, and colouring it
+   with a model ink would make the ink mean two things. The one stamp that
+   does take an ink is the caveat, which is ochre because ochre means
+   UNCERTAINTY and that is exactly what it marks. Status is legible from the
+   words either way, so nothing here is carried by colour alone.
    ------------------------------------------------------------------------ */
 
 .status {
@@ -177,46 +235,26 @@ main {
   display: inline-block;
   padding: 2px 7px 1px;
   border: 1px solid currentColor;
+  color: var(--muted);
   font-family: var(--font-body);
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
+  font-variant-numeric: lining-nums;
   letter-spacing: 0.08em;
   line-height: 1.5;
   white-space: nowrap;
 }
 
-.status.is-live {
-  color: var(--ready);
+.status.is-caveat {
+  color: var(--ochre-text);
 }
 
-.status.is-pending {
-  color: var(--orange-text);
-}
-
-/* --- Parts --------------------------------------------------------------- */
+/* --- Sections ------------------------------------------------------------ */
 
 .part {
   padding: var(--s7) 0 var(--s6);
   border-top: 1px solid var(--rule);
-}
-
-/* The part number and its status stamp hang in the margin column, level with
-   the heading they belong to. */
-.section-mark {
-  grid-column: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--s2);
-  padding-top: 0.55em;
-}
-
-.section-no {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  line-height: 1;
-  letter-spacing: 0.02em;
 }
 
 .part h2 {
@@ -226,38 +264,35 @@ main {
   letter-spacing: -0.02em;
 }
 
+.part h3 {
+  max-width: var(--measure);
+  margin: var(--s6) 0 0;
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  font-weight: 500;
+  line-height: 1.24;
+  letter-spacing: -0.01em;
+}
+
 .part p {
   margin: var(--s4) 0 0;
   line-height: 1.62;
   text-wrap: pretty;
 }
 
-.part h2 + p {
-  margin-top: var(--s4);
-}
-
-/* Parts IV and V exist on paper only. The whole part is set a shade back from
-   the implemented ones, and opens with a notice in the orange used for
-   caveats everywhere else in the system. */
-.is-unbuilt h2 {
-  color: var(--muted);
-}
-
-.unbuilt-notice {
-  max-width: var(--measure);
-  margin: var(--s4) 0 0;
-  padding-left: var(--s3);
-  border-left: 2px solid var(--orange-text);
-  color: var(--orange-text);
-  font-size: var(--t-small);
-  line-height: 1.55;
+.part h3 + p {
+  margin-top: var(--s2);
 }
 
 /* --- Equations -----------------------------------------------------------
-   Display equations are centred in the text column with the number set flush
+   Display equations centre on the text measure with the number set flush
    right, balanced by an equal gutter on the left so the body stays on the
    column's true centre. Both gutters collapse on narrow screens, where the
    equation left-aligns and the number follows it.
+
+   The body column is exactly the measure, so a centred equation shares its
+   centre with every paragraph around it. Uncapped, equations centre on the
+   full sheet column and drift right of the text they belong to.
    ------------------------------------------------------------------------ */
 
 .equation {
@@ -265,10 +300,6 @@ main {
   grid-template-columns: minmax(0, 1fr) 4rem;
   align-items: baseline;
   gap: var(--s2);
-  /* The body column is exactly the measure, so a centred equation shares its
-     centre with every paragraph around it; the number hangs in the 4rem
-     gutter to its right. Uncapped, equations centre on the full plate column
-     and drift right of the text they belong to. */
   max-width: calc(var(--measure) + 4rem);
   margin: var(--s5) 0;
 }
@@ -277,6 +308,7 @@ main {
   grid-column: 1;
   font-family: var(--font-math);
   font-size: clamp(1.02rem, 1.5vw, 1.24rem);
+  font-variant-numeric: lining-nums;
   line-height: 1.85;
   text-align: center;
   text-wrap: balance;
@@ -287,49 +319,342 @@ main {
   font-size: 1.06em;
 }
 
+/* Stacked super/subscript, as in C_R^B. Set side by side — `<sub>R</sub>
+   <sup>B</sup>` — the two marks read as a sequence and the eye has to work
+   out that both attach to the same C. Stacked, they read as one compound
+   symbol, which is what they are and how the source sets them.
+
+   The pair is boxed and shifted as a unit rather than relying on the default
+   sup/sub vertical-align, which would offset each line independently and pull
+   the stack apart. `line-height` is what keeps the two marks tight enough to
+   read as one mark rather than two. */
+.supsub {
+  display: inline-block;
+  position: relative;
+  vertical-align: -0.38em;
+  margin-left: 0.06em;
+  font-size: 0.66em;
+  line-height: 1.02;
+  text-align: left;
+}
+
+.supsub > sup,
+.supsub > sub {
+  display: block;
+  position: static;
+  font-size: 1em;
+  line-height: inherit;
+  vertical-align: baseline;
+}
+
 .eq-no {
   grid-column: 2;
   color: var(--muted);
   font-family: var(--font-body);
   font-size: var(--t-small);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums lining-nums;
   text-align: right;
 }
 
-/* --- Where-clauses -------------------------------------------------------
-   The `where …` glossaries under each equation set. A hanging indent, not a
-   table: the symbol sits in its own column and the gloss runs on.
+/* --- Where-clauses and the protocol --------------------------------------
+   Ruled, never boxed: a rule above, a rule below, hairlines between rows,
+   and no vertical rules at all. The symbol sits in its own column and the
+   gloss runs on, which is a hanging indent expressed as a table because the
+   pairs are data, not a definition list of prose.
    ------------------------------------------------------------------------ */
 
-.glossary {
+.where-table,
+.protocol-table {
+  width: 100%;
   max-width: var(--measure);
   margin: var(--s4) 0 0;
-  padding-top: var(--s3);
+  border-collapse: collapse;
+}
+
+/* Margin and padding reset in full, not just on the sides being set: a
+   caption is a table-caption box and inherits nothing useful, so leaving one
+   side undeclared lets any class on the element supply it. */
+.where-table caption,
+.protocol-table caption {
+  margin: 0;
+  padding: 0 0 var(--s2);
+  border: 0;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-style: italic;
+  font-variant-caps: normal;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+}
+
+.where-table th,
+.where-table td,
+.protocol-table th,
+.protocol-table td {
+  padding: var(--s2) var(--s3);
   border-top: 1px solid var(--rule);
+  text-align: left;
+  vertical-align: baseline;
 }
 
-.glossary div {
-  display: grid;
-  grid-template-columns: 5.5rem minmax(0, 1fr);
-  gap: var(--s2) var(--s3);
-  padding: var(--s2) 0;
+.where-table tr:first-child th,
+.where-table tr:first-child td,
+.protocol-table tr:first-child th,
+.protocol-table tr:first-child td {
+  border-top: 1px solid var(--rule-strong);
 }
 
-.glossary div + div {
-  border-top: 1px solid var(--rule);
+.where-table tr:last-child th,
+.where-table tr:last-child td,
+.protocol-table tr:last-child th,
+.protocol-table tr:last-child td {
+  border-bottom: 1px solid var(--rule-strong);
 }
 
-.glossary dt {
+.where-table th:first-child,
+.where-table td:first-child,
+.protocol-table th:first-child,
+.protocol-table td:first-child {
+  padding-left: 0;
+}
+
+.where-table th {
+  width: 6rem;
   font-family: var(--font-math);
   font-size: 1.02rem;
   font-style: italic;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
-.glossary dd {
-  margin: 0;
+.where-table td,
+.protocol-table td {
   color: var(--muted);
   font-size: var(--t-small);
   line-height: 1.55;
+}
+
+.protocol-table {
+  margin-top: var(--s5);
+}
+
+.protocol-table th {
+  width: 10rem;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-caps);
+}
+
+/* --- Plates --------------------------------------------------------------
+   base.css's .plate is the calculator's figure plate: cool-white stock inset
+   into the ivory page, because the six frozen traces were chosen against
+   near-white and the White Plate Rule protects that.
+
+   A table is not a figure. Boxing a table on its own stock would make it a
+   card — and Task 2 is explicit that the parameter table is ruled, never
+   boxed. So the paper's plates take the same numbering, the same caption
+   grid and the same rule vocabulary, on the ivory page instead of on stock.
+   Same system, different substrate.
+   ------------------------------------------------------------------------ */
+
+.plate-ruled {
+  margin: var(--s5) 0 0;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.plate-ruled figcaption {
+  /* +3rem, not +6rem: the caption index hangs in the first grid column, so
+     the text column of the caption is what has to stay under 72 characters. */
+  max-width: calc(var(--measure) + 3rem);
+  margin-top: var(--s2);
+  padding-top: var(--s2);
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--t-small);
+  line-height: 1.5;
+}
+
+/* THE SEMANTIC INK RULE, applied again. base.css sets .fig-no in oxidized
+   orange, on the stated grounds that orange means CAPABILITY COST and the
+   calculator's figures are the cost accounting. That reasoning does not carry
+   to this page: Table 2 is notation and Table 5 is a parameter contract,
+   neither of which is a cost. An ink used because the neighbouring page uses
+   it is decoration, so table numbers are set in ink — same size, same weight,
+   same tracking as .fig-no, so the two pages still read as one publication. */
+.caption-index {
+  grid-column: 1;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variant-caps: all-small-caps;
+  font-variant-numeric: lining-nums;
+  letter-spacing: var(--track-caps);
+  white-space: nowrap;
+}
+
+.caption-text {
+  grid-column: 2;
+}
+
+/* --- Tables --------------------------------------------------------------- */
+
+.summary-table,
+.preset-matrix,
+.notation-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--ink);
+  text-align: left;
+}
+
+/* Plates are capped near the measure. A two-row table stretched across the
+   full sheet column reads as a layout accident, not as a table. */
+.summary-table {
+  min-width: 520px;
+  max-width: calc(var(--measure) + 4rem);
+  font-size: var(--t-small);
+}
+
+.notation-table {
+  min-width: 640px;
+  max-width: calc(var(--measure) + 6rem);
+  font-size: var(--t-small);
+}
+
+.summary-table th,
+.summary-table td,
+.notation-table th,
+.notation-table td {
+  padding: var(--s2) var(--s3);
+  border-top: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.summary-table thead th,
+.notation-table thead th,
+.preset-matrix thead th {
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-caps);
+  white-space: nowrap;
+}
+
+.summary-table tbody th {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.notation-table tbody td {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.summary-table tbody tr:last-child th,
+.summary-table tbody tr:last-child td,
+.notation-table tbody tr:last-child th,
+.notation-table tbody tr:last-child td {
+  border-bottom: 1px solid var(--rule);
+}
+
+.summary-table th:first-child,
+.summary-table td:first-child,
+.notation-table th:first-child,
+.notation-table td:first-child {
+  padding-left: 0;
+}
+
+.summary-table th:last-child,
+.summary-table td:last-child,
+.notation-table th:last-child,
+.notation-table td:last-child {
+  padding-right: 0;
+}
+
+/* Numbers set in the mono face so the columns align optically as well as
+   metrically; row stubs stay in the body face so they read as words.
+
+   No `text-transform: uppercase` here, unlike other mono readouts in the
+   system. These tables are keyed by symbols, and uppercasing a symbol changes
+   what it means: it rendered β, γ and δ as Β, Γ and Δ, and the impact level z
+   as Z. Word headers take small caps instead, which changes the glyphs' case
+   without changing the characters. */
+.preset-matrix {
+  min-width: 420px;
+  max-width: 620px;
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: 0.055em;
+  text-align: right;
+}
+
+.preset-matrix th,
+.preset-matrix td {
+  padding: 11px var(--s2);
+  border-top: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.preset-matrix th:first-child {
+  padding-left: 0;
+  text-align: left;
+}
+
+.preset-matrix th:last-child,
+.preset-matrix td:last-child {
+  padding-right: 0;
+}
+
+.preset-matrix tbody th {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+.preset-matrix tbody tr:last-child th,
+.preset-matrix tbody tr:last-child td {
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Cells whose content is a symbol rather than a word. Set in the serif italic
+   the equations use, at their own case, so β in Table 3 is the same mark as β
+   in equation (2.1). */
+.sym,
+.notation-table .sym,
+.preset-matrix .sym {
+  font-family: var(--font-math);
+  font-size: 1rem;
+  font-style: italic;
+  font-variant-caps: normal;
+  font-weight: 500;
+  letter-spacing: normal;
+}
+
+.notation-table thead .sym,
+.preset-matrix thead .sym {
+  color: var(--muted);
 }
 
 /* --- The two user inputs -------------------------------------------------- */
@@ -361,6 +686,7 @@ main {
 
 .input-list span {
   display: block;
+  max-width: var(--measure-tight);
   margin-top: var(--s1);
   color: var(--muted);
   font-size: var(--t-small);
@@ -377,220 +703,84 @@ main {
 
 .part-rule p {
   margin: 0;
+  padding: 0;
+  border: 0;
 }
 
-/* The divider already rules off the part that follows it; the part's own
-   hairline on top of it just reads as a printing fault. */
+/* The divider already rules off the section that follows it; that section's
+   own hairline on top of it just reads as a printing fault. */
 .part-rule + .part {
   border-top: 0;
 }
 
-/* --- Plates --------------------------------------------------------------
-   Every table is a numbered plate with its caption below it, monograph style.
-   The scroll container is the fix for the real defect here: both bundle
-   tables used to clip their last column at 390px because only the parameter
-   contract had one.
+/* --- Uncertainty ---------------------------------------------------------
+   THE SEMANTIC INK RULE, third application, and the one that matters most on
+   this page. Ochre means UNCERTAINTY. Every place the paper rests on an
+   assumed prior rather than a supplied specification is marked in ochre, and
+   marked with a *hatch* rather than a solid rule — a screen, per the Halftone
+   Rule, drawn from base.css's --hatch. A band drawn in a solid ink would be
+   claiming a precision the model does not have, which is the exact failure
+   this section exists to prevent.
+
+   These were oxidized orange before. Orange means capability cost. A caveat
+   about a working prior is not a cost, so the orange was decoration.
    ------------------------------------------------------------------------ */
 
-.plate {
-  margin: var(--s5) 0 0;
-}
-
-.table-scroll {
-  max-width: 100%;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-}
-
-.plate figcaption {
+.caveat-notice {
+  position: relative;
   max-width: var(--measure);
-  margin-top: var(--s2);
-  padding-top: var(--s2);
-  border-top: 1px solid var(--rule);
-  color: var(--muted);
+  margin: var(--s4) 0 0;
+  padding-left: var(--s4);
+  color: var(--ochre-text);
   font-size: var(--t-small);
+  line-height: 1.55;
+}
+
+.caveat-notice::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.25em;
+  bottom: 0.25em;
+  width: 5px;
+  background-color: var(--ochre);
+  -webkit-mask-image: var(--hatch);
+  mask-image: var(--hatch);
+  -webkit-mask-size: 7px 7px;
+  mask-size: 7px 7px;
+}
+
+/* --- § 9, limitations ----------------------------------------------------
+   The credibility section. It is not visually louder than the rest of the
+   paper — a caveat set in a warning box is a caveat the reader learns to
+   skip. It is marked the same way every other uncertainty on the page is
+   marked, which is what makes the marking mean something.
+   ------------------------------------------------------------------------ */
+
+.is-limitations .standfirst {
+  position: relative;
+  /* Newsreader at lead size fits more characters per ch than Fira at body
+     size; the tight measure is what lands this back under 72. */
+  max-width: var(--measure-tight);
+  margin: var(--s4) 0 0;
+  padding-left: var(--s4);
+  font-family: var(--font-display);
+  font-size: var(--t-lead);
   line-height: 1.5;
 }
 
-.caption-index {
-  margin-right: 0.55em;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: var(--t-label);
-  font-weight: 600;
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
-}
-
-/* --- Tables --------------------------------------------------------------- */
-
-.summary-table,
-.preset-matrix {
-  width: 100%;
-  border-collapse: collapse;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Plates are capped near the measure. A two-row table stretched across the
-   full plate column reads as a layout accident, not as a table. */
-.summary-table {
-  min-width: 520px;
-  max-width: calc(var(--measure) + 4rem);
-  font-size: var(--t-small);
-  text-align: left;
-}
-
-.summary-table th,
-.summary-table td {
-  padding: var(--s2) var(--s3);
-  border-top: 1px solid var(--rule);
-  vertical-align: top;
-}
-
-.summary-table thead th {
-  border-top: 1px solid var(--rule-strong);
-  border-bottom: 1px solid var(--rule-strong);
-  color: var(--muted);
-  font-family: var(--font-body);
-  font-size: var(--t-label);
-  font-weight: 600;
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
-}
-
-.summary-table tbody th {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.summary-table tbody tr:last-child th,
-.summary-table tbody tr:last-child td {
-  border-bottom: 1px solid var(--rule);
-}
-
-.summary-table th:first-child,
-.summary-table td:first-child {
-  padding-left: 0;
-}
-
-.summary-table th:last-child,
-.summary-table td:last-child {
-  padding-right: 0;
-}
-
-/* Numbers are set in the mono face so columns align optically as well as
-   metrically; the row stubs stay in Barlow so they read as words.
-
-   No `text-transform: uppercase` here, unlike every other mono readout in the
-   system. These tables are keyed by symbols, and uppercasing a symbol changes
-   what it means: it was rendering β, γ and δ as Β, Γ and Δ, and the impact
-   level z as Z. Word headers get small caps instead, which changes the
-   glyphs' case without changing the characters. */
-.preset-matrix {
-  min-width: 420px;
-  max-width: 620px;
-  font-family: var(--font-mono);
-  font-size: var(--t-label);
-  letter-spacing: 0.055em;
-  text-align: right;
-}
-
-.preset-matrix th,
-.preset-matrix td {
-  padding: 11px var(--s2);
-  border-top: 1px solid var(--rule);
-  white-space: nowrap;
-}
-
-.preset-matrix th:first-child {
-  padding-left: 0;
-  text-align: left;
-}
-
-.preset-matrix th:last-child,
-.preset-matrix td:last-child {
-  padding-right: 0;
-}
-
-.preset-matrix thead th {
-  border-top: 1px solid var(--rule-strong);
-  border-bottom: 1px solid var(--rule-strong);
-  color: var(--muted);
-  font-family: var(--font-body);
-  font-size: var(--t-label);
-  font-weight: 600;
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
-}
-
-.preset-matrix tbody th {
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: normal;
-}
-
-/* Cells whose content is a symbol rather than a word. Set in the serif italic
-   the equations use, at their own case, so β in Table 2 is the same mark as
-   β in equation (2.1). */
-.preset-matrix .sym {
-  font-family: var(--font-math);
-  font-size: 1rem;
-  font-style: italic;
-  font-variant-caps: normal;
-  font-weight: 500;
-  letter-spacing: normal;
-}
-
-.preset-matrix tbody tr:last-child th,
-.preset-matrix tbody tr:last-child td {
-  border-bottom: 1px solid var(--rule);
-}
-
-/* --- Calibration protocol ------------------------------------------------
-   Was a rigid four-column grid that cramped well before 760px. It now packs
-   as many columns as fit and rules every cell from above, so wrapping never
-   leaves an orphaned vertical rule.
-   ------------------------------------------------------------------------ */
-
-.calibration-protocol {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  margin: var(--s5) 0 0;
-  border-bottom: 1px solid var(--rule);
-  font-family: var(--font-mono);
-  font-size: var(--t-label);
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-}
-
-.calibration-protocol div {
-  min-width: 0;
-  padding: var(--s2) var(--s2) var(--s3);
-  border-top: 1px solid var(--rule-strong);
-}
-
-.calibration-protocol div:first-child {
-  padding-left: 0;
-}
-
-.calibration-protocol dt {
-  margin-bottom: 5px;
-  color: var(--muted);
-}
-
-.calibration-protocol dd {
-  margin: 0;
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: normal;
-  line-height: 1.35;
-  text-transform: none;
+.is-limitations .standfirst::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  bottom: 0.3em;
+  width: 5px;
+  background-color: var(--ochre);
+  -webkit-mask-image: var(--hatch);
+  mask-image: var(--hatch);
+  -webkit-mask-size: 7px 7px;
+  mask-size: 7px 7px;
 }
 
 /* --- Parameter contract --------------------------------------------------- */
@@ -618,6 +808,8 @@ main {
   display: none;
 }
 
+/* Cobalt means COORDINATION, and on the calculator it is the ink of every
+   control. This disclosure is a control, so it takes the same ink. */
 .parameter-contract summary::after {
   content: "+";
   color: var(--blue);
@@ -631,10 +823,10 @@ main {
 }
 
 .parameter-contract summary:hover {
-  color: var(--orange-text);
+  color: var(--blue);
 }
 
-.parameter-contract .plate {
+.parameter-contract .plate-ruled {
   margin-top: 0;
 }
 
@@ -674,11 +866,11 @@ main {
 
 .parameter-contract thead th {
   color: var(--muted);
-  font-family: var(--font-mono);
-  font-size: 0.67rem;
-  font-weight: 500;
-  letter-spacing: 0.045em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-caps);
 }
 
 .parameter-contract tbody th {
@@ -693,14 +885,16 @@ main {
   color: var(--muted);
 }
 
-/* Symbols belonging to the unimplemented parts are marked in the caveat
-   colour, so the status is legible from the shape of the column and from the
-   words in it — not from colour alone. */
+/* The one row the source does not supply. Ochre, because that is what the
+   row is: an assumption. Legible from the words in the cell as well as from
+   the ink, so nothing is carried by colour alone. */
+.parameter-contract tbody .is-pending-row td:nth-child(3),
 .parameter-contract tbody .is-pending-row td:nth-child(4) {
-  color: var(--orange-text);
+  color: var(--ochre-text);
 }
 
-.closing {
+.paper .closing {
+  max-width: 42ch;
   margin-top: var(--s6);
   font-family: var(--font-display);
   font-size: var(--t-lead);
@@ -711,14 +905,52 @@ main {
   text-underline-offset: 4px;
 }
 
+/* --- Entrance ------------------------------------------------------------
+   One orchestrated reveal in reading order: running head, then title, then
+   abstract, then the apparatus below it.
+
+   THE CONTAINING BLOCK RULE. Only the title block translates. Everything
+   from the abstract down fades without transform, because a transform —
+   including an identity matrix — creates a containing block, and a containing
+   block on .frontmatter or .part breaks position: fixed for the registration
+   marks and would break any sticky element inside the sheet. base.css
+   neutralises all of this under prefers-reduced-motion.
+   ------------------------------------------------------------------------ */
+
+.running-head {
+  animation: fade 420ms var(--ease-out) both;
+}
+
+.frontmatter h1,
+.paper-number {
+  animation: rise 620ms var(--ease-out) 120ms both;
+}
+
+.byline,
+.imprint {
+  animation: rise 620ms var(--ease-out) 200ms both;
+}
+
+.frontmatter > .apparatus-heading,
+.abstract {
+  animation: fade 620ms var(--ease-out) 300ms both;
+}
+
+.keywords,
+.frontmatter .plate-ruled,
+.frontmatter .marginalia,
+.contents {
+  animation: fade 620ms var(--ease-out) 400ms both;
+}
+
 /* --- Responsive ----------------------------------------------------------- */
 
-/* On a wide screen the sheet's text column would run past 1200px, which
-   strands the parameter contract's Role column and leaves a standing void
-   down the right of every part. Capping the sheet turns that slack into an
-   outer margin — the asymmetric one a book uses, narrow at the spine where
-   the notes hang and generous at the fore-edge. Left register with the
-   masthead is preserved. */
+/* On a wide screen the sheet's text column runs past 1200px, which strands
+   the parameter contract's Role column and leaves a standing void down the
+   right of every section. Capping the sheet turns that slack into an outer
+   margin — the asymmetric one a book uses, narrow at the spine where the
+   notes hang and generous at the fore-edge. Left register with the masthead
+   and the running head is preserved. */
 @media (min-width: 1240px) {
   .paper .sheet {
     max-width: calc(var(--margin-col) + var(--s6) + 56rem);
@@ -726,26 +958,36 @@ main {
 }
 
 @media (max-width: 1020px) {
-  /* Off the margin column, the part number and its status stamp become a
-     single line above the heading rather than a stacked block. */
+  .frontmatter h1 {
+    max-width: 18ch;
+  }
+
+  /* base.css's collapse rule re-declares `display: flex` on .section-mark but
+     never clears the `flex-direction: column` it set at full width, so the
+     mark and its status stamp stay stacked and the stamp lands hard against
+     the heading with nothing between them. Restated here rather than edited
+     into base.css, which is Worker A's — filed as PUNCHLIST A13, because the
+     calculator's section marks collapse through the same rule. */
   .section-mark {
     flex-direction: row;
-    align-items: center;
+    align-items: baseline;
     gap: var(--s3);
-    padding-top: 0;
     margin-bottom: var(--s3);
   }
 
-  .section-no {
-    font-size: 1.2rem;
-  }
-
-  .frontmatter h1 {
-    max-width: 18ch;
+  /* Off the margin column the note is an inline aside. base.css gives it the
+     ink rule on the left; the number stays hung so the reciprocal reference
+     still reads. */
+  .footnote {
+    font-size: var(--t-small);
   }
 }
 
 @media (max-width: 760px) {
+  .frontmatter {
+    padding-top: var(--s6);
+  }
+
   .equation {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--s3);
@@ -756,14 +998,25 @@ main {
     text-align: left;
   }
 
-  .glossary div {
-    grid-template-columns: 4rem minmax(0, 1fr);
+  .where-table th {
+    width: 4.5rem;
+  }
+
+  .protocol-table th {
+    width: 8rem;
+  }
+
+  .where-table th,
+  .where-table td,
+  .protocol-table th,
+  .protocol-table td {
+    padding: var(--s2) var(--s2);
   }
 
   /* The entry stays on one line: the leader is a flexible spacer, so it
-     simply shrinks to nothing when the title and the status stamp need the
-     room. Wrapping the stamp onto its own line doubled the height of every
-     entry and buried the numbering. */
+     shrinks to nothing when the title and the status stamp need the room.
+     Wrapping the stamp onto its own line doubled the height of every entry
+     and buried the numbering. */
   .contents li a {
     gap: 0.5em;
     font-size: 1rem;
@@ -780,5 +1033,32 @@ main {
 
   .part {
     padding-top: var(--s6);
+  }
+
+  .part h3 {
+    margin-top: var(--s5);
+  }
+}
+
+/* 360px is where this class of layout dies: the tables are the widest thing
+   in the document and the sheet has no margin column left to give them. Each
+   scrolls inside its own container rather than pushing the page sideways. */
+@media (max-width: 420px) {
+  .frontmatter h1 {
+    max-width: none;
+    letter-spacing: -0.02em;
+  }
+
+  .abstract p {
+    font-size: 1.06rem;
+  }
+
+  .input-list {
+    padding-left: var(--s4);
+  }
+
+  .caveat-notice,
+  .is-limitations .standfirst {
+    padding-left: var(--s3);
   }
 }

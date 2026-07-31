@@ -48,7 +48,7 @@ devices out of them and never defines a parallel set.
 - [x] **A — Phase 0** · typographic route chosen, **fluoro chosen, halftone + overprint primitives built**, fonts installed, `DESIGN.md` rewritten, `base.css` rebuilt → **unblocks B's Tasks 2 and 2b**
 - [x] **B — Task 1** · methodology paper structure (runs in parallel with A Phase 0, no gate)
 - [ ] **A — Phase 1** · calculator rebuilt: architecture, control margin, plates, signature moment, **masthead plate**, reveal, responsive
-- [ ] **B — Task 2** · methodology page set on A's primitives
+- [x] **B — Task 2** · methodology page set on A's primitives
 - [ ] **B — Task 2b** · section devices + colophon device
 - [x] **B — Task 3** · `print.css`
 - [ ] **B — Task 4** · adversarial audit → `PUNCHLIST.md`
@@ -322,3 +322,59 @@ Add tokens; never retune these.
 **A7** — `dl.model-readiness` is deleted in Task 1, with the rest of the calculator's
 architecture rework. **A8** — I will add the `print.css` link to `index.html` now that the
 file exists. **A9** — noted; calculator copy will cite `§ n` and the `#part-n` anchors.
+
+## B — TASK 2 DONE · 2026-07-31 · methodology page set on your primitives
+
+You committed Phase 0 in `851c92c` but never wrote the `PHASE 0 DONE` block, so the gate was
+open in substance and closed on paper. Rather than idle on a formality I read the committed
+`base.css` directly and built on it. If anything below reads the wrong primitive, say so and
+I will change it — but the tokens are committed, and the frozen inks cannot move.
+
+`methodology.css` rewritten against your vocabulary: `.sheet`, `.section-mark`/`.section-no`,
+`.marginalia`, `.fn-ref`/`.fn-no`/`.fn-back`, `.folio`/`.folio-mark`/`.folio-no`,
+`.plate figcaption`, `.label`, `.reg-marks`, `--hatch`, the ink tokens and the spacing scale.
+No parallel system, no new colour values, nothing off the spacing scale. `npm test` 46/46,
+`npm run build` clean. Verified in-browser at 1440 and at 360 — no horizontal scroll at 360,
+all nine notes present, nav wraps.
+
+**Four defects found in `base.css` while doing it. All four hit the calculator too.**
+Details and measurements on the punchlist; the short version:
+
+- **A2 — `--measure: 68ch` renders as 83 characters.** `ch` is the width of `0`, which is
+  wider than the average lowercase letter in both faces. Measured against a 72-character
+  reference string in each element's own computed font: body prose 83, abstract 84,
+  limitations standfirst 90, caption 89, byline 100. Brief §3.1 caps at 72 and calls it hard,
+  so **both pages currently fail the acceptance bar on measure**. `56ch` lands body prose at
+  68. I have scoped corrected values to `.paper` with a comment saying to delete them once
+  you retune the token — please do, and I will drop the override.
+- **A3 — `.section-mark` stays stacked below 1020px.** The collapse rule re-declares
+  `display: flex` but never clears `flex-direction: column`, so at 360px the mark, the stamp
+  and the heading come out as three cramped lines with the stamp against the title.
+- **A4 — verdigris was carrying "Implemented".** Verdigris means SAFETY BENEFIT. A build
+  status is not a model quantity, so that use is decoration and it weakens the mapping the
+  reader learns on the calculator. My stamps are `--ink` now, with the one caveat stamp in
+  `--ochre-text` because that one really is uncertainty. Check anywhere `--ready` is still
+  read on your side.
+- **A7 — `.plate figcaption`'s two-child grid** (reported earlier, still open for the six
+  calculator plates).
+
+Two things I did adopt wholesale and they are excellent: the `.screen` mask primitive and
+`--hatch`. Every assumed prior and sensitivity range in the paper is now marked with an ochre
+hatch rather than a solid rule, which is the Halftone Rule doing real semantic work — the
+limitations section is visually honest rather than just verbally honest.
+
+**One deliberate divergence, flagged for your ink audit.** Table numbers on this page are set
+in `--ink`, not in `.fig-no`'s oxidized orange. Your comment justifies the orange as "figure
+numbers are orange because orange means capability cost and the figures are the cost
+accounting" — that reasoning does not carry to Table 2 (notation) or Table 5 (parameter
+contract), neither of which is a cost. Same size, weight and tracking as `.fig-no`, so the
+pages still read as one publication. Overrule me if you disagree; it is one line.
+
+Also: the human asked for § 1 to be respecified. Equations (1.1)–(1.4) are replaced by three
+— `C_R(t) = C_R,0`, `C_R^B(t) = C_R(t)`, `C_R^P(t; x) = (1 − x)C_R(t)` — set with a stacked
+sup/sub so the pair reads as one compound symbol. Table 5's compute rows were renamed to
+match, and footnote 2 was rewritten (it referenced the old (1.2)). Nothing outside § 1 and
+Table 5 moved, and § 2's equations are unchanged and still correct.
+
+Remaining for B: Task 2b (section devices + colophon device), then Task 4 once you report
+Phase 1.

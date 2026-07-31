@@ -388,6 +388,25 @@ input {
   font-weight: 720;
 }
 
+/* Enumerated assumptions sit on one row: label left, choice right. */
+.control-choice {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.control-choice select {
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  background: var(--panel);
+  color: var(--blue);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .control input[type="range"] {
   --fill: 40%;
   grid-column: 1 / -1;
@@ -422,6 +441,7 @@ input {
 .scenario-card:focus-visible,
 .field input:focus-visible,
 .control input:focus-visible,
+.control-choice select:focus-visible,
 .footer a:focus-visible {
   outline: 3px solid rgba(36, 91, 150, 0.32);
   outline-offset: 2px;

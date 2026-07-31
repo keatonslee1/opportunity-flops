@@ -12,7 +12,7 @@ colors:
   accessible-orange-text: "#9f381f"
   orange-wash: "#f0d5ca"
   cobalt-trace: "#245b96"
-  cobalt-wash: "#d7e3ef"
+  ready-green: "#2e7253"
 typography:
   display:
     fontFamily: "Newsreader, Iowan Old Style, Charter, Georgia, serif"

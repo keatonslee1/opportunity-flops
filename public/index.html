@@ -23,6 +23,7 @@
       FORM: Scientific monograph. The four plates are frozen; the page is designed around them.
       FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
     -->
+    <a class="skip-link" href="#top">Skip to content</a>
     <header class="topbar">
       <a class="wordmark" href="/" aria-label="Opportunity FLOPs home">
         <span>Opportunity</span><strong>FLOPs</strong>
@@ -117,12 +118,20 @@
           </div>
         </aside>
 
-        <section class="results-bay" aria-live="polite" aria-labelledby="results-title">
+        <!--
+          The live region is the headline alone. It used to wrap this whole
+          section — headline, legend, all four plates and the comparison strip —
+          while the slider re-renders on every input event, so dragging it
+          queued the entire results bay for announcement on each tick. The four
+          plate outputs are implicitly role="status" as well, which nested a
+          second layer of live regions inside the first.
+        -->
+        <section class="results-bay" aria-labelledby="results-title">
           <header class="results-header">
             <div>
               <h2 id="results-title">Baseline versus policy</h2>
             </div>
-            <div class="headline-output">
+            <div class="headline-output" aria-live="polite" aria-atomic="true">
               <span>2034 capability gap</span>
               <strong id="headline-result">Running model</strong>
             </div>
@@ -139,7 +148,7 @@
 
           <figure class="plate" aria-labelledby="software-chart-title">
             <div class="plate-readout">
-              <output id="software-gap">Running model</output>
+              <output id="software-gap" aria-live="off">Running model</output>
             </div>
             <div class="chart-frame">
               <svg class="trajectory-chart" id="software-chart" viewBox="0 0 800 300" role="img" aria-labelledby="software-svg-title software-svg-desc">
@@ -165,7 +174,7 @@
 
           <figure class="plate" aria-labelledby="slowdown-chart-title">
             <div class="plate-readout">
-              <output id="slowdown-gap">Running model</output>
+              <output id="slowdown-gap" aria-live="off">Running model</output>
             </div>
             <div class="chart-frame">
               <svg class="trajectory-chart" id="slowdown-chart" viewBox="0 0 800 300" role="img" aria-labelledby="slowdown-svg-title slowdown-svg-desc">
@@ -191,7 +200,7 @@
 
           <figure class="plate" aria-labelledby="capability-chart-title">
             <div class="plate-readout">
-              <output id="capability-gap">Running model</output>
+              <output id="capability-gap" aria-live="off">Running model</output>
             </div>
             <div class="chart-frame">
               <svg class="trajectory-chart" id="capability-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-svg-title capability-svg-desc">
@@ -217,7 +226,7 @@
 
           <figure class="plate" aria-labelledby="capability-gap-chart-title">
             <div class="plate-readout">
-              <output id="capability-gap-series-output">Running model</output>
+              <output id="capability-gap-series-output" aria-live="off">Running model</output>
             </div>
             <div class="chart-frame">
               <svg class="trajectory-chart" id="capability-gap-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-gap-svg-title capability-gap-svg-desc">

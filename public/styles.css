@@ -17,7 +17,8 @@
 .plate-readout output,
 .comparison-strip span,
 .control output,
-.parameter-readout {
+.parameter-readout > div span,
+.parameter-readout dd {
   font-family: var(--font-mono);
   font-size: var(--t-label);
   font-variant-numeric: tabular-nums;
@@ -330,6 +331,13 @@
   pointer-events: none;
 }
 
+/*
+ * The native radio is fully suppressed, so this border is the only thing
+ * marking the three cells as separate controls. It has to clear 3:1 against
+ * both surfaces it sits between (WCAG 1.4.11) — and --paper and --plate are
+ * themselves only 1.10:1 apart, so neither the fill nor a hairline can carry
+ * it. --rule managed 1.39:1; --muted clears both at 5.66:1 and 6.20:1.
+ */
 .choice-option span {
   min-height: 60px;
   display: flex;
@@ -337,14 +345,14 @@
   justify-content: center;
   gap: 3px;
   padding: 8px 5px;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--muted);
   background: var(--plate);
   text-align: center;
   transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out);
 }
 
 .choice-option:hover span {
-  border-color: var(--rule-strong);
+  border-color: var(--ink);
 }
 
 .choice-option input:checked + span {
@@ -380,7 +388,7 @@
 
 .control input[type="range"]::-webkit-slider-runnable-track {
   height: 3px;
-  background: linear-gradient(90deg, var(--blue) var(--fill), #b8c1c7 var(--fill));
+  background: linear-gradient(90deg, var(--blue) var(--fill), var(--rule-strong) var(--fill));
 }
 
 .control input[type="range"]::-webkit-slider-thumb {
@@ -389,14 +397,13 @@
   margin-top: -8px;
   appearance: none;
   border: 2px solid var(--panel);
-  border-radius: 2px;
   background: var(--blue);
   box-shadow: 0 0 0 1px var(--blue);
 }
 
 .control input[type="range"]::-moz-range-track {
   height: 3px;
-  background: #b8c1c7;
+  background: var(--rule-strong);
 }
 
 .control input[type="range"]::-moz-range-progress {
@@ -408,7 +415,6 @@
   width: 12px;
   height: 18px;
   border: 2px solid var(--panel);
-  border-radius: 2px;
   background: var(--blue);
   box-shadow: 0 0 0 1px var(--blue);
 }
@@ -452,8 +458,20 @@
   border-top: 1px solid var(--rule);
 }
 
+/*
+ * These labels end in β, γ and δ, and CSS text-transform applies the Unicode
+ * uppercase mapping to Greek as readily as to Latin — so uppercasing rendered
+ * them as Β, Γ and Δ. Those are different symbols: Δ conventionally means
+ * "change in", so the capability elasticity was being displayed as its own
+ * derivative. The label sets in Barlow at normal case; monospace stays on the
+ * values, which is all the Readout Rule ever asked for.
+ */
 .parameter-readout dt {
   color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-small);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .parameter-readout dd {
@@ -518,7 +536,7 @@
   align-items: center;
   gap: 18px;
   padding: 14px 0;
-  color: #344451;
+  color: var(--muted);
 }
 
 .legend > span {
@@ -555,7 +573,6 @@
   margin: 12px 0 0;
   padding: 11px 12px;
   border: 1px solid var(--orange);
-  border-radius: 3px;
   color: var(--orange-text);
   background: var(--orange-soft);
   font-size: 0.82rem;

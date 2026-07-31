@@ -118,7 +118,6 @@
   --orange: #c84e2f;
   --orange-soft: #f0d5ca;
   --blue: #245b96;
-  --blue-soft: #d7e3ef;
 
   /* Ground and text */
   --paper: oklch(96% 0.012 88);
@@ -499,6 +498,30 @@ footer p:nth-child(2) {
 :focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: 2px;
+}
+
+/* Bypass block (WCAG 2.4.1). Hidden until focused, then sets as a plain
+   ink-on-paper label at the top-left of the sheet. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 10;
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--ink);
+  background: var(--plate);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  left: var(--gutter);
+  top: var(--s2);
 }
 
 /* --- Entrance ------------------------------------------------------------

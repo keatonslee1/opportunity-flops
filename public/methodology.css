@@ -17,16 +17,6 @@
    the block it annotates, which is what puts it on that block's first line.
    ========================================================================== */
 
-/* --- Page ---------------------------------------------------------------
-   styles.css sizes <main> on the calculator page; that file is not loaded
-   here, so this route has to size its own.
-   ------------------------------------------------------------------------ */
-
-main {
-  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
-  margin-inline: auto;
-}
-
 /* Newsreader ships no Greek, and this page is now full of β, γ, δ and λ. The
    shared stack in base.css resolves them through Times New Roman, whose small
    x-height and light stroke make a lone β in a Newsreader equation read as a

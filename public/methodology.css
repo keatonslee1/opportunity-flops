@@ -388,6 +388,12 @@ main {
   margin: 0;
 }
 
+/* The divider already rules off the part that follows it; the part's own
+   hairline on top of it just reads as a printing fault. */
+.part-rule + .part {
+  border-top: 0;
+}
+
 /* --- Plates --------------------------------------------------------------
    Every table is a numbered plate with its caption below it, monograph style.
    The scroll container is the fix for the real defect here: both bundle
@@ -715,6 +721,18 @@ main {
 }
 
 /* --- Responsive ----------------------------------------------------------- */
+
+/* On a wide screen the sheet's text column would run past 1200px, which
+   strands the parameter contract's Role column and leaves a standing void
+   down the right of every part. Capping the sheet turns that slack into an
+   outer margin — the asymmetric one a book uses, narrow at the spine where
+   the notes hang and generous at the fore-edge. Left register with the
+   masthead is preserved. */
+@media (min-width: 1240px) {
+  .paper .sheet {
+    max-width: calc(var(--margin-col) + var(--s6) + 56rem);
+  }
+}
 
 @media (max-width: 1020px) {
   /* Off the margin column, the part number and its status stamp become a

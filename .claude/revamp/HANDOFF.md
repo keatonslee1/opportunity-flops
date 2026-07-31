@@ -378,3 +378,28 @@ Table 5 moved, and § 2's equations are unchanged and still correct.
 
 Remaining for B: Task 2b (section devices + colophon device), then Task 4 once you report
 Phase 1.
+
+## B — note on your PHASE 0 block · 2026-07-31
+
+Two corrections, both measured twice by independent methods with positive controls, both on
+`PUNCHLIST.md` A5.
+
+Your block says the subsets cover "the maths relations the copy actually sets", and that
+Greek in `<i>` "still resolves through the Greek-capable serif fallback… both paths are
+safe". The body-set half is right and it is a real improvement — Fira Sans supplies Greek
+natively now. The `--font-math` half is not: Newsreader supplies **no** Greek and **none** of
+`≤ → ∈ ∼`, so every Greek letter in every equation is currently being set in Times New Roman
+beside Newsreader Latin. A glyph appears, so nothing looks broken in a screenshot — but it is
+a second serif mid-equation in the most prominent mathematics on the page, which is exactly
+the thing the Studio Test is looking for.
+
+And `Ṡ` (U+1E60), `∈` (U+2208) and `∼` (U+223C) are in **no** shipped face, so they reach an
+OS fallback that differs per machine. `Ṡ` is the derivative in (2.1) and (2.2).
+
+Method, so you can reproduce rather than take my word: parsed each `woff2`'s `cmap` after
+brotli-decompressing it, with `A a 1 .` as controls; then independently compared rendered
+glyph widths in the built page against a deliberately different fallback, with `S` as a
+positive control. Both agree exactly.
+
+Fixing `--font-math` is yours. The three options are on A5 and I will sweep the document to
+whichever you pick.

@@ -116,6 +116,30 @@ Options, in B's order of preference:
   request but will not do it unilaterally** — changing a paper's notation to work around a
   font gap is the wrong reason to change a paper's notation.
 
+**Re-verified after your Phase 0 subsetting, by a second and independent method.** Your
+block says the subsets cover "the maths relations the copy actually sets" and that keeping
+Greek in `<i>` "still resolves through the Greek-capable serif fallback… both paths are
+safe". Measured in the built page by comparing rendered glyph widths against a deliberately
+different fallback — a family that supplies a glyph produces a different width than one that
+does not — with `S` as a positive control:
+
+| Glyph | Newsreader supplies it | Fira Sans supplies it |
+|---|---|---|
+| `S` (control) | **yes** | yes |
+| `β` `λ` `α` `γ` `δ` | **no** | yes |
+| `≤` `→` | **no** | yes |
+| `Ṡ` `∈` `∼` | **no** | **no** |
+
+This agrees exactly with the `cmap` parse. So: `--font-math` leads with Newsreader, which
+supplies **none** of the Greek and **none** of the relations, which means every Greek letter
+in every equation is currently set in Times New Roman beside Newsreader Latin — a second
+serif, mid-equation, in the most prominent mathematics on the page. That is a rendering
+fallback working correctly, not a typographic result. And `Ṡ`, `∈` and `∼` reach no shipped
+face at all, so they land on whatever the OS supplies, which differs per machine.
+
+Body-set Greek in Fira Sans is genuinely fixed, and that part of your block is right. The
+open half is `--font-math`. Options (a), (b) and (c) above still stand.
+
 Tell B which, and B will sweep the document to match.
 
 ### A6 — Fira Sans and Fira Mono are a good route — confirmed, not assumed

@@ -238,7 +238,7 @@
 
   /* Registration mark: a press target, rotationally symmetric so one drawing
      serves all four corners. Hairline, small enough to read as structure. */
-  --reg-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2386919a' stroke-width='0.75'%3E%3Cpath d='M8 0v5M8 11v5M0 8h5M11 8h5'/%3E%3Ccircle cx='8' cy='8' r='3.25'/%3E%3C/svg%3E");
+  --reg-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%2386919a' stroke-width='0.7'%3E%3Cpath d='M6 0v3.4M6 8.6v3.4M0 6h3.4M8.6 6h3.4'/%3E%3Ccircle cx='6' cy='6' r='2.4'/%3E%3C/svg%3E");
 
   /* Halftone screens — see the .screen primitive below. A 45° staggered dot
      grid on an 8px tile, coarse enough to read as a printed screen at 100%.
@@ -253,8 +253,18 @@
 
   font-family: var(--font-body);
   font-synthesis: none;
-  background: var(--paper);
   color: var(--ink);
+
+  /* The grain rides on the root, not on <body>, and the reason is paint order.
+     A stacking context paints its own background first, then its negative
+     z-index descendants, and only then the backgrounds of its in-flow block
+     descendants. With the grain on <body> it painted *over* .reg-marks — which
+     sits at z-index -1 so it can never land on a plate — and the registration
+     marks silently disappeared. On the root it becomes the canvas background,
+     below everything, and the marks sit between it and the content. */
+  background-color: var(--paper);
+  background-image: var(--grain);
+  background-attachment: fixed;
 }
 
 * {
@@ -268,9 +278,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background-color: var(--paper);
-  background-image: var(--grain);
-  background-attachment: fixed;
+  background: transparent;
   font-size: var(--t-body);
   line-height: 1.5;
 }
@@ -586,17 +594,20 @@ main {
   margin-inline: auto;
 }
 
+/* 6px in, 12px across, so the mark occupies x 6–18 and clears the 24px gutter
+   the type starts at. At 16px it touched the first letter of the running head,
+   which is a mark in the type area rather than in the trim margin. */
 .reg-marks {
   position: fixed;
-  inset: 10px;
+  inset: 6px;
   z-index: -1;
   pointer-events: none;
 }
 
 .reg-mark {
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   background-image: var(--reg-mark);
   background-repeat: no-repeat;
 }

@@ -54,21 +54,6 @@
 
     <main id="top">
       <section class="frontmatter sheet" aria-labelledby="page-title">
-        <!--
-          This replaces the old readiness list: three <dt>/<dd> pairs in a
-          three-up grid, which is a KPI chip row however it is labelled. The
-          same three facts belong in the margin as the paper's status, which is
-          where a status note belongs.
-        -->
-        <aside class="marginalia" aria-label="Build status">
-          <strong>Status</strong>
-          <p>
-            Both channels integrated. Sensitivity calibrated from 10,000 seeded
-            triangular draws. Outputs are comparative indices against a
-            normalized baseline — not a forecast.
-          </p>
-        </aside>
-
         <h1 id="page-title">What does a safety commitment cost in frontier progress?</h1>
 
         <p class="abstract">
@@ -80,6 +65,26 @@
           the benefit on a common baseline. The sensitivity bundles are marginal
           percentiles of assumed priors: working cases, not empirical estimates.
         </p>
+
+        <!--
+          This replaces the old readiness list: three <dt>/<dd> pairs in a
+          three-up grid, which is a KPI chip row however it is labelled. The
+          same three facts belong in the margin as the paper's status, which is
+          where a status note belongs.
+
+          It sits after the abstract in source order so that when the margin
+          column collapses below 1020px the status reads *after* the thing it
+          qualifies rather than before the title. Grid auto-placement still
+          hangs it in the margin beside the abstract at full width.
+        -->
+        <aside class="marginalia" aria-label="Build status">
+          <strong>Status</strong>
+          <p>
+            Both channels integrated. Sensitivity calibrated from 10,000 seeded
+            triangular draws. Outputs are comparative indices against a
+            normalized baseline — not a forecast.
+          </p>
+        </aside>
 
         <!--
           Plate I — the thesis as a picture, and the one image on the page that
@@ -213,7 +218,7 @@
             <p class="model-error" id="model-error" role="alert" hidden></p>
 
             <div class="plate-bay" id="plate-bay">
-              <figure class="plate" aria-labelledby="software-chart-title" tabindex="0" data-chart="software">
+              <figure class="plate" aria-labelledby="software-chart-title" tabindex="0" aria-describedby="cursor-hint" data-chart="software">
                 <div class="plate-readout">
                   <output id="software-gap" aria-live="off">Running model</output>
                 </div>
@@ -243,7 +248,7 @@
                 </figcaption>
               </figure>
 
-              <figure class="plate" aria-labelledby="slowdown-chart-title" tabindex="0" data-chart="softwareSlowdown">
+              <figure class="plate" aria-labelledby="slowdown-chart-title" tabindex="0" aria-describedby="cursor-hint" data-chart="softwareSlowdown">
                 <div class="plate-readout">
                   <output id="slowdown-gap" aria-live="off">Running model</output>
                 </div>
@@ -273,7 +278,7 @@
                 </figcaption>
               </figure>
 
-              <figure class="plate" aria-labelledby="capability-chart-title" tabindex="0" data-chart="capability">
+              <figure class="plate" aria-labelledby="capability-chart-title" tabindex="0" aria-describedby="cursor-hint" data-chart="capability">
                 <div class="plate-readout">
                   <output id="capability-gap" aria-live="off">Running model</output>
                 </div>
@@ -303,7 +308,7 @@
                 </figcaption>
               </figure>
 
-              <figure class="plate" aria-labelledby="capability-gap-chart-title" tabindex="0" data-chart="capabilityGap">
+              <figure class="plate" aria-labelledby="capability-gap-chart-title" tabindex="0" aria-describedby="cursor-hint" data-chart="capabilityGap">
                 <div class="plate-readout">
                   <output id="capability-gap-series-output" aria-live="off">Running model</output>
                 </div>
@@ -333,7 +338,7 @@
                 </figcaption>
               </figure>
 
-              <figure class="plate" aria-labelledby="risk-chart-title" tabindex="0" data-chart="risk">
+              <figure class="plate" aria-labelledby="risk-chart-title" tabindex="0" aria-describedby="cursor-hint" data-chart="risk">
                 <div class="plate-readout">
                   <div class="chart-series-legend" aria-label="AI risk chart legend">
                     <span><i class="legend-line baseline"></i>Baseline</span>
@@ -367,7 +372,7 @@
                 </figcaption>
               </figure>
 
-              <figure class="plate" aria-labelledby="safety-benefit-chart-title" tabindex="0" data-chart="safetyBenefit">
+              <figure class="plate" aria-labelledby="safety-benefit-chart-title" tabindex="0" aria-describedby="cursor-hint" data-chart="safetyBenefit">
                 <div class="plate-readout">
                   <div class="chart-series-legend" aria-label="Safety benefit chart legend">
                     <span><i class="legend-line baseline"></i>Baseline (0%)</span>

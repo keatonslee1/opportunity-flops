@@ -42,8 +42,17 @@
    three facts are the margin's status note now.
    ------------------------------------------------------------------------ */
 
+/* Dense packing so the status note rides up into the margin beside the title
+   rather than opening a row of its own. Sparse auto-placement put it a full
+   row below the abstract — the note has an explicit column but no explicit
+   row, and the placement cursor had already passed row one — which left a
+   third of the title page empty between the abstract and Plate I. Dense only
+   affects where the margin item lands; source order still governs the
+   single-column layout below 1020px, which is why the note reads after the
+   abstract there and beside the title here. */
 .frontmatter {
   padding: clamp(40px, 5vw, 72px) 0 clamp(32px, 4vw, 56px);
+  grid-auto-flow: row dense;
   row-gap: var(--s5);
 }
 
@@ -1134,9 +1143,9 @@
   }
 }
 
-/* At this width a hundred unit marks in four rows are 3px wide and read as a
-   texture rather than a count. The bank restacks to eight rows so a mark stays
-   a mark, which is the entire point of an Isotype array. */
+/* The compute bank restacks from 50 marks across to 20 at this width — see the
+   layout note in app.js. This block handles what CSS owns: the plate's head and
+   caption stop being two-up rows once there is no width to sit side by side. */
 @media (max-width: 560px) {
   .compute-plate-head,
   .compute-plate figcaption {
@@ -1152,5 +1161,11 @@
   .rack-heading h2,
   .results-header h2 {
     font-size: 1.2rem;
+  }
+
+  /* 2.6rem is a fine floor on a tablet and heavy on a phone, where it puts the
+     title on five lines before the reader has seen anything else. */
+  .frontmatter h1 {
+    font-size: 2.15rem;
   }
 }

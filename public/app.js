@@ -596,36 +596,56 @@ function renderResult(shouldAnimate = true) {
 const computeMarksSvg = document.querySelector("#compute-marks");
 const computePlateReadout = document.querySelector("#compute-plate-readout");
 
+const COMPUTE_UNITS = 100;
+
 // Fifty marks to a row, two rows. The slider tops out at 50 per cent, so a
 // full commitment is exactly the top row — the control's whole range and the
 // picture's top line are the same statement.
-const COMPUTE_UNITS = 100;
-const COMPUTE_COLUMNS = 50;
-const MARK = { width: 9, height: 20, pitchX: 15, pitchY: 26, originX: 3, originY: 4 };
+//
+// That correspondence is worth a lot at desktop width and nothing at all on a
+// phone: fifty marks across 360px puts each one at four pixels, where the bank
+// reads as a texture rather than as a count, and a count is the entire point of
+// an Isotype array. Below 560px it restacks to twenty across. The drawing is
+// generated, so this is a rebuild rather than a stylesheet override — the
+// geometry lives in one place either way.
+const WIDE_LAYOUT = { columns: 50, width: 9, height: 20, pitchX: 15, pitchY: 26, originX: 3, originY: 4 };
+const NARROW_LAYOUT = { columns: 20, width: 22, height: 20, pitchX: 37.5, pitchY: 26, originX: 7, originY: 4 };
+
+const narrowBank = window.matchMedia("(max-width: 560px)");
 
 const computeMarks = [];
 
 function buildComputeBank() {
   if (!computeMarksSvg) return;
 
+  const layout = narrowBank.matches ? NARROW_LAYOUT : WIDE_LAYOUT;
+  const rows = Math.ceil(COMPUTE_UNITS / layout.columns);
+
+  computeMarksSvg.replaceChildren();
+  computeMarks.length = 0;
+  computeMarksSvg.setAttribute(
+    "viewBox",
+    `0 0 750 ${layout.originY * 2 + (rows - 1) * layout.pitchY + layout.height}`,
+  );
+
   const fragment = document.createDocumentFragment();
 
   for (let index = 0; index < COMPUTE_UNITS; index += 1) {
-    const column = index % COMPUTE_COLUMNS;
-    const row = Math.floor(index / COMPUTE_COLUMNS);
-    const x = MARK.originX + column * MARK.pitchX;
-    const y = MARK.originY + row * MARK.pitchY;
+    const column = index % layout.columns;
+    const row = Math.floor(index / layout.columns);
+    const x = layout.originX + column * layout.pitchX;
+    const y = layout.originY + row * layout.pitchY;
 
     const unit = svgElement("g", { class: "unit", "data-role": "capability" });
     unit.append(
       svgElement("rect", {
-        class: "mark-capability", x, y, width: MARK.width, height: MARK.height,
+        class: "mark-capability", x, y, width: layout.width, height: layout.height,
       }),
       // Inset by half the stroke so the hollow mark occupies exactly the same
       // footprint as the solid one and the bank does not shimmer on flip.
       svgElement("rect", {
         class: "mark-alignment",
-        x: x + 1, y: y + 1, width: MARK.width - 2, height: MARK.height - 2,
+        x: x + 1, y: y + 1, width: layout.width - 2, height: layout.height - 2,
       }),
     );
     fragment.append(unit);
@@ -634,6 +654,13 @@ function buildComputeBank() {
 
   computeMarksSvg.append(fragment);
 }
+
+// Rebuild on the breakpoint itself, not on every resize event: crossing 560px
+// is the only width that changes the drawing.
+narrowBank.addEventListener("change", () => {
+  buildComputeBank();
+  renderComputeBank();
+});
 
 function renderComputeBank() {
   if (!computeMarks.length) return;

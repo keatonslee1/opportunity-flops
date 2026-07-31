@@ -44,6 +44,11 @@ Consequences worth knowing:
 - **The panel needs network access on first run.** The fetched source is cached
   in `chrome.storage.local`, so later opens work offline and fall back to the
   last good copy when the site is unreachable.
+- **It re-checks while open.** A side panel can stay open for hours, so the
+  model is revalidated every 30 minutes and when the panel regains focus after a
+  five-minute gap. The swap happens only if the source actually changed, and
+  current slider values are carried across — a routine check never resets your
+  inputs. The status line reads `Updated` when a new model has been picked up.
 - **Because it executes code fetched at runtime, this extension is intended for
   unpacked / internal use.** The Chrome Web Store's remotely-hosted-code policy
   would reject it as-is. Publishing it would mean vendoring `model.js` at

@@ -206,7 +206,8 @@ var {
    1020px, where marginalia become inline asides.
    ------------------------------------------------------------------------ */
 
-.shell {
+.shell,
+main {
   width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
   margin-inline: auto;
 }
@@ -426,6 +427,10 @@ footer p:nth-child(2) {
 @media (max-width: 1020px) {
   :root {
     --gutter: 16px;
+  }
+
+  main {
+    max-width: 900px;
   }
 
   .sheet {

@@ -11,11 +11,6 @@
    either. The plots must render identically before and after the redesign.
    ========================================================================== */
 
-main {
-  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
-  margin-inline: auto;
-}
-
 /* Uppercase monospace is reserved for values, legends and readouts — never
    for narrative. Descriptive labels use Barlow small-caps instead. */
 .headline-output span,
@@ -789,10 +784,6 @@ main {
 /* --- Responsive ---------------------------------------------------------- */
 
 @media (max-width: 1020px) {
-  main {
-    width: min(100% - 32px, 900px);
-  }
-
   .calculator {
     grid-template-columns: 300px minmax(0, 1fr);
   }

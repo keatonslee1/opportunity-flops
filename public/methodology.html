@@ -27,85 +27,332 @@
     </header>
 
     <main id="top">
-      <section class="methodology" id="methodology" aria-labelledby="methodology-title">
-        <div>
-          <h2 id="methodology-title">The model is simple on purpose</h2>
-          <p>
-            It connects one policy choice to two modeled consequences. The equations are implemented as written; <i>z</i> selects a reproducible parameter bundle calibrated by Monte Carlo from explicit, non-empirical distribution assumptions.
+      <article class="paper">
+        <header class="frontmatter sheet">
+          <p class="running-head label">Opportunity FLOPs · Methodology</p>
+          <h1 id="paper-title">AI Capability Trade-off Model</h1>
+          <p class="byline">A reduced-form specification, and a record of how much of it this calculator computes.</p>
+
+          <h2 class="question-heading" id="research-question">Research question</h2>
+          <p class="lede">
+            How does reallocating a share of frontier AI R&amp;D compute from capability research to alignment research affect frontier AI capability and AI safety over time?
           </p>
-        </div>
-        <div class="model-specification">
-          <ol>
-            <li><strong>Allocate</strong><span>Policy compute is <i>C</i><sub>R</sub><sup>P</sup> = (1 − <i>x</i>)<i>C</i><sub>R</sub>. Training compute stays unchanged.</span></li>
-            <li><strong>Propagate</strong><span>Software follows d<i>S</i>/d<i>t</i> = <i>A C</i><sub>R</sub><sup>β</sup><i>S</i><sup>γ</sup>.</span></li>
-            <li><strong>Translate</strong><span>Capability follows <i>M</i> = <i>C</i><sub>T</sub><sup>α</sup><i>S</i><sup>δ</sup>, so the training-compute term cancels in the policy comparison.</span></li>
-            <li><strong>Compare</strong><span>Capability gap = 1 − (<i>S</i><sub>P</sub>/<i>S</i><sub>B</sub>)<sup>δ</sup>.</span></li>
-          </ol>
 
-          <div class="preset-matrix">
-            <h3>Monte Carlo parameter bundles</h3>
-            <table>
-              <caption>Marginal P10 / P50 / P90 bundles from 10,000 seeded triangular draws</caption>
-              <thead><tr><th><i>z</i></th><th>β</th><th>γ</th><th>δ</th></tr></thead>
-              <tbody>
-                <tr><th>Low · P10</th><td>0.223</td><td>0.290</td><td>0.589</td></tr>
-                <tr><th>Medium · P50</th><td>0.313</td><td>0.400</td><td>0.701</td></tr>
-                <tr><th>High · P90</th><td>0.416</td><td>0.511</td><td>0.810</td></tr>
-              </tbody>
-            </table>
-
-            <table class="distribution-inputs">
-              <caption>Working triangular inputs—not Katherine-supplied empirical estimates</caption>
-              <thead><tr><th>Parameter</th><th>Minimum</th><th>Mode</th><th>Maximum</th></tr></thead>
-              <tbody>
-                <tr><th>β</th><td>0.15</td><td>0.30</td><td>0.50</td></tr>
-                <tr><th>γ</th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
-                <tr><th>δ</th><td>0.50</td><td>0.70</td><td>0.90</td></tr>
-              </tbody>
-            </table>
-
-            <dl class="calibration-protocol" aria-label="Monte Carlo protocol">
-              <div><dt>Samples</dt><dd>10,000 per parameter</dd></div>
-              <div><dt>Seed</dt><dd>Seed 20260731</dd></div>
-              <div><dt>Sampling</dt><dd>Independent draws</dd></div>
-              <div><dt>Quantiles</dt><dd>Linear at (<i>n</i> - 1)<i>q</i></dd></div>
-            </dl>
-            <p>The bundles rank-align each parameter's marginal percentile. They are sensitivity cases, not joint outcome percentiles or empirical estimates. Seeded calibration makes the same <i>z</i> selection reproduce the same parameter set on every run.</p>
-            <p>Software begins at index 100. The baseline is normalized to index 200 in 2034, so the charts communicate policy divergence—not a dated forecast of absolute capability. The normalization absorbs <i>A</i>; unchanged training compute makes <i>α</i> cancel from relative outputs.</p>
-          </div>
-
-          <details class="parameter-contract">
-            <summary>Inspect the full parameter contract</summary>
-            <div class="parameter-contract-table" tabindex="0" role="region" aria-label="Full model parameter contract">
-              <table>
-                <thead><tr><th>Symbol</th><th>Role</th><th>Source status</th><th>Implementation</th></tr></thead>
+          <aside class="marginalia" aria-label="Note on Table 1">
+            <strong>Note</strong>
+            Only the capability channel is implemented. The safety channel is specified in Parts <span class="numeric">IV</span> and <span class="numeric">V</span> and computed nowhere.
+          </aside>
+          <figure class="plate" id="table-1">
+            <div class="table-scroll" tabindex="0" role="region" aria-labelledby="table-1-caption">
+              <table class="summary-table">
+                <thead><tr><th scope="col">Channel</th><th scope="col">Mechanism</th><th scope="col">Primary output</th></tr></thead>
                 <tbody>
-                  <tr><th><i>x</i></th><td>R&amp;D compute reallocation share</td><td>User input</td><td>0%–50% slider</td></tr>
-                  <tr><th><i>z</i></th><td>Policy impact level</td><td>User input</td><td>Marginal P10 / P50 / P90 bundle</td></tr>
-                  <tr><th><i>C</i><sub>R,B</sub></th><td>Baseline capability-R&amp;D compute</td><td>Exogenous path</td><td>Fixed and normalized</td></tr>
-                  <tr><th><i>C</i><sub>R,P</sub></th><td>Policy capability-R&amp;D compute</td><td>Model-derived</td><td>(1 − <i>x</i>)<i>C</i><sub>R,B</sub></td></tr>
-                  <tr><th><i>A</i></th><td>Research productivity</td><td>Set by <i>z</i> / calibrated</td><td>Absorbed into baseline normalization</td></tr>
-                  <tr><th>β</th><td>R&amp;D-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
-                  <tr><th>γ</th><td>Software-feedback elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
-                  <tr data-parameter="S_B"><th><i>S</i><sub>B</sub>(<i>t</i>)</th><td>Baseline software level</td><td>Model-generated</td><td>Baseline software series</td></tr>
-                  <tr data-parameter="S_P"><th><i>S</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy software level</td><td>Model-generated</td><td>Firm policy series</td></tr>
-                  <tr><th><i>S</i><sub>0</sub></th><td>Initial software level</td><td>Fixed normalization</td><td>Index 100</td></tr>
-                  <tr><th><i>C</i><sub>T</sub></th><td>Frontier training compute</td><td>Exogenous path</td><td>Equal across scenarios</td></tr>
-                  <tr><th>α</th><td>Training-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Cancels from relative outputs</td></tr>
-                  <tr><th>δ</th><td>Software-to-capability elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
-                  <tr data-parameter="M_B"><th><i>M</i><sub>B</sub>(<i>t</i>)</th><td>Baseline capability level</td><td>Model-generated</td><td>Baseline capability series</td></tr>
-                  <tr data-parameter="M_P"><th><i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy capability level</td><td>Model-generated</td><td>Firm policy series</td></tr>
-                  <tr><th><i>M</i><sub>0</sub></th><td>Initial capability level</td><td>Fixed normalization</td><td>Index 100</td></tr>
-                  <tr><th><i>t</i></th><td>Time since policy start</td><td>Model index</td><td>2026–2034, quarterly</td></tr>
-                  <tr><th>SS</th><td>Software progress-rate slowdown</td><td>Model output</td><td>Shown in software slowdown chart</td></tr>
-                  <tr><th>SG</th><td>Software level gap</td><td>Model output</td><td>Returned in model contract</td></tr>
-                  <tr><th>CG</th><td>Capability gap</td><td>Model output</td><td>Shown in AI capability gap chart</td></tr>
+                  <tr><th scope="row">Capability</th><td>R&amp;D compute <span aria-hidden="true">→</span><span class="sr-only">to</span> software progress <span aria-hidden="true">→</span><span class="sr-only">to</span> frontier capability</td><td>Capability cost / gap</td></tr>
+                  <tr><th scope="row">Safety</th><td>Alignment compute <span aria-hidden="true">→</span><span class="sr-only">to</span> lower AI risk</td><td>Safety benefit</td></tr>
                 </tbody>
               </table>
             </div>
-          </details>
+            <figcaption id="table-1-caption"><span class="caption-index">Table 1</span> Model summary, reproduced from the specification. The model consists of two parallel channels.</figcaption>
+          </figure>
+
+          <nav class="contents" aria-labelledby="contents-heading">
+            <h2 class="label" id="contents-heading">Contents</h2>
+            <ol>
+              <li><a href="#part-1"><span class="numeric">I</span> Compute reallocation</a><span class="status is-live">Implemented</span></li>
+              <li><a href="#part-2"><span class="numeric">II</span> Software progress</a><span class="status is-live">Implemented</span></li>
+              <li><a href="#part-3"><span class="numeric">III</span> Frontier AI capability</a><span class="status is-live">Implemented</span></li>
+              <li><a href="#part-4"><span class="numeric">IV</span> AI risk</a><span class="status is-pending">Not implemented</span></li>
+              <li><a href="#part-5"><span class="numeric">V</span> Safety benefit</a><span class="status is-pending">Not implemented</span></li>
+              <li><a href="#part-6"><span class="numeric">VI</span> User inputs</a><span class="status is-live">Implemented</span></li>
+              <li><a href="#part-7"><span class="numeric">VII</span> Calibration of the bundles</a><span class="status is-live">Implemented</span></li>
+              <li><a href="#part-8"><span class="numeric">VIII</span> Normalization and scope</a><span class="status is-live">Implemented</span></li>
+              <li><a href="#part-9"><span class="numeric">IX</span> Parameter contract</a><span class="status is-live">Implemented</span></li>
+            </ol>
+          </nav>
+        </header>
+
+        <section class="part sheet" id="part-1" aria-labelledby="part-1-title">
+          <div class="section-mark">
+            <span class="section-no numeric">I</span>
+            <span class="status is-live">Implemented</span>
+          </div>
+          <h2 id="part-1-title">Compute reallocation</h2>
+          <p>
+            Let <i>C</i><sub>R</sub>(<i>t</i>) be total frontier AI R&amp;D compute and <i>x</i> the share of it reallocated to alignment. Under the policy the R&amp;D budget splits in two: the remaining capability-oriented compute, and the alignment compute it paid for.
+          </p>
+          <div class="equation"><span class="eq-body"><i>C</i><sub>C,P</sub>(<i>t</i>) = (1 − <i>x</i>)<i>C</i><sub>R</sub>(<i>t</i>)</span><span class="eq-no">(1.1)</span></div>
+          <div class="equation"><span class="eq-body"><i>C</i><sub>A,P</sub>(<i>t</i>) = <i>x C</i><sub>R</sub>(<i>t</i>)</span><span class="eq-no">(1.2)</span></div>
+          <p>Under the baseline nothing is reallocated, so the whole budget stays with capability work.</p>
+          <div class="equation"><span class="eq-body"><i>C</i><sub>C,B</sub>(<i>t</i>) = <i>C</i><sub>R</sub>(<i>t</i>)</span><span class="eq-no">(1.3)</span></div>
+          <div class="equation"><span class="eq-body"><i>C</i><sub>A,B</sub>(<i>t</i>) = 0</span><span class="eq-no">(1.4)</span></div>
+          <aside class="marginalia" aria-label="Note on equation 1.2">
+            <strong>Unused term</strong>
+            Equation (1.2) is specified but has no consumer. Alignment compute only enters the model through Parts <span class="numeric">IV</span> and <span class="numeric">V</span>, so nothing downstream of the calculator reads it.
+          </aside>
+          <p>
+            The calculator implements (1.1), (1.3) and (1.4). It carries no quantity derived from (1.2).
+          </p>
+        </section>
+
+        <section class="part sheet" id="part-2" aria-labelledby="part-2-title">
+          <div class="section-mark">
+            <span class="section-no numeric">II</span>
+            <span class="status is-live">Implemented</span>
+          </div>
+          <h2 id="part-2-title">Software progress</h2>
+          <p>
+            Let <i>S</i>(<i>t</i>) denote the software (algorithmic) progress index. Software progress follows an ideas-production function, run once for the baseline and once for the policy.
+          </p>
+          <div class="equation"><span class="eq-body"><i>Ṡ</i><sub>B</sub>(<i>t</i>) = <i>A</i>[<i>C</i><sub>R</sub>(<i>t</i>)]<sup>β</sup>[<i>S</i><sub>B</sub>(<i>t</i>)]<sup>γ</sup></span><span class="eq-no">(2.1)</span></div>
+          <div class="equation"><span class="eq-body"><i>Ṡ</i><sub>P</sub>(<i>t</i>) = <i>A</i>[(1 − <i>x</i>)<i>C</i><sub>R</sub>(<i>t</i>)]<sup>β</sup>[<i>S</i><sub>P</sub>(<i>t</i>)]<sup>γ</sup></span><span class="eq-no">(2.2)</span></div>
+          <p>Both arms start from the same initial condition.</p>
+          <div class="equation"><span class="eq-body"><i>S</i><sub>B</sub>(0) = <i>S</i><sub>P</sub>(0) = <i>S</i><sub>0</sub></span><span class="eq-no">(2.3)</span></div>
+          <dl class="glossary">
+            <div><dt><i>A</i></dt><dd>Research productivity.</dd></div>
+            <div><dt>β</dt><dd>Elasticity of software progress with respect to capability R&amp;D compute.</dd></div>
+            <div><dt>γ</dt><dd>Software feedback — knowledge accumulation and AI-assisted R&amp;D.</dd></div>
+          </dl>
+          <p>
+            The policy enters through one factor. Comparing (2.2) with (2.1), reallocation multiplies the instantaneous rate by (1 − <i>x</i>)<sup>β</sup> and changes nothing else.
+          </p>
+        </section>
+
+        <section class="part sheet" id="part-3" aria-labelledby="part-3-title">
+          <div class="section-mark">
+            <span class="section-no numeric">III</span>
+            <span class="status is-live">Implemented</span>
+          </div>
+          <h2 id="part-3-title">Frontier AI capability</h2>
+          <p>
+            Frontier AI capability is modeled using a reduced-form Cobb–Douglas production function over training compute and software.
+          </p>
+          <div class="equation"><span class="eq-body"><i>M</i><sub>j</sub>(<i>t</i>) = [<i>C</i><sub>T</sub>(<i>t</i>)]<sup>α</sup>[<i>S</i><sub>j</sub>(<i>t</i>)]<sup>δ</sup>,&ensp; <i>j</i> ∈ {B, P}</span><span class="eq-no">(3.1)</span></div>
+          <dl class="glossary">
+            <div><dt><i>M</i>(<i>t</i>)</dt><dd>Frontier AI capability index.</dd></div>
+            <div><dt><i>C</i><sub>T</sub>(<i>t</i>)</dt><dd>Frontier training compute.</dd></div>
+            <div><dt>α</dt><dd>Training-compute elasticity.</dd></div>
+            <div><dt>δ</dt><dd>Software elasticity.</dd></div>
+          </dl>
+          <p>Since the policy reallocates only R&amp;D compute, training compute is identical in both arms.</p>
+          <div class="equation"><span class="eq-body"><i>C</i><sub>T,B</sub>(<i>t</i>) = <i>C</i><sub>T,P</sub>(<i>t</i>) = <i>C</i><sub>T</sub>(<i>t</i>)</span><span class="eq-no">(3.2)</span></div>
+          <p>Capability cost is therefore the shortfall of the policy capability path against the baseline,</p>
+          <div class="equation"><span class="eq-body"><i>CC</i>(<i>t</i>) = 1 − <i>M</i><sub>P</sub>(<i>t</i>) / <i>M</i><sub>B</sub>(<i>t</i>)</span><span class="eq-no">(3.3)</span></div>
+          <aside class="marginalia" aria-label="Note on equation 3.4">
+            <strong>Named CG in the interface</strong>
+            The chart headed “AI capability gap” plots (3.4) exactly. <i>CG</i> and <i>CC</i> are the same quantity under two names; the parameter contract lists it as <i>CG</i>.
+          </aside>
+          <p>or equivalently, once the common training-compute term cancels,</p>
+          <div class="equation"><span class="eq-body"><i>CC</i>(<i>t</i>) = 1 − (<i>S</i><sub>P</sub>(<i>t</i>) / <i>S</i><sub>B</sub>(<i>t</i>))<sup>δ</sup></span><span class="eq-no">(3.4)</span></div>
+          <p>
+            The cancellation in (3.4) is why α never needs a value. It is a real parameter of the model that the relative outputs are insensitive to, not an omission.
+          </p>
+        </section>
+
+        <section class="part sheet is-unbuilt" id="part-4" aria-labelledby="part-4-title">
+          <div class="section-mark">
+            <span class="section-no numeric">IV</span>
+            <span class="status is-pending">Not implemented</span>
+          </div>
+          <h2 id="part-4-title">AI risk</h2>
+          <p class="unbuilt-notice">
+            Specified below, computed nowhere. Nothing on this site evaluates the equations in Parts <span class="numeric">IV</span> and <span class="numeric">V</span>; they are recorded here so the specification is complete and the gap is visible.
+          </p>
+          <p>
+            Rather than explicitly modeling alignment progress, AI risk is represented using a reduced-form function. Under the policy, risk decays away from its baseline path in proportion to the reallocated share and the time elapsed since the policy began.
+          </p>
+          <div class="equation"><span class="eq-body"><i>R</i><sub>P</sub>(<i>t</i>) = <i>R</i><sub>B</sub>(<i>t</i>) exp[−λ<sub>z</sub><i>x</i>(<i>t</i> − <i>t</i><sub>0</sub>)]</span><span class="eq-no">(4.1)</span></div>
+          <dl class="glossary">
+            <div><dt><i>R</i>(<i>t</i>)</dt><dd>AI risk index.</dd></div>
+            <div><dt>λ<sub>z</sub></dt><dd>Alignment effectiveness under policy impact level <i>z</i>.</dd></div>
+            <div><dt><i>t</i><sub>0</sub></dt><dd>Policy implementation year.</dd></div>
+          </dl>
+          <aside class="marginalia" aria-label="What implementing Part IV would require">
+            <strong>What it would need</strong>
+            A baseline risk path <i>R</i><sub>B</sub>(<i>t</i>), a value for λ in each bundle, and a policy start year <i>t</i><sub>0</sub>. None of the three exists in the shipped model.
+          </aside>
+          <p>
+            The baseline risk path is <i>R</i><sub>B</sub>(<i>t</i>). The specification does not fix it, and neither does this implementation.
+          </p>
+        </section>
+
+        <section class="part sheet is-unbuilt" id="part-5" aria-labelledby="part-5-title">
+          <div class="section-mark">
+            <span class="section-no numeric">V</span>
+            <span class="status is-pending">Not implemented</span>
+          </div>
+          <h2 id="part-5-title">Safety benefit</h2>
+          <p class="unbuilt-notice">
+            Specified below, computed nowhere. No control, chart or model output on this site reports a safety benefit.
+          </p>
+          <p>
+            Safety benefit is defined as the percentage reduction in AI risk relative to the baseline.
+          </p>
+          <div class="equation"><span class="eq-body"><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>) / <i>R</i><sub>B</sub>(<i>t</i>)</span><span class="eq-no">(5.1)</span></div>
+          <aside class="marginalia" aria-label="Note on notation">
+            <strong>Notation collision</strong>
+            <i>S</i><sub>B</sub>(<i>t</i>) in Part <span class="numeric">II</span> is baseline software. <i>SB</i>(<i>t</i>) here is safety benefit. Both are reproduced as the specification writes them.
+          </aside>
+          <p>Substituting the risk function (4.1), the baseline path divides out,</p>
+          <div class="equation"><span class="eq-body"><i>SB</i>(<i>t</i>) = 1 − <i>e</i><sup>−λ<sub>z</sub><i>x</i>(<i>t</i> − <i>t</i><sub>0</sub>)</sup></span><span class="eq-no">(5.2)</span></div>
+          <p>Thus increasing <i>x</i> increases safety benefit, and increasing λ makes alignment compute more effective. Both statements follow from (5.2) alone; neither has been evaluated against anything.</p>
+        </section>
+
+        <section class="part sheet" id="part-6" aria-labelledby="part-6-title">
+          <div class="section-mark">
+            <span class="section-no numeric">VI</span>
+            <span class="status is-live">Implemented</span>
+          </div>
+          <h2 id="part-6-title">User inputs</h2>
+          <p>Users choose only two inputs.</p>
+          <ol class="input-list">
+            <li>
+              <strong>Compute reallocation share</strong>
+              <span>The share <i>x</i> of frontier AI R&amp;D compute reallocated to alignment. The calculator exposes it as a slider from 0% to 50%.</span>
+            </li>
+            <li>
+              <strong>Policy impact level</strong>
+              <span>A categorical selection, <i>z</i> ∈ {Lower, Central, Higher}, which selects a parameter set.</span>
+            </li>
+          </ol>
+          <div class="equation"><span class="eq-body"><i>z</i> ⟶ (β, γ, δ, λ)</span><span class="eq-no">(6.1)</span></div>
+          <aside class="marginalia" aria-label="Note on impact level naming">
+            <strong>Labels differ</strong>
+            The specification writes <i>z</i> ∈ {Lower, Central, Higher}. The control is labelled Low, Medium and High. Same three levels, and the same order.
+          </aside>
+          <p>
+            The mapping in (6.1) carries four parameters. The shipped bundles carry three of them: β, γ and δ. λ has no calibrated value, because the only equations that read it — (4.1) and (5.2) — are not implemented.
+          </p>
+        </section>
+
+        <div class="part-rule sheet">
+          <p class="label">Implementation record</p>
         </div>
-      </section>
+
+        <section class="part sheet" id="part-7" aria-labelledby="part-7-title">
+          <div class="section-mark">
+            <span class="section-no numeric">VII</span>
+            <span class="status is-live">Implemented</span>
+          </div>
+          <h2 id="part-7-title">Calibration of the bundles</h2>
+          <p>
+            The parameter sets are obtained from 10,000 Monte Carlo simulations using triangular distributions. Each parameter is drawn independently, sorted, and read at the percentile its impact level names.
+          </p>
+
+          <figure class="plate" id="table-2">
+            <div class="table-scroll" tabindex="0" role="region" aria-labelledby="table-2-caption">
+              <table class="preset-matrix">
+                <thead><tr><th class="sym" scope="col"><i>z</i></th><th class="sym" scope="col">β</th><th class="sym" scope="col">γ</th><th class="sym" scope="col">δ</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">Low · P10</th><td>0.223</td><td>0.290</td><td>0.589</td></tr>
+                  <tr><th scope="row">Medium · P50</th><td>0.313</td><td>0.400</td><td>0.701</td></tr>
+                  <tr><th scope="row">High · P90</th><td>0.416</td><td>0.511</td><td>0.810</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption id="table-2-caption"><span class="caption-index">Table 2</span> Marginal P10 / P50 / P90 bundles from 10,000 seeded triangular draws. λ is absent because it is uncalibrated.</figcaption>
+          </figure>
+
+          <aside class="marginalia" aria-label="Note on Table 3">
+            <strong>Assumed, not measured</strong>
+            These bounds and modes are the modelling team's working choices. No validated empirical calibration exists yet, and the interface must not present these as estimates.
+          </aside>
+          <figure class="plate" id="table-3">
+            <div class="table-scroll" tabindex="0" role="region" aria-labelledby="table-3-caption">
+              <table class="preset-matrix distribution-inputs">
+                <thead><tr><th scope="col">Parameter</th><th scope="col">Minimum</th><th scope="col">Mode</th><th scope="col">Maximum</th></tr></thead>
+                <tbody>
+                  <tr><th class="sym" scope="row">β</th><td>0.15</td><td>0.30</td><td>0.50</td></tr>
+                  <tr><th class="sym" scope="row">γ</th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
+                  <tr><th class="sym" scope="row">δ</th><td>0.50</td><td>0.70</td><td>0.90</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption id="table-3-caption"><span class="caption-index">Table 3</span> Working triangular inputs—not Katherine-supplied empirical estimates.</figcaption>
+          </figure>
+
+          <dl class="calibration-protocol" aria-label="Monte Carlo protocol">
+            <div><dt>Samples</dt><dd>10,000 per parameter</dd></div>
+            <div><dt>Seed</dt><dd>Seed 20260731</dd></div>
+            <div><dt>Sampling</dt><dd>Independent draws</dd></div>
+            <div><dt>Quantiles</dt><dd>Linear at (<i>n</i> − 1)<i>q</i></dd></div>
+          </dl>
+          <p>
+            The bundles rank-align each parameter's marginal percentile. They are sensitivity cases, not joint outcome percentiles or empirical estimates. Seeded calibration makes the same <i>z</i> selection reproduce the same parameter set on every run.
+          </p>
+        </section>
+
+        <section class="part sheet" id="part-8" aria-labelledby="part-8-title">
+          <div class="section-mark">
+            <span class="section-no numeric">VIII</span>
+            <span class="status is-live">Implemented</span>
+          </div>
+          <h2 id="part-8-title">Normalization and scope</h2>
+          <aside class="marginalia" aria-label="Note on the horizon">
+            <strong>Read as divergence</strong>
+            Every output on the calculator is a comparison between two arms of the same normalized run. None of them is a dated forecast of absolute capability.
+          </aside>
+          <p>
+            Software begins at index 100. The baseline is normalized to index 200 in 2034, so the charts communicate policy divergence—not a dated forecast of absolute capability. The normalization absorbs <i>A</i>; unchanged training compute makes <i>α</i> cancel from relative outputs.
+          </p>
+          <p>
+            The horizon runs from 2026 to 2034 at quarterly resolution. Because the normalization fixes the baseline endpoint, <i>A</i> and <i>C</i><sub>R</sub>(<i>t</i>) never appear as numbers: the calculator solves (2.1) for the growth constant that reaches the fixed endpoint, then applies the policy factor (1 − <i>x</i>)<sup>β</sup> from (2.2) to obtain the policy arm.
+          </p>
+        </section>
+
+        <section class="part sheet" id="part-9" aria-labelledby="part-9-title">
+          <div class="section-mark">
+            <span class="section-no numeric">IX</span>
+            <span class="status is-live">Implemented</span>
+          </div>
+          <h2 id="part-9-title">Parameter contract</h2>
+          <p>
+            Every symbol in the specification, its role, where its value comes from, and what the shipped model does with it. Rows marked <em>Not implemented</em> belong to Parts <span class="numeric">IV</span> and <span class="numeric">V</span>.
+          </p>
+          <details class="parameter-contract">
+            <summary>Inspect the full parameter contract</summary>
+            <figure class="plate" id="table-4">
+              <div class="parameter-contract-table" tabindex="0" role="region" aria-labelledby="table-4-caption">
+                <table>
+                  <thead><tr><th scope="col">Symbol</th><th scope="col">Role</th><th scope="col">Source status</th><th scope="col">Implementation</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row"><i>x</i></th><td>R&amp;D compute reallocation share</td><td>User input</td><td>0%–50% slider</td></tr>
+                    <tr><th scope="row"><i>z</i></th><td>Policy impact level</td><td>User input</td><td>Marginal P10 / P50 / P90 bundle</td></tr>
+                    <tr><th scope="row"><i>C</i><sub>R</sub></th><td>Total frontier R&amp;D compute</td><td>Exogenous path</td><td>Fixed and normalized</td></tr>
+                    <tr><th scope="row"><i>C</i><sub>C,B</sub></th><td>Baseline capability-R&amp;D compute</td><td>Model-derived</td><td><i>C</i><sub>R</sub>, unchanged</td></tr>
+                    <tr><th scope="row"><i>C</i><sub>C,P</sub></th><td>Policy capability-R&amp;D compute</td><td>Model-derived</td><td>(1 − <i>x</i>)<i>C</i><sub>R</sub></td></tr>
+                    <tr class="is-pending-row"><th scope="row"><i>C</i><sub>A,P</sub></th><td>Policy alignment compute</td><td>Model-derived</td><td>Not implemented — no consumer</td></tr>
+                    <tr><th scope="row"><i>A</i></th><td>Research productivity</td><td>Set by <i>z</i> / calibrated</td><td>Absorbed into baseline normalization</td></tr>
+                    <tr><th scope="row">β</th><td>R&amp;D-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
+                    <tr><th scope="row">γ</th><td>Software-feedback elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
+                    <tr data-parameter="S_B"><th scope="row"><i>S</i><sub>B</sub>(<i>t</i>)</th><td>Baseline software level</td><td>Model-generated</td><td>Baseline software series</td></tr>
+                    <tr data-parameter="S_P"><th scope="row"><i>S</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy software level</td><td>Model-generated</td><td>Firm policy series</td></tr>
+                    <tr><th scope="row"><i>S</i><sub>0</sub></th><td>Initial software level</td><td>Fixed normalization</td><td>Index 100</td></tr>
+                    <tr><th scope="row"><i>C</i><sub>T</sub></th><td>Frontier training compute</td><td>Exogenous path</td><td>Equal across scenarios</td></tr>
+                    <tr><th scope="row">α</th><td>Training-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Cancels from relative outputs</td></tr>
+                    <tr><th scope="row">δ</th><td>Software-to-capability elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
+                    <tr data-parameter="M_B"><th scope="row"><i>M</i><sub>B</sub>(<i>t</i>)</th><td>Baseline capability level</td><td>Model-generated</td><td>Baseline capability series</td></tr>
+                    <tr data-parameter="M_P"><th scope="row"><i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy capability level</td><td>Model-generated</td><td>Firm policy series</td></tr>
+                    <tr><th scope="row"><i>M</i><sub>0</sub></th><td>Initial capability level</td><td>Fixed normalization</td><td>Index 100</td></tr>
+                    <tr><th scope="row"><i>t</i></th><td>Time since policy start</td><td>Model index</td><td>2026–2034, quarterly</td></tr>
+                    <tr class="is-pending-row"><th scope="row">λ<sub>z</sub></th><td>Alignment effectiveness</td><td>Set by <i>z</i> / uncalibrated</td><td>Not implemented — no value assigned</td></tr>
+                    <tr class="is-pending-row"><th scope="row"><i>t</i><sub>0</sub></th><td>Policy implementation year</td><td>Exogenous</td><td>Not implemented</td></tr>
+                    <tr class="is-pending-row"><th scope="row"><i>R</i><sub>B</sub>(<i>t</i>)</th><td>Baseline AI risk index</td><td>Exogenous path</td><td>Not implemented — path undefined</td></tr>
+                    <tr class="is-pending-row"><th scope="row"><i>R</i><sub>P</sub>(<i>t</i>)</th><td>Policy AI risk index</td><td>Model-generated</td><td>Not implemented</td></tr>
+                    <tr class="is-pending-row"><th scope="row"><i>SB</i>(<i>t</i>)</th><td>Safety benefit</td><td>Model output</td><td>Not implemented</td></tr>
+                    <tr><th scope="row">SS</th><td>Software progress-rate slowdown</td><td>Model output</td><td>Shown in software slowdown chart</td></tr>
+                    <tr><th scope="row">SG</th><td>Software level gap</td><td>Model output</td><td>Returned in model contract</td></tr>
+                    <tr><th scope="row">CG</th><td>Capability cost / gap, <i>CC</i>(<i>t</i>)</td><td>Model output</td><td>Shown in AI capability gap chart</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <figcaption id="table-4-caption"><span class="caption-index">Table 4</span> Full parameter contract across all five parts of the specification.</figcaption>
+            </figure>
+          </details>
+          <p class="closing">
+            <a href="/">Return to the calculator</a> — the instrument this document specifies.
+          </p>
+        </section>
+      </article>
     </main>
 
     <footer>

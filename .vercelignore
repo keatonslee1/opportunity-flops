@@ -1,0 +1,6 @@
+.env*
+.git
+.npm-cache
+.vercel
+server.mjs
+test

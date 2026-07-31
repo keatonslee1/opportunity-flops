@@ -1,0 +1,11 @@
+{
+  "name": "opportunity-flops",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "build": "node --check public/app.js && node --check public/model.js",
+    "test": "node --test"
+  }
+}

@@ -156,15 +156,6 @@ const plot = {
   bottom: 244,
 };
 
-// The plate each chart is drawn on, and the year rule that crosses it. Looked
-// up by convention rather than listed six more times in the config above: the
-// ids are already derivable from the chart svg's own id.
-for (const [kind, chart] of Object.entries(charts)) {
-  chart.kind = kind;
-  chart.plate = chart.svg?.closest(".plate") ?? null;
-  chart.yearRule = document.querySelector(`#${chart.svg.id.replace("-chart", "")}-year-rule`);
-}
-
 function formatValue(definition, value) {
   return `${value}${definition.suffix ?? ""}`;
 }
@@ -541,12 +532,7 @@ function renderResult(shouldAnimate = true) {
     renderChart("safetyBenefit", result, shouldAnimate);
     updateComparisonStrip(result);
 
-    latestResult = result;
     renderComputeBank();
-    // The rule stays where the reader put it across a re-render; only the
-    // numbers under it change. Moving it back to a default on every slider
-    // tick would mean losing your place every time you adjusted anything.
-    if (cursorIndex !== null) applyYearCursor(false);
   } catch (error) {
     modelError.textContent = `The model could not run: ${error.message}. Reset the assumptions and try again.`;
     modelError.hidden = false;
@@ -683,199 +669,71 @@ function renderComputeBank() {
     : `Frontier R&D compute · ${reallocated} to alignment · ${100 - reallocated} to capability`;
 }
 
-// ── The year cursor ────────────────────────────────────────────────────
-//
-// The signature moment. Pointing at or focusing any plate raises a vertical
-// rule at that year across all six at once, and every plate reports its own
-// value for that year on its own readout line.
-//
-// Deliberately not gated behind prefers-reduced-motion. The rule does not
-// animate — it is a readout, and the reduced-motion gate is for motion. Taking
-// it away would remove a way of reading the figures from exactly the readers
-// most likely to depend on it. What the gate does disable, in renderChart, is
-// the chart-recorder draw.
+// ── Figure carousel ────────────────────────────────────────────────────
 
-const plateBay = document.querySelector("#plate-bay");
-const yearAnnounce = document.querySelector("#year-cursor-announce");
+/**
+ * Moves the plate track and keeps the selector, the position readout and the
+ * accessibility tree in step.
+ *
+ * The carousel deliberately owns none of the rendering. All six plates are
+ * drawn on every `renderResult`, exactly as they were when they were stacked;
+ * this only decides which one you are looking at. That keeps the model wiring
+ * and the chart tests independent of the presentation, and it means switching
+ * figures costs a transform rather than a redraw.
+ */
+function initCarousel() {
+  const track = document.querySelector("#carousel-track");
+  const tabs = [...document.querySelectorAll(".carousel-tab")];
+  const slides = [...document.querySelectorAll(".carousel-slide")];
+  const previous = document.querySelector("#carousel-prev");
+  const next = document.querySelector("#carousel-next");
+  const position = document.querySelector("#carousel-position");
 
-let latestResult = null;
-let cursorIndex = null;
+  if (!track || !slides.length || !tabs.length) return;
 
-function yearCount() {
-  return latestResult?.series.years.length ?? 0;
-}
+  let current = 0;
 
-// The model samples quarterly, but the axis is labelled in whole years and the
-// reader thinks in whole years. Without this the rule moved a quarter at a
-// time and the readout printed "2034" for four consecutive presses, so an
-// arrow key looked broken. Derived from the data rather than hardcoded to 4,
-// because the sampling interval belongs to the model, not to this file.
-function yearStep() {
-  const years = latestResult?.series.years;
-  if (!years || years.length < 2) return 1;
-  return Math.max(1, Math.round(1 / (years[1] - years[0])));
-}
+  function show(index, moveFocus = false) {
+    current = Math.min(Math.max(index, 0), slides.length - 1);
+    track.style.transform = `translateX(${current * -100}%)`;
+    position.textContent = `Figure ${current + 1} of ${slides.length}`;
 
-function formatAt(chart, value) {
-  return chart.domainKind === "fraction"
-    ? `${(value * 100).toFixed(1)}%`
-    : value.toFixed(1);
-}
+    slides.forEach((slide, slideIndex) => {
+      slide.setAttribute("aria-hidden", String(slideIndex !== current));
+    });
 
-function cursorReadout(chart, index) {
-  const series = latestResult.series[chart.seriesKey];
-  const year = Math.round(latestResult.series.years[index]);
-  const at = (values) => formatAt(chart, values[index]);
+    tabs.forEach((tab, tabIndex) => {
+      const selected = tabIndex === current;
+      tab.setAttribute("aria-selected", String(selected));
+      // Roving tabindex: the selector is one tab stop, and the arrow keys move
+      // within it. Six separate stops would push the comparison strip six
+      // presses further away for anyone using the keyboard.
+      tab.tabIndex = selected ? 0 : -1;
+    });
 
-  if (chart.projectionOnly) {
-    return `${year} · ${at(series.policy)} · base ${at(series.baseline)}`;
-  }
-  if (scenario === "baseline") {
-    return `${year} · ${at(series.baseline)}`;
-  }
-  if (scenario === "unilateral") {
-    return `${year} · A ${at(series.firmA)} · base ${at(series.baseline)}`;
-  }
-  return `${year} · A/B ${at(series.firmA)} · base ${at(series.baseline)}`;
-}
+    // The track does not wrap, so the ends are real stops.
+    previous.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
 
-function applyYearCursor(announce) {
-  const count = yearCount();
-
-  for (const chart of Object.values(charts)) {
-    if (cursorIndex === null || !count) {
-      chart.yearRule.hidden = true;
-      chart.plate?.classList.remove("is-cursored");
-      chart.output.classList.remove("is-cursored");
-      continue;
-    }
-
-    const x = xPosition(cursorIndex, count);
-    chart.yearRule.setAttribute("transform", `translate(${(x - plot.left).toFixed(1)} 0)`);
-    chart.yearRule.hidden = false;
-    chart.plate?.classList.add("is-cursored");
-    chart.output.classList.add("is-cursored");
-    chart.output.textContent = cursorReadout(chart, cursorIndex);
+    if (moveFocus) tabs[current].focus();
   }
 
-  if (cursorIndex === null) {
-    // Put the summary values back; they are what the plate says at rest.
-    if (latestResult) {
-      for (const kind of Object.keys(charts)) renderChart(kind, latestResult, false);
-    }
-    yearAnnounce.textContent = "";
-    return;
-  }
-
-  if (announce) {
-    const year = Math.round(latestResult.series.years[cursorIndex]);
-    yearAnnounce.textContent = `Year ${year}. ${
-      Object.values(charts)
-        .map((chart) => `${chart.plate?.querySelector("figcaption h3")?.textContent ?? chart.kind}, ${chart.output.textContent}`)
-        .join(". ")
-    }.`;
-  }
-}
-
-function setYearCursor(index, { announce = false } = {}) {
-  const count = yearCount();
-  if (!count) return;
-
-  const step = yearStep();
-  const next = index === null
-    ? null
-    : Math.min(count - 1, Math.max(0, Math.round(index / step) * step));
-
-  if (next === cursorIndex) {
-    // Re-announcing an unchanged year still matters: a keyboard reader who
-    // holds ArrowLeft at the start of the series needs to hear that it did
-    // not move, rather than silence.
-    if (announce && next !== null) applyYearCursor(true);
-    return;
-  }
-  cursorIndex = next;
-  applyYearCursor(announce);
-}
-
-// Maps a client x onto a year index using the plot's own geometry, so the
-// rule lands on a sampled year rather than wherever the pointer happens to be.
-function indexFromPointer(chartSvg, clientX) {
-  const count = yearCount();
-  if (!count) return null;
-
-  const rect = chartSvg.getBoundingClientRect();
-  if (!rect.width) return null;
-
-  const viewBoxX = ((clientX - rect.left) / rect.width) * 800;
-  const ratio = (viewBoxX - plot.left) / (plot.right - plot.left);
-  return Math.round(Math.min(1, Math.max(0, ratio)) * (count - 1));
-}
-
-function chartFromEvent(event) {
-  const plate = event.target.closest?.(".plate");
-  if (!plate) return null;
-  return charts[plate.dataset.chart] ?? null;
-}
-
-if (plateBay) {
-  plateBay.addEventListener("pointermove", (event) => {
-    // Touch drags are scrolls. Tapping still works, via click below.
-    if (event.pointerType === "touch") return;
-    const chart = chartFromEvent(event);
-    if (!chart) return;
-    setYearCursor(indexFromPointer(chart.svg, event.clientX));
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => show(index));
   });
 
-  plateBay.addEventListener("pointerleave", (event) => {
-    if (event.pointerType === "touch") return;
-    setYearCursor(null);
-  });
-
-  plateBay.addEventListener("click", (event) => {
-    const chart = chartFromEvent(event);
-    if (!chart) return;
-    setYearCursor(indexFromPointer(chart.svg, event.clientX), { announce: true });
-  });
-
-  // Focusing a plate puts the rule on the horizon year — the one the headline
-  // quotes — so a keyboard reader lands somewhere meaningful rather than at
-  // the left edge where every series is still identical.
-  plateBay.addEventListener("focusin", (event) => {
-    if (!event.target.classList?.contains("plate")) return;
-    if (cursorIndex === null) setYearCursor(yearCount() - 1, { announce: true });
-  });
-
-  plateBay.addEventListener("keydown", (event) => {
-    if (!event.target.classList?.contains("plate")) return;
-
-    const count = yearCount();
-    if (!count) return;
-    const from = cursorIndex ?? count - 1;
-    const step = yearStep();
-
-    switch (event.key) {
-      case "ArrowLeft":
-        setYearCursor(from - step, { announce: true });
-        break;
-      case "ArrowRight":
-        setYearCursor(from + step, { announce: true });
-        break;
-      case "Home":
-        setYearCursor(0, { announce: true });
-        break;
-      case "End":
-        setYearCursor(count - 1, { announce: true });
-        break;
-      case "Escape":
-        setYearCursor(null);
-        return;
-      default:
-        return;
-    }
-
-    // Arrow keys would otherwise scroll the plate bay out from under the rule.
+  document.querySelector("#carousel-tabs").addEventListener("keydown", (event) => {
+    const steps = { ArrowRight: 1, ArrowLeft: -1, Home: -slides.length, End: slides.length };
+    const step = steps[event.key];
+    if (step === undefined) return;
     event.preventDefault();
+    show(Math.min(Math.max(current + step, 0), slides.length - 1), true);
   });
+
+  previous.addEventListener("click", () => show(current - 1));
+  next.addEventListener("click", () => show(current + 1));
+
+  show(0);
 }
 
 // ── Permalink ──────────────────────────────────────────────────────────
@@ -950,6 +808,7 @@ resetButton.addEventListener("click", () => {
 
 createControls();
 buildComputeBank();
+initCarousel();
 
 // Reflect a scenario restored from the URL in the participation radios.
 const restoredScenario = scenarioInputs.find((input) => input.value === scenario);

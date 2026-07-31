@@ -1,0 +1,453 @@
+/* ==========================================================================
+   Opportunity FLOPs — shared foundation
+   Direction: "Scientific Monograph". Ink and paper, numbered figure plates,
+   caveats hung in the margin, structure carried by rules and typography.
+
+   Loaded by BOTH /index.html and /methodology.html, ahead of each page's own
+   stylesheet. Anything that must look identical across the two pages lives
+   here: fonts, tokens, the page shell, the masthead and the colophon.
+   Page-specific rules belong in styles.css (calculator) or methodology.css.
+   ========================================================================== */
+
+/* --- Fonts ---------------------------------------------------------------
+   Barlow carries body, controls and labels. Newsreader carries display,
+   figure numbers and mathematics — a serif/sans pairing contrasts on
+   structure, where two sans faces would only muddy the hierarchy.
+
+   Newsreader ships no Greek. β, γ, δ and α therefore resolve through
+   --font-math's fallback, which is why that stack leads with a face that
+   actually has Greek rather than reusing --font-display.
+   ------------------------------------------------------------------------ */
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/assets/fonts/Barlow-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/assets/fonts/Barlow-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/assets/fonts/Barlow-SemiBold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/assets/fonts/Barlow-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  src: url("/assets/fonts/Newsreader-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  src: url("/assets/fonts/Newsreader-latin-ext.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  src: url("/assets/fonts/Newsreader-Italic-latin.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Newsreader";
+  src: url("/assets/fonts/Newsreader-Italic-latin-ext.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* --- Tokens --------------------------------------------------------------
+   The four chart plates are frozen, and their strokes read straight from
+   --ink, --orange, --blue, --orange-soft, --panel and --rule-strong. Those
+   six keep their exact legacy values so the plots render byte-identical.
+   --ink (#101b2b) is already a deep cool printer's black, so the monograph
+   is built around it rather than against it.
+
+   What genuinely changes is the ground: a warm ivory page beneath cool-white
+   plate stock, replacing the old paper/panel pair that differed by ~2%
+   lightness and left everything looking washed out.
+   ------------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+
+  /* Frozen — referenced by the chart rules. Do not retune. */
+  --ink: #101b2b;
+  --panel: #fbfcfb;
+  --rule: #c8d0d4;
+  --rule-strong: #86919a;
+  --orange: #c84e2f;
+  --orange-soft: #f0d5ca;
+  --blue: #245b96;
+  --blue-soft: #d7e3ef;
+
+  /* Ground and text */
+  --paper: oklch(96% 0.012 88);
+  --plate: var(--panel);
+  --muted: #556070;
+  --orange-text: #9f381f;
+  --ready: #2e7253;
+
+  /* Type */
+  --font-body: "Barlow", "Trebuchet MS", sans-serif;
+  --font-display: "Newsreader", "Iowan Old Style", Charter, Georgia, serif;
+  --font-math: "Newsreader", "Times New Roman", Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --t-display: clamp(2.6rem, 5.2vw, 4.75rem);
+  --t-headline: clamp(1.9rem, 3.2vw, 2.9rem);
+  --t-title: 1.3rem;
+  --t-lead: clamp(1.05rem, 1.3vw, 1.2rem);
+  --t-body: 1rem;
+  --t-small: 0.875rem;
+  --t-label: 0.7rem;
+
+  --measure: 68ch;
+
+  /* Space — multiples of the 24px body baseline */
+  --s1: 8px;
+  --s2: 12px;
+  --s3: 16px;
+  --s4: 24px;
+  --s5: 32px;
+  --s6: 48px;
+  --s7: 72px;
+  --s8: 96px;
+  --s9: 144px;
+
+  /* Shell */
+  --shell: 1460px;
+  --gutter: 24px;
+  --margin-col: 200px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  font-family: var(--font-body);
+  font-synthesis: none;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--paper);
+  font-size: var(--t-body);
+  line-height: 1.5;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+/* Mathematics and single-letter variables are set in the serif italic, the
+   way they would be in print. Greek falls through to --font-math's fallback. */
+i,
+var {
+  font-family: var(--font-math);
+  font-style: italic;
+}
+
+/* --- Shell ---------------------------------------------------------------
+   `.sheet` is the monograph's two-column measure: a narrow margin for
+   hanging notes, and the main text column. It collapses to one column below
+   1020px, where marginalia become inline asides.
+   ------------------------------------------------------------------------ */
+
+.shell {
+  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
+  margin-inline: auto;
+}
+
+.sheet {
+  display: grid;
+  grid-template-columns: var(--margin-col) minmax(0, 1fr);
+  column-gap: var(--s6);
+}
+
+.sheet > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
+/* Hung in the margin, aligned to the first line of the block it annotates. */
+.marginalia {
+  grid-column: 1;
+  margin: 0;
+  padding-top: 3px;
+  border-top: 1px solid var(--ink);
+  color: var(--muted);
+  font-size: var(--t-label);
+  line-height: 1.45;
+}
+
+.marginalia strong {
+  display: block;
+  margin-bottom: var(--s1);
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+}
+
+/* --- Shared typography --------------------------------------------------- */
+
+.label {
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-wrap: balance;
+}
+
+/* --- Masthead ------------------------------------------------------------
+   Shared chrome. Both pages carry this markup verbatim; edit it here rather
+   than in either page's stylesheet.
+   ------------------------------------------------------------------------ */
+
+.topbar {
+  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
+  min-height: 68px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-top: var(--s4);
+  border-bottom: 2px solid var(--ink);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3em;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.22rem;
+  text-decoration: none;
+}
+
+.wordmark span {
+  font-weight: 400;
+  font-style: italic;
+}
+
+.wordmark strong {
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+}
+
+.topbar nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s4);
+  padding-bottom: var(--s2);
+}
+
+.topbar nav a {
+  color: var(--muted);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+  text-decoration: none;
+}
+
+.topbar nav a[aria-current="page"] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.topbar nav a:hover,
+.topbar nav a:focus-visible {
+  color: var(--orange-text);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+/* --- Colophon ------------------------------------------------------------ */
+
+footer {
+  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s3) var(--s6);
+  align-items: baseline;
+  margin-top: var(--s7);
+  padding: var(--s4) 0 var(--s6);
+  border-top: 2px solid var(--ink);
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+footer p {
+  margin: 0;
+}
+
+footer p:first-child {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+footer p:nth-child(2) {
+  grid-column: 1;
+  max-width: 52ch;
+}
+
+.footer-links {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+}
+
+.footer-links a {
+  color: var(--muted);
+  font-size: var(--t-label);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+  text-decoration: none;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+  color: var(--orange-text);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+/* --- Focus --------------------------------------------------------------- */
+
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 1020px) {
+  :root {
+    --gutter: 16px;
+  }
+
+  .sheet {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sheet > * {
+    grid-column: 1;
+  }
+
+  /* Off the margin, a hanging note becomes an inline aside rather than
+     disappearing — the caveat is the point, not the placement. */
+  .marginalia {
+    max-width: var(--measure);
+    margin-block: var(--s3) var(--s4);
+    padding-left: var(--s3);
+    padding-top: 0;
+    border-top: 0;
+    border-left: 2px solid var(--ink);
+  }
+}
+
+@media (max-width: 760px) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .topbar {
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s4);
+  }
+
+  footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .footer-links {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

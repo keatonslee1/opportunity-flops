@@ -47,7 +47,7 @@ devices out of them and never defines a parallel set.
 
 - [x] **A — Phase 0** · typographic route chosen, **fluoro chosen, halftone + overprint primitives built**, fonts installed, `DESIGN.md` rewritten, `base.css` rebuilt → **unblocks B's Tasks 2 and 2b**
 - [x] **B — Task 1** · methodology paper structure (runs in parallel with A Phase 0, no gate)
-- [ ] **A — Phase 1** · calculator rebuilt: architecture, control margin, plates, signature moment, **masthead plate**, reveal, responsive
+- [x] **A — Phase 1** · calculator rebuilt: architecture, control margin, plates, signature moment, **masthead plate**, reveal, responsive
 - [x] **B — Task 2** · methodology page set on A's primitives
 - [ ] **B — Task 2b** · section devices + colophon device
 - [x] **B — Task 3** · `print.css`
@@ -403,3 +403,90 @@ positive control. Both agree exactly.
 
 Fixing `--font-math` is yours. The three options are on A5 and I will sweep the document to
 whichever you pick.
+
+---
+
+## A — PHASE 1 DONE · 2026-07-31
+
+Calculator rebuilt. `npm test` 46/46, `npm run build` clean. Commits `c1f57df`, `b8ef67a`.
+Verified by loading the site at 1440 / 1020 / 760 / 360, not by reading the code.
+
+### What shipped
+
+**Architecture.** `index.html` opens with the running head, the masthead, then a frontmatter
+block on the shared `.sheet` grid: display title, abstract at a 68ch measure, build status
+hung in the margin column, then Plate I. A folio line closes the sheet. `print.css` is
+linked (**your A8 is done**).
+
+**A7 is done — `dl.model-readiness` is gone.** Its three facts are the margin's status note.
+
+**Plate I — the compute bank.** A hundred unit marks standing for frontier R&D compute,
+inline SVG built from the ink system. The committed share flips from oxidized orange to
+verdigris mark by mark as the policy slider moves. Fifty marks to a row and two rows, so a
+full 50 % commitment is exactly the top row — the control's range and the picture's top line
+are the same statement. The flip changes the *fill* as well as the ink (solid bar → hollow
+bar), so it reads with no colour at all. Ground is an **ink** halftone screen at
+`.screen-10`. It was ochre for one draft and that was wrong: ochre means uncertainty, and
+there is nothing uncertain about the denominator. Fluoro appears exactly once, on the
+plate's own device.
+
+**The signature moment.** Pointing at or focusing any plate raises a cobalt rule at that year
+across all six plates at once, each reporting its own value on its own readout line in
+tabular monospace. Arrow keys move it, Home/End jump, Escape clears. The rule snaps to whole
+years — the model samples quarterly, so without snapping an arrow key moved a quarter and
+the readout printed the same rounded year four presses running, which reads as a broken
+control.
+
+### Things you should know about, because they touch shared surfaces
+
+1. **The grain moved from `<body>` to the root.** This is in `base.css`, so it affects your
+   page too. It is a paint-order fix, not a preference: a stacking context paints its own
+   background, then negative-`z-index` descendants, then the backgrounds of its in-flow
+   block descendants — so a grain on `<body>` painted straight over `.reg-marks`, which sits
+   at `z-index: -1` precisely so it can never land on a plate. **Your registration marks
+   were invisible too, and now are not.** Nothing for you to change.
+
+2. **Registration marks are now 12px at a 6px inset**, down from 16px at 10px. At the old
+   size the top-left mark touched the first letter of the running head. If your page places
+   anything within ~20px of a viewport corner, it will sit near one.
+
+3. **`base.css` `.plate` gives you cool-white stock and a `1px --rule` border.** The
+   calculator overrides it to a rule-separated variant *because its plates already sit on a
+   plate-stock bay* — two boxes drawn around each other otherwise. If your figures sit
+   directly on the ivory, take the `base.css` default; it is the one that keeps the White
+   Plate Rule true.
+
+4. **Reduced motion.** The year rule is deliberately *not* gated behind
+   `prefers-reduced-motion`. It does not animate — it is a readout, and taking it away would
+   remove a way of reading the figures from the readers most likely to need it. What the
+   gate disables is the chart-recorder draw. Flagging it because brief Task 4 says
+   "everything disabled under reduced motion" and I read that as the motion, not the
+   feature. Say so at Task 4 if you disagree.
+
+### Checks run
+
+- **Banlist grep clean** across `base.css`, `styles.css`, `index.html`, `app.js`: zero
+  non-zero `border-radius`, zero blurred `box-shadow` (three remain, all zero-blur hairline
+  rules), zero gradients, zero `backdrop-filter`, zero banned faces, zero `transition: all`,
+  zero icon-set references, zero `<img>`. The range control's progress fill *was* a
+  two-stop gradient and is now two elements.
+- **Keyboard.** 25 focusable stops in DOM order, no traps, cobalt focus ring at the declared
+  3px/2px. All six plates reachable and operable by arrow keys.
+- **Responsive.** 1440 / 1020 / 760 / 360, each in a real viewport: no horizontal overflow,
+  no element extending past the viewport, navigation never hidden, marginalia never hidden.
+  Rack is sticky above 760 and static at or below it. The compute bank restacks to 20 marks
+  across below 560.
+- **Ink audit on my surfaces.** Orange: Firm A trace, figure numbers, capability marks,
+  headline value. Cobalt: controls, range fill, focus ring, Firm B trace, the year rule and
+  its plate mark. Verdigris: alignment marks in Plate I. Ochre: nothing on the calculator
+  yet — it is yours on the paper, and the calculator has no uncertainty band to draw.
+  Fluoro: the Plate I device, once. Ink: text, rules, baseline trace, the Plate I ground
+  screen.
+
+### Still open on my side
+
+Phase 2, once you report Task 4: your `## For A` punchlist, cross-page reconciliation in
+`base.css`, the full Studio Test, and reconciling `DESIGN.md` against what shipped. The
+`.running-head` margin override in `methodology.css` I flagged in the Phase 0 block is still
+there — it is yours, and it makes the running head start at x=0 and clip while the masthead
+below it starts at the gutter.

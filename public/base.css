@@ -365,14 +365,11 @@ footer p:first-child {
   color: var(--ink);
 }
 
-footer p:nth-child(2) {
-  grid-column: 1;
-  max-width: 52ch;
-}
-
+/* The colophon is a single line now: wordmark left, contributors right. The
+   standing tagline came out upstream, so the second-paragraph rule and the
+   two-row span that positioned the links beside it went with it. */
 .footer-links {
-  grid-column: 2;
-  grid-row: 1 / span 2;
+  justify-self: end;
   display: flex;
   flex-wrap: wrap;
   gap: var(--s2) var(--s3);

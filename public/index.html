@@ -54,7 +54,7 @@
           </div>
           <div>
             <dt>Chart data</dt>
-            <dd>Illustrative</dd>
+            <dd id="status-chart-data">Illustrative</dd>
           </div>
         </dl>
       </section>
@@ -91,7 +91,7 @@
               <circle cx="10" cy="10" r="8.25"></circle>
               <path d="M10 8v5M10 5.5v.5"></path>
             </svg>
-            <p>Controls currently drive illustrative geometry, not validated model results.</p>
+            <p id="rack-note-text">Controls currently drive illustrative geometry, not validated model results.</p>
           </div>
         </aside>
 
@@ -110,7 +110,7 @@
             <span><i class="legend-line baseline"></i>Baseline</span>
             <span><i class="legend-line firm-a"></i>Firm A</span>
             <span><i class="legend-line firm-b"></i>Firm B</span>
-            <span class="legend-disclaimer">Illustrative preview</span>
+            <span class="legend-disclaimer" id="legend-disclaimer">Illustrative preview</span>
           </div>
 
           <article class="chart-block" aria-labelledby="software-chart-title">
@@ -125,14 +125,9 @@
               <svg class="trajectory-chart" id="software-chart" viewBox="0 0 800 300" role="img" aria-labelledby="software-svg-title software-svg-desc">
                 <title id="software-svg-title">Illustrative software progress trajectories</title>
                 <desc id="software-svg-desc">Baseline, Firm A, and Firm B trajectories from 2026 through 2034. These are interface demonstration values, not model results.</desc>
-                <g class="plot-grid" aria-hidden="true">
-                  <path d="M68 34H768M68 96H768M68 158H768M68 220H768"></path>
-                  <path d="M68 34V244M243 34V244M418 34V244M593 34V244M768 34V244"></path>
-                </g>
-                <g class="axis-labels" aria-hidden="true">
-                  <text x="50" y="39" text-anchor="end">220</text><text x="50" y="101" text-anchor="end">180</text><text x="50" y="163" text-anchor="end">140</text><text x="50" y="225" text-anchor="end">100</text>
-                  <text x="68" y="270">2026</text><text x="243" y="270">2028</text><text x="418" y="270">2030</text><text x="593" y="270">2032</text><text x="768" y="270" text-anchor="end">2034</text>
-                </g>
+                <!-- Grid and labels are regenerated from the plotted range. -->
+                <g class="plot-grid" id="software-grid" aria-hidden="true"></g>
+                <g class="axis-labels" id="software-axis" aria-hidden="true"></g>
                 <path class="gap-area" id="software-area"></path>
                 <path class="trace trace-baseline" id="software-baseline"></path>
                 <path class="trace trace-a" id="software-a"></path>
@@ -156,14 +151,9 @@
               <svg class="trajectory-chart" id="capability-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-svg-title capability-svg-desc">
                 <title id="capability-svg-title">Illustrative frontier capability trajectories</title>
                 <desc id="capability-svg-desc">Baseline, Firm A, and Firm B trajectories from 2026 through 2034. These are interface demonstration values, not model results.</desc>
-                <g class="plot-grid" aria-hidden="true">
-                  <path d="M68 34H768M68 96H768M68 158H768M68 220H768"></path>
-                  <path d="M68 34V244M243 34V244M418 34V244M593 34V244M768 34V244"></path>
-                </g>
-                <g class="axis-labels" aria-hidden="true">
-                  <text x="50" y="39" text-anchor="end">220</text><text x="50" y="101" text-anchor="end">180</text><text x="50" y="163" text-anchor="end">140</text><text x="50" y="225" text-anchor="end">100</text>
-                  <text x="68" y="270">2026</text><text x="243" y="270">2028</text><text x="418" y="270">2030</text><text x="593" y="270">2032</text><text x="768" y="270" text-anchor="end">2034</text>
-                </g>
+                <!-- Grid and labels are regenerated from the plotted range. -->
+                <g class="plot-grid" id="capability-grid" aria-hidden="true"></g>
+                <g class="axis-labels" id="capability-axis" aria-hidden="true"></g>
                 <path class="gap-area" id="capability-area"></path>
                 <path class="trace trace-baseline" id="capability-baseline"></path>
                 <path class="trace trace-a" id="capability-a"></path>

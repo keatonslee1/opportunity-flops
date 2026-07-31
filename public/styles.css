@@ -356,6 +356,33 @@ footer {
   font-weight: 720;
 }
 
+.control-select {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.control-select-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 630;
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.control-select-input:hover {
+  border-color: var(--blue);
+}
+
+.control-select-input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
 .control input[type="range"] {
   --fill: 40%;
   grid-column: 1 / -1;
@@ -487,6 +514,11 @@ footer {
 .legend-disclaimer {
   margin-left: auto;
   color: var(--orange-text);
+}
+
+/* Set once the traces are driven by real model output rather than the preview. */
+.legend-disclaimer.is-live {
+  color: var(--ready);
 }
 
 .chart-block {

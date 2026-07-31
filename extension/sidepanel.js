@@ -91,9 +91,24 @@ function resolveScenarioKey(result, uiScenario) {
  * model publishes its own `SCENARIOS`, that wins.
  */
 const FALLBACK_SCENARIOS = [
-  { key: "none", label: "No reallocation", short: "Baseline" },
-  { key: "unilateral", label: "One firm reallocates", short: "Unilateral" },
-  { key: "coordinated", label: "Both firms reallocate", short: "Coordinated" },
+  {
+    key: "none",
+    label: "No reallocation",
+    short: "Baseline",
+    description: "Neither firm diverts compute. The counterfactual.",
+  },
+  {
+    key: "unilateral",
+    label: "One firm reallocates",
+    short: "Unilateral",
+    description: "One firm acts alone while the other keeps pushing the frontier.",
+  },
+  {
+    key: "coordinated",
+    label: "Both firms reallocate",
+    short: "Coordinated",
+    description: "Both firms reallocate under a common policy or commitment.",
+  },
 ];
 
 /**
@@ -329,6 +344,15 @@ function mountScenarioCards() {
     metric.textContent = EMPTY;
 
     card.append(name, metric);
+
+    // Only the selected row shows its description, which keeps three options
+    // legible in a narrow panel without hiding the reasoning entirely.
+    if (scenario.description) {
+      const desc = document.createElement("span");
+      desc.className = "scenario-desc";
+      desc.textContent = scenario.description;
+      card.append(desc);
+    }
     card.addEventListener("click", () => {
       state.scenario = scenario.key;
       saveState();

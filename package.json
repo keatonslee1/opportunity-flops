@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node server.mjs",
-    "build": "node --check public/app.js && node --check public/model.js",
+    "build": "node --check public/app.js && node --check public/model.js && node --check public/charts.js",
     "test": "node --test"
   }
 }

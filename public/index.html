@@ -16,31 +16,121 @@
         <p class="eyebrow">A model-driven policy calculator</p>
         <h1>Opportunity <span>FLOPs</span></h1>
         <p class="lede">
-          Explore the economic tradeoffs of reallocating frontier AI compute.
+          If frontier labs move compute from capabilities to alignment, how far
+          does AI progress fall behind — and what does the delay cost?
         </p>
       </header>
 
-      <section class="workspace" aria-label="Calculator preview">
-        <div class="controls">
-          <div class="section-heading">
-            <p>Assumptions</p>
-            <span>Provisional interface</span>
+      <p class="status-banner" id="model-status" role="status">
+        <strong>Model not yet connected.</strong> The interface below is fully
+        wired. Values and chart lines appear as soon as
+        <code>runModel()</code> returns results.
+      </p>
+
+      <nav class="tabs" role="tablist" aria-label="Views">
+        <button
+          role="tab"
+          id="tab-calculator"
+          aria-controls="panel-calculator"
+          aria-selected="true"
+        >
+          Calculator
+        </button>
+        <button
+          role="tab"
+          id="tab-dashboard"
+          aria-controls="panel-dashboard"
+          aria-selected="false"
+        >
+          Empirical dashboard
+        </button>
+      </nav>
+
+      <!-- ── Calculator ─────────────────────────────────────────────── -->
+      <section
+        class="panel"
+        id="panel-calculator"
+        role="tabpanel"
+        aria-labelledby="tab-calculator"
+      >
+        <div class="workspace">
+          <div class="controls">
+            <div class="section-heading">
+              <p>Assumptions</p>
+              <button type="button" class="link-button" id="reset-assumptions">
+                Reset
+              </button>
+            </div>
+            <div id="assumption-controls"></div>
           </div>
-          <div id="assumption-controls"></div>
+
+          <div class="results" aria-live="polite">
+            <div class="section-heading">
+              <p>Estimated opportunity cost</p>
+              <span id="active-scenario-label"></span>
+            </div>
+
+            <p class="result-value" id="headline-result">—</p>
+            <p class="result-note" id="result-note"></p>
+
+            <dl class="metric-grid" id="metric-grid"></dl>
+          </div>
         </div>
 
-        <div class="results" aria-live="polite">
+        <div class="scenario-strip">
           <div class="section-heading">
-            <p>Estimated opportunity cost</p>
-            <span>Model connection pending</span>
+            <p>Scenario comparison</p>
+            <span>Select one to drive the headline</span>
           </div>
-          <p class="result-value" id="headline-result">—</p>
-          <p class="result-note" id="result-note">
-            The interface is ready for the economic model. Values shown here are
-            intentionally disabled until its assumptions and equations are settled.
-          </p>
-          <div class="chart-placeholder" aria-hidden="true">
-            <div></div><div></div><div></div><div></div><div></div><div></div>
+          <div class="scenario-cards" id="scenario-cards"></div>
+        </div>
+      </section>
+
+      <!-- ── Empirical dashboard ────────────────────────────────────── -->
+      <section
+        class="panel"
+        id="panel-dashboard"
+        role="tabpanel"
+        aria-labelledby="tab-dashboard"
+        hidden
+      >
+        <div class="dashboard">
+          <aside class="dashboard-controls">
+            <div class="section-heading">
+              <p>Inputs</p>
+            </div>
+
+            <label class="field">
+              <span>Policy impact</span>
+              <select id="preset-select"></select>
+            </label>
+
+            <label class="field">
+              <span>Scenario</span>
+              <select id="dashboard-scenario"></select>
+            </label>
+
+            <div id="dashboard-controls"></div>
+
+            <div class="readout" id="dashboard-readout"></div>
+          </aside>
+
+          <div class="dashboard-charts">
+            <figure class="chart-block">
+              <figcaption class="section-heading">
+                <p>How much does software progress slow down?</p>
+                <span>S(t)</span>
+              </figcaption>
+              <div class="chart-frame" id="chart-software"></div>
+            </figure>
+
+            <figure class="chart-block">
+              <figcaption class="section-heading">
+                <p>How far do AI capabilities fall behind?</p>
+                <span>M(t)</span>
+              </figcaption>
+              <div class="chart-frame" id="chart-capability"></div>
+            </figure>
           </div>
         </div>
       </section>

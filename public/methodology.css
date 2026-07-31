@@ -1224,3 +1224,69 @@
     opacity: 1;
   }
 }
+
+/* --- Screened marks ------------------------------------------------------
+   THE HALFTONE RULE says a tint is a dot screen, never an opacity fade and
+   never a gradient. base.css ships four screen densities and a hatch that the
+   pages had barely touched.
+
+   The first thing I tried here was a 10% ochre screen across the whole of
+   § 9. It was wrong twice over: at full ochre saturation a 10% screen reads
+   as a solid tan panel rather than as stock, it cost the section real
+   legibility, and a tinted rectangle with type on it is a card however it is
+   drawn. It also fought the grain layer, which the brief already caps at one.
+
+   What replaced it is the printed convention for exactly this job — a change
+   bar. A hatched ochre rule runs the full height of § 9 in the margin, the
+   way a revised passage is marked in a specification. It says "this whole
+   section is qualified" without tinting a single word, and hatch is already
+   the mark uncertainty carries everywhere else on the page.
+   ------------------------------------------------------------------------ */
+
+.is-limitations {
+  position: relative;
+}
+
+.is-limitations::before {
+  content: "";
+  position: absolute;
+  top: var(--s6);
+  bottom: var(--s6);
+  left: 0;
+  width: 6px;
+  background-color: var(--ochre);
+  -webkit-mask-image: var(--hatch);
+  mask-image: var(--hatch);
+  -webkit-mask-size: 7px 7px;
+  mask-size: 7px 7px;
+  pointer-events: none;
+}
+
+/* The seam between the specification and the record of what was built. A
+   printer would screen it; so does this. */
+.part-rule {
+  position: relative;
+}
+
+.part-rule::after {
+  content: "";
+  /* A ::after on a grid container is a grid item, and base.css's `.sheet > *`
+     put it in the margin column — the band sat beside the divider instead of
+     under it. It spans the whole sheet, matching the 2px rule above it. */
+  grid-column: 1 / -1;
+  display: block;
+  height: 8px;
+  margin-top: var(--s2);
+  background-color: var(--ink);
+  -webkit-mask-image: var(--screen-25);
+  mask-image: var(--screen-25);
+  -webkit-mask-size: 8px 8px;
+  mask-size: 8px 8px;
+}
+
+@media (max-width: 1020px) {
+  /* The margin column is gone; the change bar would land on the text. */
+  .is-limitations::before {
+    display: none;
+  }
+}

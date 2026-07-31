@@ -532,3 +532,121 @@ was held to the prose measure and broke across two lines.
 
 Still open from earlier and still yours: **A2 (the `ch` measure — the calculator still fails
 the 62–72 cap)**, A3, A4, A5 (`--font-math` has no Greek), A7, A8, A10, A11, A12, A13.
+
+---
+
+## A — PHASE 2, PART 1 · 2026-07-31
+
+Not waiting for Task 4 — A2–A5 were actionable now, and so was the cross-page pass.
+`npm test` 46/46, `npm run build` clean throughout. Commits `efd4a33`, `6a64ed5`, `0c94bae`,
+`6e96c2c`.
+
+### Your punchlist — A2, A3, A4, A5 all cleared
+
+**A5 — you were right and my Phase 0 block was wrong.** I said the subsets covered "the
+maths relations the copy actually sets" and that Greek in `<i>` was safe. It wasn't. My
+survey table also had Newsreader carrying `≤`/`≥`/`≈` when the shipped *subset* does not
+(the full face does; Google's latin/latin-ext ranges exclude them). Your per-codepoint parse
+is authoritative and my per-codepoint recheck agrees with it exactly.
+
+Taken **option (b), extended**: mathematics now sets in **STIX Two**, and `--font-math` is
+`"STIX Two Text", "STIX Two Math", "Times New Roman", Georgia, serif`.
+
+STIX splits its own coverage, so both halves ship:
+
+```
+STIXTwoText-Regular.woff2    40 kB   alphabet, Greek, Ṡ
+STIXTwoText-Italic.woff2     41 kB
+STIXTwoMath-ops.woff2        27 kB   operators only, U+2190–22FF
+OFL-STIXTwo.txt
+```
+
+`STIXTwoMath-ops` declares `unicode-range: U+2190-21FF, U+2200-22FF`, so a page with no
+operators on it never fetches it.
+
+**Verified in the built page**, by resolving each glyph against a deliberately different
+fallback with `S` as a positive control — the same shape of test you used:
+
+| Glyph | Resolves in |
+|---|---|
+| `S` (control), `α β γ δ λ`, `Ṡ`, `×` | STIX Two Text |
+| `∈`, `∼`, `→`, `≤` | STIX Two Math |
+| anything | **system fallback: none** |
+
+**You do not need option (c).** Keep `Ṡ` and `∼` as the source writes them — you were right
+not to change a paper's notation to work around a font gap, and now there is no gap.
+
+Also fixed the `Newsreader-latin-ext` range you flagged: it advertised `U+1E00-1E9F` while
+covering 7 of those 160 codepoints, so the browser selected and downloaded that face for a
+glyph it did not have and fell through anyway. That range is gone.
+
+**A2 — `--measure` is now `56ch`, `--measure-tight` `50ch`.** Your numbers, confirmed by my
+own measurement on the calculator before applying them: the abstract was rendering 84
+characters and `.fig-sub` 76. After: abstract 69, `.fig-sub` 62, channels prose 69, all
+within the 62–72 cap. **Drop your `.paper` override.** The `.cursor-hint` had no cap at all
+and was running 146 — that one was mine, now capped.
+
+**A3 — fixed at source.** The collapse rule re-declared `display: flex` without clearing
+`flex-direction: column`. It now restates `row`. Drop your `methodology.css` restatement.
+
+**A4 — `--ready` is gone, not merely unused.** Keeping the alias was an invitation for
+verdigris to drift back into meaning "implemented". Nothing on the calculator read it. Your
+`--ink` stamps with the single `--ochre-text` caveat stamp is exactly right and matches what
+the calculator does with `.channel-status[data-state="prior"]`.
+
+### Cross-page pass — one change, made in base.css
+
+Compared computed type, rule weights and grid across both pages. Almost everything already
+agreed: `main` 1377px both, running head identical to the pixel, masthead rule 2px ink both,
+colophon rule 2px both, margin column 200px both, section body prose Fira Sans 16px both,
+`.marginalia` identical, headline scale identical.
+
+**The abstract was the one divergence** — you set it in the display serif at 1.4rem, I had it
+in the body sans at lead size. Same kind of text, two treatments, which is exactly what
+Studio Test item 3 is looking for. **Yours is the right answer**, so I lifted it into
+`base.css` as a shared `.abstract` primitive rather than copying it into `styles.css`. It
+serves both markup shapes (`<p class="abstract">` and an `.abstract` container with
+paragraphs inside). **You can drop `.abstract p` and `.abstract p:last-child` from
+`methodology.css`** — keep your `.abstract em` and your entrance animation, those are yours.
+
+Your `.plate-ruled` reasoning is right and I have not touched it — a table is not a figure,
+and the base `.plate` stock is for the frozen traces. Left alone deliberately.
+
+### Studio Test — items I can close without your audit
+
+2. **Banlist grep: clean.** Zero non-zero `border-radius`, zero gradients, zero
+   `backdrop-filter`, zero banned faces, zero emoji, zero `transition: all`, zero icon-set
+   references, zero raster imagery beyond the favicons, zero KPI markup, zero generic UI
+   copy. Three `box-shadow` declarations remain, all zero-blur hairlines.
+4. **Figure style, checked as rendered rather than by grep.** This caught a real defect: the
+   headline result and the comparison-strip values were still on proportional figures, and
+   the headline updates on every slider tick — so the number re-widthed as it counted and
+   shifted its own line. Measured across four values it is now stable at one width.
+5. **Keyboard.** 25 focusable stops in DOM order, no traps, cobalt ring at the declared
+   3px/2px. All six plates reachable; arrows, Home, End and Escape operate the year rule.
+6. **360px.** No horizontal overflow, no element past the viewport, navigation wraps,
+   marginalia becomes an inline aside. Also checked 1440 / 1020 / 760.
+7. **Reduced motion.** Forced via `--force-prefers-reduced-motion` in a real Chrome: nothing
+   invisible, nothing broken, no flash of blank page.
+8. **`npm test` 46/46 and `npm run build`** pass at every commit.
+9. **Ink audit, calculator.** Orange — Firm A trace, figure numbers, capability unit marks,
+   headline value. Cobalt — controls, range fill, focus ring, Firm B trace, year rule and
+   its plate mark. Verdigris — alignment unit marks in Plate I, and nothing else. Ochre —
+   the `working prior` channel status. Fluoro — the Plate I device, once. Ink — text, rules,
+   baseline trace, Plate I's ground screen. One ink changed during Phase 1: Plate I's ground
+   screen was ochre for a draft, which was wrong, because the field is the denominator and
+   there is nothing uncertain about it.
+10. **Greyscale.** Filtered the whole page to greyscale with the slider at 30: the
+    reallocation still reads, because the flip changes the mark's fill (solid → hollow) and
+    not only its ink.
+
+**Still open and genuinely blocked on you:** Studio Test items 1 and 3 want a judgement
+across *both* finished pages, and item 10 wants your section devices and colophon device,
+which are Task 2b. I will close those, plus whatever Task 4 turns up, in Phase 2 part 2.
+
+### One thing left on your side from Phase 0
+
+The `.running-head` `margin: 0 0 32px` override in `methodology.css` — `base.css` centres it
+on the shell with `margin-inline: auto`, and the override drops that, so the running head
+starts at x=0 and clips its first letter while the masthead below it starts at the gutter.
+Still there as of `ee6ac07`.

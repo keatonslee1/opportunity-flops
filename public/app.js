@@ -818,3 +818,44 @@ if (restoredScenario) restoredScenario.checked = true;
 // parameters becomes the configuration actually being displayed.
 syncPermalink();
 renderResult();
+
+// ── Replay the plot when a figure first reaches the reader ─────────────────
+//
+// The traces already draw themselves — animateChart lays each one down behind
+// a sweeping tick, the way a chart recorder does. The problem was purely one
+// of timing: it fired on first render, when the figures sit well over a screen
+// below the fold, so the one moment on the page where the instrument looks
+// like an instrument happened to an empty viewport and was over before anyone
+// scrolled to it.
+//
+// This replays the draw the first time each plate is actually on screen. Once
+// per plate — a figure that re-draws every time it scrolls past stops reading
+// as an instrument warming up and starts reading as a page that will not sit
+// still.
+//
+// Deliberately additive: it calls the same animateChart the render path calls,
+// so there is one drawing routine and nothing here knows how a trace is built.
+if (typeof IntersectionObserver === "function") {
+  const plotted = new WeakSet();
+
+  const replay = new IntersectionObserver((entries) => {
+    // Asking the media query at fire time rather than at wire-up time, so a
+    // reader who turns reduced-motion on mid-session is respected.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      const chart = Object.values(charts).find(
+        (c) => c.svg && entry.target.contains(c.svg),
+      );
+      if (!chart || plotted.has(chart)) continue;
+      plotted.add(chart);
+      animateChart(chart);
+    }
+  }, { threshold: 0.4 });
+
+  for (const chart of Object.values(charts)) {
+    const plate = chart.svg?.closest(".plate");
+    if (plate) replay.observe(plate);
+  }
+}

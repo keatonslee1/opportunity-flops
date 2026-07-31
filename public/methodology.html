@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="How the Opportunity FLOPs reduced-form model works: the four model steps, the Monte Carlo parameter bundles, and the full parameter contract."
+      content="Working Paper 01: the reduced-form model behind Opportunity FLOPs — the reallocation channel, the software and capability equations, the risk channel, the assumed priors, and an explicit statement of what the output does not support."
     />
     <title>Methodology — Opportunity FLOPs</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -15,7 +15,32 @@
     <link rel="stylesheet" href="/methodology.css" />
   </head>
   <body>
+    <!--
+      THESIS: The calculator is an instrument; this is the paper it implements. Read as a working paper, it earns the trust the instrument spends.
+      OWN-WORLD: Ivory stock and printer's ink. Running head, folio line, § marks in the margin, numbered display equations, notes hung beside the paragraph that cites them, ruled plates with the caption below.
+      STORY: Abstract → the four modelled steps → the implementation record → an explicit limitations section → the full parameter contract.
+      FIRST VIEWPORT: Running head over a hairline, the working-paper number, the title, an abstract set to a 68-character measure.
+      FORM: Research working paper. Structure is carried by rules and typography; there are no cards and no fills anywhere in this document.
+      FINISH: unreviewed and undocumented is unfinished.
+    -->
+
+    <!-- Registration marks, four corners. Structural print artifact, not content. -->
+    <div class="reg-marks" aria-hidden="true">
+      <span class="reg-mark reg-mark-tl"></span>
+      <span class="reg-mark reg-mark-tr"></span>
+      <span class="reg-mark reg-mark-bl"></span>
+      <span class="reg-mark reg-mark-br"></span>
+    </div>
+
     <a class="skip-link" href="#top">Skip to content</a>
+
+    <p class="running-head" aria-hidden="true">
+      <span>Opportunity FLOPs</span>
+      <span>Working Paper 01</span>
+      <span>Reallocation of capability compute</span>
+      <span>July 2026</span>
+    </p>
+
     <header class="topbar">
       <a class="wordmark" href="/" aria-label="Opportunity FLOPs home">
         <span>Opportunity</span><strong>FLOPs</strong>
@@ -30,322 +55,865 @@
     <main id="top">
       <article class="paper">
         <header class="frontmatter sheet">
-          <p class="running-head label">Opportunity FLOPs · Methodology</p>
-          <h1 id="paper-title">AI Capability Trade-off Model</h1>
-          <p class="byline">A reduced-form specification, and a record of how much of it this calculator computes.</p>
+          <p class="paper-number label">Working Paper No.&#8201;01</p>
 
-          <h2 class="question-heading" id="research-question">Research question</h2>
-          <p class="lede">
-            How does reallocating a share of frontier AI R&amp;D compute from capability research to alignment research affect frontier AI capability and AI safety over time?
+          <h1 id="paper-title">The AI capability trade-off model</h1>
+          <p class="byline">
+            A reduced-form specification, and a record of how much of it this calculator computes.
+          </p>
+          <p class="imprint">
+            After Katherine’s reduced-form model · Draft of 31 July 2026 ·
+            Priors unvalidated
           </p>
 
-          <aside class="marginalia" aria-label="Note on Table 1">
-            <strong>Note</strong>
-            Both channels are implemented. They do not rest on equal footing: the capability channel follows the specification, while the safety channel supplies its own baseline and prior for λ, neither of which the source fixes.
+          <h2 class="apparatus-heading" id="abstract-heading">Abstract</h2>
+          <div class="abstract" aria-labelledby="abstract-heading">
+            <p>
+              A policy reallocates a share <i>x</i> of frontier AI R&amp;D compute from
+              capability research to alignment. This paper specifies the reduced-form
+              model that carries that reallocation through to two observable quantities,
+              and records exactly how much of the specification the shipped calculator
+              evaluates.
+            </p>
+            <p>
+              The reallocation enters an ideas-production function for software progress,
+              propagates into a Cobb–Douglas capability index that holds training
+              compute equal across arms, and drives an exponential reduction channel for
+              AI risk. A <em>capability cost</em> and a <em>safety benefit</em>
+              follow.<sup class="fn-ref"><a id="fnref-1" href="#fn-1" role="doc-noteref" aria-label="Footnote 1">1</a></sup>
+              Every quantity the calculator plots is a comparison between a baseline arm
+              and a policy arm of the same normalized run: a statement about divergence,
+              never a dated forecast of absolute capability.
+            </p>
+            <p>
+              The parameter bundles are sensitivity cases drawn from assumed priors. They
+              are not empirical estimates, they are not joint outcome percentiles, and
+              they are not a forecast. <a href="#part-9">§&#8201;9</a> says so at length,
+              because for this audience an honest account of what the model cannot
+              support is the only thing that makes the rest of it usable.
+            </p>
+          </div>
+
+          <p class="keywords">
+            <span class="label">Keywords</span>
+            compute governance · alignment investment · reduced-form modelling
+            · sensitivity analysis
+          </p>
+
+          <aside class="footnote marginalia" id="fn-1" role="doc-footnote">
+            <a class="fn-back" href="#fnref-1" aria-label="Back to footnote 1 in the text"
+              ><span class="fn-no">1</span></a
+            >
+            Both channels are implemented. They do not rest on equal footing: the
+            capability channel follows the specification, while the safety channel
+            supplies its own baseline and its own prior for <i>λ</i>, neither of which the
+            source fixes.
           </aside>
           <figure class="plate" id="table-1">
             <div class="table-scroll" tabindex="0" role="region" aria-labelledby="table-1-caption">
               <table class="summary-table">
-                <thead><tr><th scope="col">Channel</th><th scope="col">Mechanism</th><th scope="col">Primary output</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th scope="col">Channel</th>
+                    <th scope="col">Mechanism</th>
+                    <th scope="col">Primary output</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  <tr><th scope="row">Capability</th><td>R&amp;D compute <span aria-hidden="true">→</span><span class="sr-only">to</span> software progress <span aria-hidden="true">→</span><span class="sr-only">to</span> frontier capability</td><td>Capability cost / gap</td></tr>
-                  <tr><th scope="row">Safety</th><td>Alignment compute <span aria-hidden="true">→</span><span class="sr-only">to</span> lower AI risk</td><td>Safety benefit</td></tr>
+                  <tr>
+                    <th scope="row">Capability</th>
+                    <td>
+                      R&amp;D compute <span aria-hidden="true">→</span><span class="sr-only">to</span>
+                      software progress <span aria-hidden="true">→</span><span class="sr-only">to</span>
+                      frontier capability
+                    </td>
+                    <td>Capability cost</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Safety</th>
+                    <td>
+                      Alignment compute <span aria-hidden="true">→</span><span class="sr-only">to</span>
+                      lower AI risk
+                    </td>
+                    <td>Safety benefit</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
-            <figcaption id="table-1-caption"><span class="caption-index">Table 1</span> Model summary, reproduced from the specification. The model consists of two parallel channels.</figcaption>
+            <figcaption id="table-1-caption">
+              <span class="caption-index">Table 1</span> Model summary, reproduced from the
+              specification. The model consists of two parallel channels driven by the same
+              policy variable.
+            </figcaption>
+          </figure>
+
+          <figure class="plate" id="table-2">
+            <div class="table-scroll" tabindex="0" role="region" aria-labelledby="table-2-caption">
+              <table class="notation-table">
+                <thead>
+                  <tr>
+                    <th class="sym" scope="col">Symbol</th>
+                    <th scope="col">Role in the model</th>
+                    <th scope="col">Value in this build</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th class="sym" scope="row"><i>A</i></th>
+                    <td>Research productivity in the ideas-production function</td>
+                    <td>Absorbed by the baseline normalization</td>
+                    <td>Never evaluated numerically</td>
+                  </tr>
+                  <tr>
+                    <th class="sym" scope="row"><i>β</i></th>
+                    <td>Elasticity of software progress to capability R&amp;D compute</td>
+                    <td>Triangular(0.15, 0.30, 0.50)</td>
+                    <td>Working prior, from the specification</td>
+                  </tr>
+                  <tr>
+                    <th class="sym" scope="row"><i>γ</i></th>
+                    <td>Software feedback — knowledge and AI-assisted R&amp;D</td>
+                    <td>Triangular(0.20, 0.40, 0.60)</td>
+                    <td>Working prior, from the specification</td>
+                  </tr>
+                  <tr>
+                    <th class="sym" scope="row"><i>α</i></th>
+                    <td>Training-compute elasticity in the capability index</td>
+                    <td>Cancels from every relative output</td>
+                    <td>Never evaluated numerically</td>
+                  </tr>
+                  <tr>
+                    <th class="sym" scope="row"><i>δ</i></th>
+                    <td>Software-to-capability elasticity</td>
+                    <td>Triangular(0.50, 0.70, 0.90)</td>
+                    <td>Working prior, from the specification</td>
+                  </tr>
+                  <tr>
+                    <th class="sym" scope="row"><i>λ</i></th>
+                    <td>Alignment effectiveness in the risk channel</td>
+                    <td>Triangular(0.20, 0.40, 0.60)</td>
+                    <td>Working prior chosen here; the source supplies none</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption id="table-2-caption">
+              <span class="caption-index">Table 2</span> Notation. The six structural
+              parameters, the role each one plays, and where its value comes from. Two of
+              the six are never evaluated; the remaining four are drawn, not measured.
+            </figcaption>
           </figure>
 
           <nav class="contents" aria-labelledby="contents-heading">
-            <h2 class="label" id="contents-heading">Contents</h2>
+            <h2 class="apparatus-heading" id="contents-heading">Contents</h2>
             <ol>
-              <li><a href="#part-1"><span class="numeric">I</span> Compute reallocation</a><span class="status is-live">Implemented</span></li>
-              <li><a href="#part-2"><span class="numeric">II</span> Software progress</a><span class="status is-live">Implemented</span></li>
-              <li><a href="#part-3"><span class="numeric">III</span> Frontier AI capability</a><span class="status is-live">Implemented</span></li>
-              <li><a href="#part-4"><span class="numeric">IV</span> AI risk</a><span class="status is-live">Implemented</span></li>
-              <li><a href="#part-5"><span class="numeric">V</span> Safety benefit</a><span class="status is-live">Implemented</span></li>
-              <li><a href="#part-6"><span class="numeric">VI</span> User inputs</a><span class="status is-live">Implemented</span></li>
-              <li><a href="#part-7"><span class="numeric">VII</span> Calibration of the bundles</a><span class="status is-live">Implemented</span></li>
-              <li><a href="#part-8"><span class="numeric">VIII</span> Normalization and scope</a><span class="status is-live">Implemented</span></li>
-              <li><a href="#part-9"><span class="numeric">IX</span> Parameter contract</a><span class="status is-live">Implemented</span></li>
+              <li>
+                <a href="#part-1"><span class="numeric">§&#8201;1</span> Compute reallocation</a>
+                <span class="status is-live">Implemented</span>
+              </li>
+              <li>
+                <a href="#part-2"><span class="numeric">§&#8201;2</span> Software progress</a>
+                <span class="status is-live">Implemented</span>
+              </li>
+              <li>
+                <a href="#part-3"><span class="numeric">§&#8201;3</span> Frontier AI capability</a>
+                <span class="status is-live">Implemented</span>
+              </li>
+              <li>
+                <a href="#part-4"><span class="numeric">§&#8201;4</span> AI risk</a>
+                <span class="status is-live">Implemented</span>
+              </li>
+              <li>
+                <a href="#part-5"><span class="numeric">§&#8201;5</span> Safety benefit</a>
+                <span class="status is-live">Implemented</span>
+              </li>
+              <li>
+                <a href="#part-6"><span class="numeric">§&#8201;6</span> User inputs</a>
+                <span class="status is-live">Implemented</span>
+              </li>
+              <li>
+                <a href="#part-7"><span class="numeric">§&#8201;7</span> Calibration of the bundles</a>
+                <span class="status is-live">Implemented</span>
+              </li>
+              <li>
+                <a href="#part-8"><span class="numeric">§&#8201;8</span> Normalization and scope</a>
+                <span class="status is-live">Implemented</span>
+              </li>
+              <li>
+                <a href="#part-9"><span class="numeric">§&#8201;9</span> Limitations and scope of inference</a>
+                <span class="status is-caveat">Read first</span>
+              </li>
+              <li>
+                <a href="#part-10"><span class="numeric">§&#8201;10</span> Parameter contract</a>
+                <span class="status is-live">Implemented</span>
+              </li>
             </ol>
           </nav>
         </header>
 
         <section class="part sheet" id="part-1" aria-labelledby="part-1-title">
           <div class="section-mark">
-            <span class="section-no numeric">I</span>
+            <span class="section-no numeric">§&#8201;1</span>
             <span class="status is-live">Implemented</span>
           </div>
           <h2 id="part-1-title">Compute reallocation</h2>
           <p>
-            Let <i>C</i><sub>R</sub>(<i>t</i>) be total frontier AI R&amp;D compute and <i>x</i> the share of it reallocated to alignment. Under the policy the R&amp;D budget splits in two: the remaining capability-oriented compute, and the alignment compute it paid for.
+            Let <i>C</i><sub>R</sub>(<i>t</i>) be total frontier AI R&amp;D compute and
+            <i>x</i> the share of it reallocated to alignment, with
+            0&#8201;≤&#8201;<i>x</i>&#8201;≤&#8201;0.5 over the range the calculator
+            exposes. Under the policy the R&amp;D budget splits in two: the remaining
+            capability-oriented compute, and the alignment compute it paid for.
           </p>
-          <div class="equation"><span class="eq-body"><i>C</i><sub>C,P</sub>(<i>t</i>) = (1 − <i>x</i>)<i>C</i><sub>R</sub>(<i>t</i>)</span><span class="eq-no">(1.1)</span></div>
-          <div class="equation"><span class="eq-body"><i>C</i><sub>A,P</sub>(<i>t</i>) = <i>x C</i><sub>R</sub>(<i>t</i>)</span><span class="eq-no">(1.2)</span></div>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>C</i><sub>C,P</sub>(<i>t</i>) = (1 − <i>x</i>)<i>C</i><sub>R</sub>(<i>t</i>)</span
+            ><span class="eq-no">(1.1)</span>
+          </div>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>C</i><sub>A,P</sub>(<i>t</i>) = <i>x</i>&#8201;<i>C</i><sub>R</sub>(<i>t</i>)</span
+            ><span class="eq-no">(1.2)</span>
+          </div>
           <p>Under the baseline nothing is reallocated, so the whole budget stays with capability work.</p>
-          <div class="equation"><span class="eq-body"><i>C</i><sub>C,B</sub>(<i>t</i>) = <i>C</i><sub>R</sub>(<i>t</i>)</span><span class="eq-no">(1.3)</span></div>
-          <div class="equation"><span class="eq-body"><i>C</i><sub>A,B</sub>(<i>t</i>) = 0</span><span class="eq-no">(1.4)</span></div>
-          <aside class="marginalia" aria-label="Note on equation 1.2">
-            <strong>Unused term</strong>
-            Equation (1.2) is specified but has no consumer. Alignment compute only enters the model through Parts <span class="numeric">IV</span> and <span class="numeric">V</span>, so nothing downstream of the calculator reads it.
+          <div class="equation">
+            <span class="eq-body"
+              ><i>C</i><sub>C,B</sub>(<i>t</i>) = <i>C</i><sub>R</sub>(<i>t</i>)</span
+            ><span class="eq-no">(1.3)</span>
+          </div>
+          <div class="equation">
+            <span class="eq-body"><i>C</i><sub>A,B</sub>(<i>t</i>) = 0</span
+            ><span class="eq-no">(1.4)</span>
+          </div>
+          <aside class="footnote marginalia" id="fn-2" role="doc-footnote">
+            <a class="fn-back" href="#fnref-2" aria-label="Back to footnote 2 in the text"
+              ><span class="fn-no">2</span></a
+            >
+            Equation (1.2) is specified but has no consumer. Alignment compute only enters
+            the model through <a href="#part-4">§&#8201;4</a> and
+            <a href="#part-5">§&#8201;5</a>, and it enters there through
+            <i>x</i> directly, so nothing downstream reads the quantity itself.
           </aside>
           <p>
-            The calculator implements (1.1), (1.3) and (1.4). It carries no quantity derived from (1.2).
+            The calculator implements (1.1), (1.3) and (1.4). It carries no quantity
+            derived from
+            (1.2).<sup class="fn-ref"><a id="fnref-2" href="#fn-2" role="doc-noteref" aria-label="Footnote 2">2</a></sup>
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;1</span>
+            <span class="folio-title">Compute reallocation</span>
+            <span class="folio-no numeric">1&#8202;/&#8202;10</span>
           </p>
         </section>
 
         <section class="part sheet" id="part-2" aria-labelledby="part-2-title">
           <div class="section-mark">
-            <span class="section-no numeric">II</span>
+            <span class="section-no numeric">§&#8201;2</span>
             <span class="status is-live">Implemented</span>
           </div>
           <h2 id="part-2-title">Software progress</h2>
           <p>
-            Let <i>S</i>(<i>t</i>) denote the software (algorithmic) progress index. Software progress follows an ideas-production function, run once for the baseline and once for the policy.
+            Let <i>S</i>(<i>t</i>) denote the software&#8202;—&#8202;that is,
+            algorithmic&#8202;—&#8202;progress index. Software progress follows an
+            ideas-production function, run once for the baseline and once for the policy.
           </p>
-          <div class="equation"><span class="eq-body"><i>Ṡ</i><sub>B</sub>(<i>t</i>) = <i>A</i>[<i>C</i><sub>R</sub>(<i>t</i>)]<sup>β</sup>[<i>S</i><sub>B</sub>(<i>t</i>)]<sup>γ</sup></span><span class="eq-no">(2.1)</span></div>
-          <div class="equation"><span class="eq-body"><i>Ṡ</i><sub>P</sub>(<i>t</i>) = <i>A</i>[(1 − <i>x</i>)<i>C</i><sub>R</sub>(<i>t</i>)]<sup>β</sup>[<i>S</i><sub>P</sub>(<i>t</i>)]<sup>γ</sup></span><span class="eq-no">(2.2)</span></div>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>Ṡ</i><sub>B</sub>(<i>t</i>) = <i>A</i>[<i>C</i><sub>R</sub>(<i>t</i>)]<sup><i>β</i></sup
+              >[<i>S</i><sub>B</sub>(<i>t</i>)]<sup><i>γ</i></sup></span
+            ><span class="eq-no">(2.1)</span>
+          </div>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>Ṡ</i><sub>P</sub>(<i>t</i>) = <i>A</i>[(1 − <i>x</i>)<i>C</i><sub>R</sub>(<i>t</i>)]<sup
+                ><i>β</i></sup
+              >[<i>S</i><sub>P</sub>(<i>t</i>)]<sup><i>γ</i></sup></span
+            ><span class="eq-no">(2.2)</span>
+          </div>
           <p>Both arms start from the same initial condition.</p>
-          <div class="equation"><span class="eq-body"><i>S</i><sub>B</sub>(0) = <i>S</i><sub>P</sub>(0) = <i>S</i><sub>0</sub></span><span class="eq-no">(2.3)</span></div>
-          <dl class="glossary">
-            <div><dt><i>A</i></dt><dd>Research productivity.</dd></div>
-            <div><dt>β</dt><dd>Elasticity of software progress with respect to capability R&amp;D compute.</dd></div>
-            <div><dt>γ</dt><dd>Software feedback — knowledge accumulation and AI-assisted R&amp;D.</dd></div>
-          </dl>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>S</i><sub>B</sub>(0) = <i>S</i><sub>P</sub>(0) = <i>S</i><sub>0</sub></span
+            ><span class="eq-no">(2.3)</span>
+          </div>
+          <table class="where-table">
+            <caption class="apparatus-heading">where</caption>
+            <tbody>
+              <tr>
+                <th class="sym" scope="row"><i>A</i></th>
+                <td>Research productivity.</td>
+              </tr>
+              <tr>
+                <th class="sym" scope="row"><i>β</i></th>
+                <td>Elasticity of software progress with respect to capability R&amp;D compute.</td>
+              </tr>
+              <tr>
+                <th class="sym" scope="row"><i>γ</i></th>
+                <td>Software feedback — knowledge accumulation and AI-assisted R&amp;D.</td>
+              </tr>
+            </tbody>
+          </table>
           <p>
-            The policy enters through one factor. Comparing (2.2) with (2.1), reallocation multiplies the instantaneous rate by (1 − <i>x</i>)<sup>β</sup> and changes nothing else.
+            The policy enters through one factor. Comparing (2.2) with (2.1),
+            reallocation multiplies the instantaneous rate by
+            (1&#8201;−&#8201;<i>x</i>)<sup><i>β</i></sup> and changes nothing else.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;2</span>
+            <span class="folio-title">Software progress</span>
+            <span class="folio-no numeric">2&#8202;/&#8202;10</span>
           </p>
         </section>
 
         <section class="part sheet" id="part-3" aria-labelledby="part-3-title">
           <div class="section-mark">
-            <span class="section-no numeric">III</span>
+            <span class="section-no numeric">§&#8201;3</span>
             <span class="status is-live">Implemented</span>
           </div>
           <h2 id="part-3-title">Frontier AI capability</h2>
           <p>
-            Frontier AI capability is modeled using a reduced-form Cobb–Douglas production function over training compute and software.
+            Frontier AI capability is modelled with a reduced-form Cobb–Douglas
+            production function over training compute and software.
           </p>
-          <div class="equation"><span class="eq-body"><i>M</i><sub>j</sub>(<i>t</i>) = [<i>C</i><sub>T</sub>(<i>t</i>)]<sup>α</sup>[<i>S</i><sub>j</sub>(<i>t</i>)]<sup>δ</sup>,&ensp; <i>j</i> ∈ {B, P}</span><span class="eq-no">(3.1)</span></div>
-          <dl class="glossary">
-            <div><dt><i>M</i>(<i>t</i>)</dt><dd>Frontier AI capability index.</dd></div>
-            <div><dt><i>C</i><sub>T</sub>(<i>t</i>)</dt><dd>Frontier training compute.</dd></div>
-            <div><dt>α</dt><dd>Training-compute elasticity.</dd></div>
-            <div><dt>δ</dt><dd>Software elasticity.</dd></div>
-          </dl>
-          <p>Since the policy reallocates only R&amp;D compute, training compute is identical in both arms.</p>
-          <div class="equation"><span class="eq-body"><i>C</i><sub>T,B</sub>(<i>t</i>) = <i>C</i><sub>T,P</sub>(<i>t</i>) = <i>C</i><sub>T</sub>(<i>t</i>)</span><span class="eq-no">(3.2)</span></div>
-          <p>Capability cost is therefore the shortfall of the policy capability path against the baseline,</p>
-          <div class="equation"><span class="eq-body"><i>CC</i>(<i>t</i>) = 1 − <i>M</i><sub>P</sub>(<i>t</i>) / <i>M</i><sub>B</sub>(<i>t</i>)</span><span class="eq-no">(3.3)</span></div>
-          <aside class="marginalia" aria-label="Note on equation 3.4">
-            <strong>Named CG in the interface</strong>
-            The chart headed “AI capability gap” plots (3.4) exactly. <i>CG</i> and <i>CC</i> are the same quantity under two names; the parameter contract lists it as <i>CG</i>.
-          </aside>
-          <p>or equivalently, once the common training-compute term cancels,</p>
-          <div class="equation"><span class="eq-body"><i>CC</i>(<i>t</i>) = 1 − (<i>S</i><sub>P</sub>(<i>t</i>) / <i>S</i><sub>B</sub>(<i>t</i>))<sup>δ</sup></span><span class="eq-no">(3.4)</span></div>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>M</i><sub><i>j</i></sub>(<i>t</i>) = [<i>C</i><sub>T</sub>(<i>t</i>)]<sup><i>α</i></sup
+              >[<i>S</i><sub><i>j</i></sub>(<i>t</i>)]<sup><i>δ</i></sup>,&ensp;
+              <i>j</i> ∈ {B, P}</span
+            ><span class="eq-no">(3.1)</span>
+          </div>
+          <table class="where-table">
+            <caption class="apparatus-heading">where</caption>
+            <tbody>
+              <tr>
+                <th class="sym" scope="row"><i>M</i>(<i>t</i>)</th>
+                <td>Frontier AI capability index.</td>
+              </tr>
+              <tr>
+                <th class="sym" scope="row"><i>C</i><sub>T</sub>(<i>t</i>)</th>
+                <td>Frontier training compute.</td>
+              </tr>
+              <tr>
+                <th class="sym" scope="row"><i>α</i></th>
+                <td>Training-compute elasticity.</td>
+              </tr>
+              <tr>
+                <th class="sym" scope="row"><i>δ</i></th>
+                <td>Software elasticity.</td>
+              </tr>
+            </tbody>
+          </table>
           <p>
-            The cancellation in (3.4) is why α never needs a value. It is a real parameter of the model that the relative outputs are insensitive to, not an omission.
+            Since the policy reallocates only R&amp;D compute, training compute is
+            identical in both arms.
+          </p>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>C</i><sub>T,B</sub>(<i>t</i>) = <i>C</i><sub>T,P</sub>(<i>t</i>) =
+              <i>C</i><sub>T</sub>(<i>t</i>)</span
+            ><span class="eq-no">(3.2)</span>
+          </div>
+          <p>
+            Capability cost is therefore the shortfall of the policy capability path
+            against the baseline,
+          </p>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>CC</i>(<i>t</i>) = 1 − <i>M</i><sub>P</sub>(<i>t</i>)&#8201;/&#8201;<i>M</i
+              ><sub>B</sub>(<i>t</i>)</span
+            ><span class="eq-no">(3.3)</span>
+          </div>
+          <aside class="footnote marginalia" id="fn-3" role="doc-footnote">
+            <a class="fn-back" href="#fnref-3" aria-label="Back to footnote 3 in the text"
+              ><span class="fn-no">3</span></a
+            >
+            The plate headed “AI capability gap” on the calculator plots (3.4)
+            exactly. <i>CG</i> and <i>CC</i> are the same quantity under two names; the
+            parameter contract in <a href="#part-10">§&#8201;10</a> lists it as <i>CG</i>.
+          </aside>
+          <p>
+            or equivalently, once the common training-compute term
+            cancels,<sup class="fn-ref"><a id="fnref-3" href="#fn-3" role="doc-noteref" aria-label="Footnote 3">3</a></sup>
+          </p>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>CC</i>(<i>t</i>) = 1 − (<i>S</i><sub>P</sub>(<i>t</i>)&#8201;/&#8201;<i>S</i
+              ><sub>B</sub>(<i>t</i>))<sup><i>δ</i></sup></span
+            ><span class="eq-no">(3.4)</span>
+          </div>
+          <p>
+            The cancellation in (3.4) is why <i>α</i> never needs a value. It is a real
+            parameter of the model that the relative outputs happen to be insensitive
+            to&#8202;—&#8202;not an omission.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;3</span>
+            <span class="folio-title">Frontier AI capability</span>
+            <span class="folio-no numeric">3&#8202;/&#8202;10</span>
           </p>
         </section>
 
         <section class="part sheet" id="part-4" aria-labelledby="part-4-title">
           <div class="section-mark">
-            <span class="section-no numeric">IV</span>
+            <span class="section-no numeric">§&#8201;4</span>
             <span class="status is-live">Implemented</span>
           </div>
           <h2 id="part-4-title">AI risk</h2>
           <p>
-            Rather than explicitly modeling alignment progress, AI risk is represented using a reduced-form function. Under the policy, risk decays away from its baseline path in proportion to the reallocated share and the time elapsed since the policy began.
+            Rather than modelling alignment progress explicitly, AI risk is represented
+            with a reduced-form function. Under the policy, risk decays away from its
+            baseline path in proportion to the reallocated share and the time elapsed
+            since the policy began.
           </p>
-          <div class="equation"><span class="eq-body"><i>R</i><sub>P</sub>(<i>t</i>) = <i>R</i><sub>B</sub>(<i>t</i>) exp[−λ<sub>z</sub><i>x</i>(<i>t</i> − <i>t</i><sub>0</sub>)]</span><span class="eq-no">(4.1)</span></div>
-          <dl class="glossary">
-            <div><dt><i>R</i>(<i>t</i>)</dt><dd>AI risk index.</dd></div>
-            <div><dt>λ<sub>z</sub></dt><dd>Alignment effectiveness under policy impact level <i>z</i>.</dd></div>
-            <div><dt><i>t</i><sub>0</sub></dt><dd>Policy implementation year.</dd></div>
-          </dl>
-          <aside class="marginalia" aria-label="Note on the risk baseline">
-            <strong>On different footing</strong>
-            Parts <span class="numeric">I</span>–<span class="numeric">III</span> implement a specification. This part implements a reading of one, because the source fixes neither <i>R</i><sub>B</sub>(<i>t</i>) nor bounds for λ.
+          <div class="equation">
+            <span class="eq-body"
+              ><i>R</i><sub>P</sub>(<i>t</i>) = <i>R</i><sub>B</sub>(<i>t</i>)&#8201;exp[−<i>λ</i
+              ><sub><i>z</i></sub><i>x</i>(<i>t</i> − <i>t</i><sub>0</sub>)]</span
+            ><span class="eq-no">(4.1)</span>
+          </div>
+          <table class="where-table">
+            <caption class="apparatus-heading">where</caption>
+            <tbody>
+              <tr>
+                <th class="sym" scope="row"><i>R</i>(<i>t</i>)</th>
+                <td>AI risk index.</td>
+              </tr>
+              <tr>
+                <th class="sym" scope="row"><i>λ</i><sub><i>z</i></sub></th>
+                <td>Alignment effectiveness under policy impact level <i>z</i>.</td>
+              </tr>
+              <tr>
+                <th class="sym" scope="row"><i>t</i><sub>0</sub></th>
+                <td>Policy implementation year.</td>
+              </tr>
+            </tbody>
+          </table>
+          <aside class="footnote marginalia" id="fn-4" role="doc-footnote">
+            <a class="fn-back" href="#fnref-4" aria-label="Back to footnote 4 in the text"
+              ><span class="fn-no">4</span></a
+            >
+            <a href="#part-1">§&#8201;1</a>–<a href="#part-3">§&#8201;3</a> implement
+            a specification. This section implements a <em>reading</em> of one, because the
+            source fixes neither <i>R</i><sub>B</sub>(<i>t</i>) nor bounds for <i>λ</i>.
           </aside>
-          <p class="unbuilt-notice">
-            The specification supplies no shape for <i>R</i><sub>B</sub>(<i>t</i>) and no empirical bounds for λ. The implementation therefore holds baseline risk at a normalized index of 100 and draws λ from an explicit working prior, λ ~ Triangular(0.20, 0.40, 0.60). Fig. 5 is a sensitivity surface over that assumption, not a risk forecast.
+          <p class="caveat-notice">
+            The specification supplies no shape for <i>R</i><sub>B</sub>(<i>t</i>) and no
+            empirical bounds for
+            <i>λ</i>.<sup class="fn-ref"><a id="fnref-4" href="#fn-4" role="doc-noteref" aria-label="Footnote 4">4</a></sup>
+            This implementation therefore holds baseline risk at a normalized index of 100
+            and draws <i>λ</i> from an explicit working prior,
+            <i>λ</i> ∼ Triangular(0.20, 0.40, 0.60). The AI-risk plate is a
+            sensitivity surface over that assumption, not a risk forecast.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;4</span>
+            <span class="folio-title">AI risk</span>
+            <span class="folio-no numeric">4&#8202;/&#8202;10</span>
           </p>
         </section>
 
         <section class="part sheet" id="part-5" aria-labelledby="part-5-title">
           <div class="section-mark">
-            <span class="section-no numeric">V</span>
+            <span class="section-no numeric">§&#8201;5</span>
             <span class="status is-live">Implemented</span>
           </div>
           <h2 id="part-5-title">Safety benefit</h2>
           <p>
-            Safety benefit is defined as the percentage reduction in AI risk relative to the baseline.
+            Safety benefit is defined as the proportional reduction in AI risk relative to
+            the baseline.
           </p>
-          <div class="equation"><span class="eq-body"><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>) / <i>R</i><sub>B</sub>(<i>t</i>)</span><span class="eq-no">(5.1)</span></div>
-          <aside class="marginalia" aria-label="Note on notation">
-            <strong>Notation collision</strong>
-            <i>S</i><sub>B</sub>(<i>t</i>) in Part <span class="numeric">II</span> is baseline software. <i>SB</i>(<i>t</i>) here is safety benefit. Both are reproduced as the specification writes them.
+          <div class="equation">
+            <span class="eq-body"
+              ><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>)&#8201;/&#8201;<i>R</i
+              ><sub>B</sub>(<i>t</i>)</span
+            ><span class="eq-no">(5.1)</span>
+          </div>
+          <aside class="footnote marginalia" id="fn-5" role="doc-footnote">
+            <a class="fn-back" href="#fnref-5" aria-label="Back to footnote 5 in the text"
+              ><span class="fn-no">5</span></a
+            >
+            <i>S</i><sub>B</sub>(<i>t</i>) in <a href="#part-2">§&#8201;2</a> is baseline
+            software. <i>SB</i>(<i>t</i>) here is safety benefit. Both are reproduced as
+            the specification writes them.
           </aside>
-          <p>Substituting the risk function (4.1), the baseline path divides out,</p>
-          <div class="equation"><span class="eq-body"><i>SB</i>(<i>t</i>) = 1 − <i>e</i><sup>−λ<sub>z</sub><i>x</i>(<i>t</i> − <i>t</i><sub>0</sub>)</sup></span><span class="eq-no">(5.2)</span></div>
-          <p>Thus increasing <i>x</i> increases safety benefit, and increasing λ makes alignment compute more effective. Both follow from (5.2) alone. Note what (5.2) means for the calculator: the baseline path divides out entirely, so Fig. 6 is independent of the assumed shape of <i>R</i><sub>B</sub>(<i>t</i>) and depends only on λ, <i>x</i> and elapsed time. The normalization in Part <span class="numeric">IV</span> constrains Fig. 5; it does not constrain this one.</p>
+          <p>
+            Substituting the risk function (4.1), the baseline path divides
+            out,<sup class="fn-ref"><a id="fnref-5" href="#fn-5" role="doc-noteref" aria-label="Footnote 5">5</a></sup>
+          </p>
+          <div class="equation">
+            <span class="eq-body"
+              ><i>SB</i>(<i>t</i>) = 1 − <i>e</i><sup>−<i>λ</i><sub><i>z</i></sub><i>x</i>(<i>t</i>
+              − <i>t</i><sub>0</sub>)</sup></span
+            ><span class="eq-no">(5.2)</span>
+          </div>
+          <p>
+            Increasing <i>x</i> therefore increases safety benefit, and increasing
+            <i>λ</i> makes alignment compute more effective. Both follow from (5.2) alone.
+            Note what (5.2) means for the calculator: the baseline path divides out
+            entirely, so the safety-benefit plate is independent of the assumed shape of
+            <i>R</i><sub>B</sub>(<i>t</i>) and depends only on <i>λ</i>, <i>x</i> and
+            elapsed time. The normalization in <a href="#part-4">§&#8201;4</a> constrains
+            the risk plate; it does not constrain this one.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;5</span>
+            <span class="folio-title">Safety benefit</span>
+            <span class="folio-no numeric">5&#8202;/&#8202;10</span>
+          </p>
         </section>
 
         <section class="part sheet" id="part-6" aria-labelledby="part-6-title">
           <div class="section-mark">
-            <span class="section-no numeric">VI</span>
+            <span class="section-no numeric">§&#8201;6</span>
             <span class="status is-live">Implemented</span>
           </div>
           <h2 id="part-6-title">User inputs</h2>
-          <p>Users choose only two inputs.</p>
+          <p>The reader controls two inputs, and only two.</p>
           <ol class="input-list">
             <li>
               <strong>Compute reallocation share</strong>
-              <span>The share <i>x</i> of frontier AI R&amp;D compute reallocated to alignment. The calculator exposes it as a slider from 0% to 50%.</span>
+              <span
+                >The share <i>x</i> of frontier AI R&amp;D compute reallocated to
+                alignment. The calculator exposes it as a slider over
+                0&#8202;%–50&#8202;%.</span
+              >
             </li>
             <li>
               <strong>Policy impact level</strong>
-              <span>A categorical selection, <i>z</i> ∈ {Lower, Central, Higher}, which selects a parameter set.</span>
+              <span
+                >A categorical selection,
+                <i>z</i> ∈ {Lower, Central, Higher}, which selects a parameter
+                bundle.</span
+              >
             </li>
           </ol>
-          <div class="equation"><span class="eq-body"><i>z</i> ⟶ (β, γ, δ, λ)</span><span class="eq-no">(6.1)</span></div>
-          <aside class="marginalia" aria-label="Note on impact level naming">
-            <strong>Labels differ</strong>
-            The specification writes <i>z</i> ∈ {Lower, Central, Higher}. The control is labelled Low, Medium and High. Same three levels, and the same order.
+          <div class="equation">
+            <span class="eq-body"
+              ><i>z</i> ⟶ (<i>β</i>, <i>γ</i>, <i>δ</i>, <i>λ</i>)</span
+            ><span class="eq-no">(6.1)</span>
+          </div>
+          <aside class="footnote marginalia" id="fn-6" role="doc-footnote">
+            <a class="fn-back" href="#fnref-6" aria-label="Back to footnote 6 in the text"
+              ><span class="fn-no">6</span></a
+            >
+            The specification writes <i>z</i> ∈ {Lower, Central, Higher}. The control
+            is labelled Low, Medium and High. Same three levels, same order.
           </aside>
           <p>
-            The mapping in (6.1) carries four parameters, and the shipped bundles carry all four. β, γ and δ are drawn from the source's own triangular ranges; λ is drawn the same way, but from a range this implementation chose, because the source supplies none.
+            The mapping in (6.1) carries four parameters, and the shipped bundles carry
+            all
+            four.<sup class="fn-ref"><a id="fnref-6" href="#fn-6" role="doc-noteref" aria-label="Footnote 6">6</a></sup>
+            <i>β</i>, <i>γ</i> and <i>δ</i> are drawn from the source’s own
+            triangular ranges; <i>λ</i> is drawn the same way, but from a range this
+            implementation chose, because the source supplies none.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;6</span>
+            <span class="folio-title">User inputs</span>
+            <span class="folio-no numeric">6&#8202;/&#8202;10</span>
           </p>
         </section>
 
         <div class="part-rule sheet">
-          <p class="label">Implementation record</p>
+          <p class="apparatus-heading">Implementation record</p>
         </div>
 
         <section class="part sheet" id="part-7" aria-labelledby="part-7-title">
           <div class="section-mark">
-            <span class="section-no numeric">VII</span>
+            <span class="section-no numeric">§&#8201;7</span>
             <span class="status is-live">Implemented</span>
           </div>
           <h2 id="part-7-title">Calibration of the bundles</h2>
+          <aside class="footnote marginalia" id="fn-7" role="doc-footnote">
+            <a class="fn-back" href="#fnref-7" aria-label="Back to footnote 7 in the text"
+              ><span class="fn-no">7</span></a
+            >
+            Independence is an assumption of convenience, not a finding.
+            <i>β</i> and <i>γ</i> plausibly co-vary&#8202;—&#8202;both describe how
+            productively an ideas-production process converts inputs&#8202;—&#8202;and
+            a correlated draw would widen every interval below.
+          </aside>
           <p>
-            The parameter sets are obtained from 10,000 Monte Carlo simulations using triangular distributions. Each parameter is drawn independently, sorted, and read at the percentile its impact level names.
+            The parameter bundles come from 10,000 × 4 seeded Monte Carlo draws on
+            triangular distributions. Each parameter is drawn independently,
+            sorted,<sup class="fn-ref"><a id="fnref-7" href="#fn-7" role="doc-noteref" aria-label="Footnote 7">7</a></sup>
+            and read at the marginal percentile its impact level names.
           </p>
 
-          <figure class="plate" id="table-2">
-            <div class="table-scroll" tabindex="0" role="region" aria-labelledby="table-2-caption">
-              <table class="preset-matrix">
-                <thead><tr><th class="sym" scope="col"><i>z</i></th><th class="sym" scope="col">β</th><th class="sym" scope="col">γ</th><th class="sym" scope="col">δ</th><th class="sym" scope="col">λ</th></tr></thead>
-                <tbody>
-                  <tr><th scope="row">Low · P10</th><td>0.223</td><td>0.290</td><td>0.589</td><td>0.288</td></tr>
-                  <tr><th scope="row">Medium · P50</th><td>0.313</td><td>0.400</td><td>0.701</td><td>0.400</td></tr>
-                  <tr><th scope="row">High · P90</th><td>0.416</td><td>0.511</td><td>0.810</td><td>0.509</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <figcaption id="table-2-caption"><span class="caption-index">Table 2</span> Marginal P10 / P50 / P90 bundles from 10,000 seeded triangular draws. λ is drawn the same way as the other three, but from a working prior rather than a supplied one — see Part <span class="numeric">IV</span>.</figcaption>
-          </figure>
-
-          <aside class="marginalia" aria-label="Note on Table 3">
-            <strong>Assumed, not measured</strong>
-            These bounds and modes are the modelling team's working choices. No validated empirical calibration exists yet, and the interface must not present these as estimates.
-          </aside>
           <figure class="plate" id="table-3">
             <div class="table-scroll" tabindex="0" role="region" aria-labelledby="table-3-caption">
-              <table class="preset-matrix distribution-inputs">
-                <thead><tr><th scope="col">Parameter</th><th scope="col">Minimum</th><th scope="col">Mode</th><th scope="col">Maximum</th></tr></thead>
+              <table class="preset-matrix">
+                <thead>
+                  <tr>
+                    <th class="sym" scope="col"><i>z</i></th>
+                    <th class="sym" scope="col"><i>β</i></th>
+                    <th class="sym" scope="col"><i>γ</i></th>
+                    <th class="sym" scope="col"><i>δ</i></th>
+                    <th class="sym" scope="col"><i>λ</i></th>
+                  </tr>
+                </thead>
                 <tbody>
-                  <tr><th class="sym" scope="row">β</th><td>0.15</td><td>0.30</td><td>0.50</td></tr>
-                  <tr><th class="sym" scope="row">γ</th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
-                  <tr><th class="sym" scope="row">δ</th><td>0.50</td><td>0.70</td><td>0.90</td></tr>
-                  <tr><th class="sym" scope="row">λ</th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
+                  <tr>
+                    <th scope="row">Low · P10</th>
+                    <td>0.223</td><td>0.290</td><td>0.589</td><td>0.288</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Medium · P50</th>
+                    <td>0.313</td><td>0.400</td><td>0.701</td><td>0.400</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">High · P90</th>
+                    <td>0.416</td><td>0.511</td><td>0.810</td><td>0.509</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
-            <figcaption id="table-3-caption"><span class="caption-index">Table 3</span> Working triangular inputs—not Katherine-supplied empirical estimates.</figcaption>
+            <figcaption id="table-3-caption">
+              <span class="caption-index">Table 3</span> Marginal P10&#8202;/&#8202;P50&#8202;/&#8202;P90
+              bundles from 10,000 seeded triangular draws per parameter. <i>λ</i> is drawn
+              the same way as the other three, but from a working prior rather than a
+              supplied one — see <a href="#part-4">§&#8201;4</a>.
+            </figcaption>
           </figure>
 
-          <dl class="calibration-protocol" aria-label="Monte Carlo protocol">
-            <div><dt>Samples</dt><dd>10,000 per parameter</dd></div>
-            <div><dt>Seed</dt><dd>Seed 20260731</dd></div>
-            <div><dt>Sampling</dt><dd>Independent draws</dd></div>
-            <div><dt>Quantiles</dt><dd>Linear at (<i>n</i> − 1)<i>q</i></dd></div>
-          </dl>
+          <aside class="footnote marginalia" id="fn-8" role="doc-footnote">
+            <a class="fn-back" href="#fnref-8" aria-label="Back to footnote 8 in the text"
+              ><span class="fn-no">8</span></a
+            >
+            These bounds and modes are the modelling team’s working choices. No
+            validated empirical calibration exists yet, and the interface must not present
+            them as estimates.
+          </aside>
+          <figure class="plate" id="table-4">
+            <div class="table-scroll" tabindex="0" role="region" aria-labelledby="table-4-caption">
+              <table class="preset-matrix distribution-inputs">
+                <thead>
+                  <tr>
+                    <th scope="col">Parameter</th>
+                    <th scope="col">Minimum</th>
+                    <th scope="col">Mode</th>
+                    <th scope="col">Maximum</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><th class="sym" scope="row"><i>β</i></th><td>0.15</td><td>0.30</td><td>0.50</td></tr>
+                  <tr><th class="sym" scope="row"><i>γ</i></th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
+                  <tr><th class="sym" scope="row"><i>δ</i></th><td>0.50</td><td>0.70</td><td>0.90</td></tr>
+                  <tr><th class="sym" scope="row"><i>λ</i></th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption id="table-4-caption">
+              <span class="caption-index">Table 4</span> Working triangular inputs&#8202;—&#8202;assumed
+              priors, not Katherine-supplied empirical
+              estimates.<sup class="fn-ref"><a id="fnref-8" href="#fn-8" role="doc-noteref" aria-label="Footnote 8">8</a></sup>
+            </figcaption>
+          </figure>
+
+          <table class="protocol-table">
+            <caption class="apparatus-heading">Monte Carlo protocol</caption>
+            <tbody>
+              <tr><th scope="row">Samples</th><td>10,000 per parameter</td></tr>
+              <tr><th scope="row">Reproducibility</th><td>Seed 20260731</td></tr>
+              <tr><th scope="row">Sampling</th><td>Independent draws</td></tr>
+              <tr><th scope="row">Quantiles</th><td>Linear at (<i>n</i> − 1)<i>q</i></td></tr>
+            </tbody>
+          </table>
           <p>
-            The bundles rank-align each parameter's marginal percentile. They are sensitivity cases, not joint outcome percentiles or empirical estimates. Seeded calibration makes the same <i>z</i> selection reproduce the same parameter set on every run.
+            The bundles rank-align each parameter’s marginal percentile. Seeding the
+            draw makes the same <i>z</i> selection reproduce the same bundle on every run,
+            which is what allows a reader to check a figure against the source.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;7</span>
+            <span class="folio-title">Calibration of the bundles</span>
+            <span class="folio-no numeric">7&#8202;/&#8202;10</span>
           </p>
         </section>
 
         <section class="part sheet" id="part-8" aria-labelledby="part-8-title">
           <div class="section-mark">
-            <span class="section-no numeric">VIII</span>
+            <span class="section-no numeric">§&#8201;8</span>
             <span class="status is-live">Implemented</span>
           </div>
           <h2 id="part-8-title">Normalization and scope</h2>
-          <aside class="marginalia" aria-label="Note on the horizon">
-            <strong>Read as divergence</strong>
-            Every output on the calculator is a comparison between two arms of the same normalized run. None of them is a dated forecast of absolute capability.
+          <aside class="footnote marginalia" id="fn-9" role="doc-footnote">
+            <a class="fn-back" href="#fnref-9" aria-label="Back to footnote 9 in the text"
+              ><span class="fn-no">9</span></a
+            >
+            Every output on the calculator is a comparison between two arms of the same
+            normalized run. None of them is a dated forecast of absolute capability.
           </aside>
           <p>
-            Software begins at index 100. The baseline is normalized to index 200 in 2034, so the charts communicate policy divergence—not a dated forecast of absolute capability. The normalization absorbs <i>A</i>; unchanged training compute makes <i>α</i> cancel from relative outputs.
+            Software begins at index 100. The baseline is normalized to index 200 in 2034,
+            so the plates communicate policy
+            divergence&#8202;—&#8202;not a dated forecast of absolute
+            capability.<sup class="fn-ref"><a id="fnref-9" href="#fn-9" role="doc-noteref" aria-label="Footnote 9">9</a></sup>
+            The normalization absorbs <i>A</i>; unchanged training compute makes
+            <i>α</i> cancel from relative outputs.
           </p>
           <p>
-            The horizon runs from 2026 to 2034 at quarterly resolution. Because the normalization fixes the baseline endpoint, <i>A</i> and <i>C</i><sub>R</sub>(<i>t</i>) never appear as numbers: the calculator solves (2.1) for the growth constant that reaches the fixed endpoint, then applies the policy factor (1 − <i>x</i>)<sup>β</sup> from (2.2) to obtain the policy arm.
+            The horizon runs 2026–2034 at quarterly resolution. Because the
+            normalization fixes the baseline endpoint, <i>A</i> and
+            <i>C</i><sub>R</sub>(<i>t</i>) never appear as numbers: the calculator solves
+            (2.1) for the growth constant that reaches the fixed endpoint, then applies
+            the policy factor (1&#8201;−&#8201;<i>x</i>)<sup><i>β</i></sup> from
+            (2.2) to obtain the policy arm.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;8</span>
+            <span class="folio-title">Normalization and scope</span>
+            <span class="folio-no numeric">8&#8202;/&#8202;10</span>
           </p>
         </section>
 
-        <section class="part sheet" id="part-9" aria-labelledby="part-9-title">
+        <section class="part sheet is-limitations" id="part-9" aria-labelledby="part-9-title">
           <div class="section-mark">
-            <span class="section-no numeric">IX</span>
+            <span class="section-no numeric">§&#8201;9</span>
+            <span class="status is-caveat">Read first</span>
+          </div>
+          <h2 id="part-9-title">Limitations and scope of inference</h2>
+          <p class="standfirst">
+            What follows is the shortest honest account of what this model cannot tell you.
+            It is set here, in full, rather than in a disclaimer at the foot of the page,
+            because a reader who takes the plates for estimates will draw conclusions the
+            model does not support.
+          </p>
+
+          <h3 id="limit-1">The bundles are sensitivity cases, not estimates</h3>
+          <p>
+            The triangular ranges in Table 4 are assumed priors chosen by the modelling
+            team. No validated empirical calibration of <i>β</i>, <i>γ</i>, <i>δ</i> or
+            <i>λ</i> exists. Table 3 is therefore a set of <em>sensitivity cases</em>: it
+            answers “how much does the result move if the elasticities are toward
+            the low end of what we assumed?” and nothing more. Read as estimates,
+            the numbers claim a precision that has no evidence behind it.
+          </p>
+
+          <h3 id="limit-2">The bundles are not joint outcome percentiles</h3>
+          <p>
+            Low, Medium and High rank-align each parameter’s <em>marginal</em>
+            percentile. The Low bundle is the vector of P10 marginals, not the 10th
+            percentile of any output distribution. Because the parameters are drawn
+            independently and then composed, the joint probability of the Low bundle
+            occurring is far below 10&#8202;%, and the interval between Low and High is
+            <em>not</em> an 80&#8202;% credible interval for any plotted quantity.
+          </p>
+
+          <h3 id="limit-3">Nothing here is a forecast</h3>
+          <p>
+            The horizon 2026–2034 is a modelling window, not a prediction schedule.
+            Absolute levels are normalized away by construction
+            (<a href="#part-8">§&#8201;8</a>), so a value on any plate is a ratio between
+            two arms of the same run at the same instant. “Capability is
+            4&#8202;% lower in 2031” is a statement about the model’s two
+            arms; it is not a claim about 2031.
+          </p>
+
+          <h3 id="limit-4">The risk channel rests on a supplied baseline</h3>
+          <p>
+            The source specifies no shape for <i>R</i><sub>B</sub>(<i>t</i>). Holding it
+            constant at index 100 is this implementation’s choice, and it is the
+            weakest link in the document. The risk plate should be read as a relative
+            sensitivity path only. The safety-benefit plate is exempt: (5.2) divides the
+            baseline out, so it survives the assumption intact.
+          </p>
+
+          <h3 id="limit-5">Structural omissions</h3>
+          <p>
+            The model has no diffusion or spillover between firms, no lag between
+            alignment spend and alignment effect, no adversarial response to a unilateral
+            commitment, and no cost to coordination itself. Each of those would, in the
+            direction economic intuition suggests, reduce the measured safety benefit of a
+            unilateral policy relative to a coordinated one. The model is silent on all of
+            them, and silence is not a null result.
+          </p>
+
+          <h3 id="limit-6">What the model is for</h3>
+          <p>
+            Within those limits the instrument answers one question well: for a given
+            assumed elasticity bundle, how do the capability cost and the safety benefit
+            of a reallocation trade off against one another over time, and which
+            assumption is doing the work? That is a question about structure, and
+            structure is what a reduced form is good for.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;9</span>
+            <span class="folio-title">Limitations and scope of inference</span>
+            <span class="folio-no numeric">9&#8202;/&#8202;10</span>
+          </p>
+        </section>
+
+        <section class="part sheet" id="part-10" aria-labelledby="part-10-title">
+          <div class="section-mark">
+            <span class="section-no numeric">§&#8201;10</span>
             <span class="status is-live">Implemented</span>
           </div>
-          <h2 id="part-9-title">Parameter contract</h2>
+          <h2 id="part-10-title">Parameter contract</h2>
           <p>
-            Every symbol in the specification, its role, where its value comes from, and what the shipped model does with it. Every row is now implemented; the one still marked is <i>R</i><sub>B</sub>(<i>t</i>), which the model supplies itself because the source does not.
+            Every symbol in the specification, its role, where its value comes from, and
+            what the shipped model does with it. Every row is implemented; the one still
+            marked is <i>R</i><sub>B</sub>(<i>t</i>), which the model supplies itself
+            because the source does not.
           </p>
           <details class="parameter-contract">
             <summary>Inspect the full parameter contract</summary>
-            <figure class="plate" id="table-4">
-              <div class="parameter-contract-table" tabindex="0" role="region" aria-labelledby="table-4-caption">
+            <figure class="plate" id="table-5">
+              <div class="parameter-contract-table" tabindex="0" role="region" aria-labelledby="table-5-caption">
                 <table>
-                  <thead><tr><th scope="col">Symbol</th><th scope="col">Role</th><th scope="col">Source status</th><th scope="col">Implementation</th></tr></thead>
+                  <thead>
+                    <tr>
+                      <th scope="col">Symbol</th>
+                      <th scope="col">Role</th>
+                      <th scope="col">Source status</th>
+                      <th scope="col">Implementation</th>
+                    </tr>
+                  </thead>
                   <tbody>
-                    <tr><th scope="row"><i>x</i></th><td>R&amp;D compute reallocation share</td><td>User input</td><td>0%–50% slider</td></tr>
-                    <tr><th scope="row"><i>z</i></th><td>Policy impact level</td><td>User input</td><td>Marginal P10 / P50 / P90 bundle</td></tr>
+                    <tr><th scope="row"><i>x</i></th><td>R&amp;D compute reallocation share</td><td>User input</td><td>0&#8202;%–50&#8202;% slider</td></tr>
+                    <tr><th scope="row"><i>z</i></th><td>Policy impact level</td><td>User input</td><td>Marginal P10&#8202;/&#8202;P50&#8202;/&#8202;P90 bundle</td></tr>
                     <tr><th scope="row"><i>C</i><sub>R</sub></th><td>Total frontier R&amp;D compute</td><td>Exogenous path</td><td>Fixed and normalized</td></tr>
                     <tr><th scope="row"><i>C</i><sub>C,B</sub></th><td>Baseline capability-R&amp;D compute</td><td>Model-derived</td><td><i>C</i><sub>R</sub>, unchanged</td></tr>
                     <tr><th scope="row"><i>C</i><sub>C,P</sub></th><td>Policy capability-R&amp;D compute</td><td>Model-derived</td><td>(1 − <i>x</i>)<i>C</i><sub>R</sub></td></tr>
-                    <tr><th scope="row"><i>C</i><sub>A,P</sub></th><td>Policy alignment compute</td><td>Model-derived</td><td><i>x C</i><sub>R</sub>; enters risk through λ</td></tr>
+                    <tr><th scope="row"><i>C</i><sub>A,P</sub></th><td>Policy alignment compute</td><td>Model-derived</td><td><i>x</i>&#8201;<i>C</i><sub>R</sub>; enters risk through <i>λ</i></td></tr>
                     <tr><th scope="row"><i>A</i></th><td>Research productivity</td><td>Set by <i>z</i> / calibrated</td><td>Absorbed into baseline normalization</td></tr>
-                    <tr><th scope="row">β</th><td>R&amp;D-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
-                    <tr><th scope="row">γ</th><td>Software-feedback elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
+                    <tr><th scope="row"><i>β</i></th><td>R&amp;D-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
+                    <tr><th scope="row"><i>γ</i></th><td>Software-feedback elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
                     <tr data-parameter="S_B"><th scope="row"><i>S</i><sub>B</sub>(<i>t</i>)</th><td>Baseline software level</td><td>Model-generated</td><td>Baseline software series</td></tr>
                     <tr data-parameter="S_P"><th scope="row"><i>S</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy software level</td><td>Model-generated</td><td>Firm policy series</td></tr>
                     <tr><th scope="row"><i>S</i><sub>0</sub></th><td>Initial software level</td><td>Fixed normalization</td><td>Index 100</td></tr>
                     <tr><th scope="row"><i>C</i><sub>T</sub></th><td>Frontier training compute</td><td>Exogenous path</td><td>Equal across scenarios</td></tr>
-                    <tr><th scope="row">α</th><td>Training-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Cancels from relative outputs</td></tr>
-                    <tr><th scope="row">δ</th><td>Software-to-capability elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
+                    <tr><th scope="row"><i>α</i></th><td>Training-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Cancels from relative outputs</td></tr>
+                    <tr><th scope="row"><i>δ</i></th><td>Software-to-capability elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
                     <tr data-parameter="M_B"><th scope="row"><i>M</i><sub>B</sub>(<i>t</i>)</th><td>Baseline capability level</td><td>Model-generated</td><td>Baseline capability series</td></tr>
                     <tr data-parameter="M_P"><th scope="row"><i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy capability level</td><td>Model-generated</td><td>Firm policy series</td></tr>
                     <tr><th scope="row"><i>M</i><sub>0</sub></th><td>Initial capability level</td><td>Fixed normalization</td><td>Index 100</td></tr>
                     <tr><th scope="row"><i>t</i></th><td>Time since policy start</td><td>Model index</td><td>2026–2034, quarterly</td></tr>
-                    <tr><th scope="row">λ<sub>z</sub></th><td>Alignment effectiveness</td><td>Set by <i>z</i> / working prior</td><td>10k triangular-draw quantile</td></tr>
+                    <tr><th scope="row"><i>λ</i><sub><i>z</i></sub></th><td>Alignment effectiveness</td><td>Set by <i>z</i> / working prior</td><td>10k triangular-draw quantile</td></tr>
                     <tr><th scope="row"><i>t</i><sub>0</sub></th><td>Policy implementation year</td><td>Exogenous</td><td>Start of the modelled horizon</td></tr>
                     <tr class="is-pending-row" data-parameter="R_B"><th scope="row"><i>R</i><sub>B</sub>(<i>t</i>)</th><td>Baseline AI risk index</td><td>Not supplied by the source</td><td>Held constant at index 100</td></tr>
-                    <tr data-parameter="R_P"><th scope="row"><i>R</i><sub>P</sub>(<i>t</i>)</th><td>Policy AI risk index</td><td>Model-generated</td><td>Shown in AI risk chart</td></tr>
-                    <tr><th scope="row"><i>SB</i>(<i>t</i>)</th><td>Safety benefit</td><td>Model output</td><td>Shown in safety benefit chart</td></tr>
-                    <tr><th scope="row">SS</th><td>Software progress-rate slowdown</td><td>Model output</td><td>Shown in software slowdown chart</td></tr>
-                    <tr><th scope="row">SG</th><td>Software level gap</td><td>Model output</td><td>Returned in model contract</td></tr>
-                    <tr><th scope="row">CG</th><td>Capability cost / gap, <i>CC</i>(<i>t</i>)</td><td>Model output</td><td>Shown in AI capability gap chart</td></tr>
+                    <tr data-parameter="R_P"><th scope="row"><i>R</i><sub>P</sub>(<i>t</i>)</th><td>Policy AI risk index</td><td>Model-generated</td><td>Shown in the AI-risk plate</td></tr>
+                    <tr><th scope="row"><i>SB</i>(<i>t</i>)</th><td>Safety benefit</td><td>Model output</td><td>Shown in the safety-benefit plate</td></tr>
+                    <tr><th scope="row">SS</th><td>Software progress-rate slowdown</td><td>Model output</td><td>Shown in the software-slowdown plate</td></tr>
+                    <tr><th scope="row">SG</th><td>Software level gap</td><td>Model output</td><td>Returned in the model contract</td></tr>
+                    <tr><th scope="row">CG</th><td>Capability cost&#8202;/&#8202;gap, <i>CC</i>(<i>t</i>)</td><td>Model output</td><td>Shown in the capability-gap plate</td></tr>
                   </tbody>
                 </table>
               </div>
-              <figcaption id="table-4-caption"><span class="caption-index">Table 4</span> Full parameter contract across all five parts of the specification.</figcaption>
+              <figcaption id="table-5-caption">
+                <span class="caption-index">Table 5</span> The full parameter contract
+                across all six sections of the specification.
+              </figcaption>
             </figure>
           </details>
           <p class="closing">
-            <a href="/">Return to the calculator</a> — the instrument this document specifies.
+            <a href="/">Return to the calculator</a> — the instrument this document
+            specifies.
+          </p>
+          <p class="folio" aria-hidden="true">
+            <span class="folio-mark">§&#8201;10</span>
+            <span class="folio-title">Parameter contract</span>
+            <span class="folio-no numeric">10&#8202;/&#8202;10</span>
           </p>
         </section>
       </article>

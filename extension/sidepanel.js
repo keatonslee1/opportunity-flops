@@ -26,7 +26,9 @@ const read = {
   isPending: (result) => !result || result.status === "pending-model",
 
   /** Big number at the top of the calculator, as a preformatted string. */
-  headline: (result) => result.headline ?? null,
+  headline: (result) =>
+    result.headline ??
+    (typeof result.cumulativeLoss === "string" ? result.cumulativeLoss : null),
 
   /** Sentence under the headline. */
   explanation: (result) => result.explanation ?? null,
@@ -36,7 +38,53 @@ const read = {
 
   /** Per-scenario summary for the scenario rows. */
   scenarioSummary: (result, key) => result.scenarios?.[key] ?? null,
+
+  /** Raw time-series rows. */
+  rows: (result) => (Array.isArray(result?.series) ? result.series : []),
+
+  /** X axis, taken from whichever field the model uses for time. */
+  years: (result) =>
+    read.rows(result)
+      .map((row) => row.year ?? row.t)
+      .filter(Number.isFinite),
+
+  /**
+   * Pulls one numeric field from every row for a scenario, optionally per firm.
+   * Returns [] the moment a row is missing the field, so a partial series never
+   * renders as a complete trace.
+   */
+  values: (result, scenarioKey, field, firm) => {
+    const out = [];
+    for (const row of read.rows(result)) {
+      const scoped = row[scenarioKey];
+      if (!scoped) return [];
+      const source = firm ? scoped[firm] : scoped;
+      const value = source?.[field];
+      if (!Number.isFinite(value)) return [];
+      out.push(value);
+    }
+    return out;
+  },
 };
+
+/** Chart id -> the model fields it plots. */
+const CHART_FIELDS = {
+  software: { value: "softwareIndex", baseline: "softwareIndexBaseline" },
+  capability: { value: "capabilityIndex", baseline: "capabilityIndexBaseline" },
+};
+
+/**
+ * The scenario rows use the brief's keys; a model is likelier to call the
+ * counterfactual `none` than `baseline`. Accept either rather than forcing a
+ * convention on the model owner.
+ */
+function resolveScenarioKey(result, uiScenario) {
+  const rows = read.rows(result);
+  if (!rows.length) return null;
+  const candidates =
+    uiScenario === "none" ? ["none", "baseline"] : [uiScenario];
+  return candidates.find((key) => rows[0][key]) ?? null;
+}
 
 /**
  * Scenario labels come from the project brief. These are view copy — if the

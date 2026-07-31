@@ -1159,3 +1159,68 @@
     margin-bottom: var(--s3);
   }
 }
+
+/* --- The devices draw themselves -----------------------------------------
+   Each section device plots in as it scrolls into view, hairline first, the
+   way a pen plotter lays a figure down. It is the brief's chart-recorder idea
+   applied to the drawn plates rather than to the charts.
+
+   Done on a scroll-driven timeline with no JavaScript at all — this page is
+   script-free and a test asserts it stays that way. `animation-timeline:
+   view()` ties each device's progress to its own position in the viewport, so
+   a device eight sections down draws when the reader reaches it rather than
+   having already finished before it was ever on screen.
+
+   Two guards, and both matter:
+
+   `:not([stroke-dasharray])` — § 4 and § 5 draw their normalized baselines as
+   real dashed rules. Setting a dash pattern on those to animate them would
+   overwrite the pattern that carries the meaning, so they fade instead.
+
+   `@supports` — engines without scroll-driven animation get the finished
+   drawing, not a blank box. The declaration only ever removes ink that the
+   timeline then puts back, so failing to apply it is the safe direction.
+
+   The whole block sits inside prefers-reduced-motion: no-preference, so a
+   reader who asked for no motion is served the completed plates directly
+   rather than a neutralised animation.
+   ------------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .device [stroke]:not([stroke-dasharray]) {
+      /* Longer than any path in a 120×64 device, so the dash reads as one
+         solid stroke once the offset reaches zero. */
+      stroke-dasharray: 520;
+      animation: device-plot linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 95%;
+    }
+
+    /* Screened and hatched areas cannot be drawn, so they arrive with the
+       stroke work rather than after it. */
+    .device [fill^="url"] {
+      animation: device-ink linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 100%;
+    }
+  }
+}
+
+@keyframes device-plot {
+  from {
+    stroke-dashoffset: 520;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes device-ink {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

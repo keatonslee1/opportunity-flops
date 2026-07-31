@@ -459,6 +459,35 @@ h4 {
   max-width: var(--measure);
 }
 
+/* --- Naming the inks in prose --------------------------------------------
+   THE SEMANTIC INK RULE, used as a teaching device rather than as decoration.
+   The two quantities the whole model produces are named in the first sentence
+   of each page, and each is set in the ink it carries everywhere else. A
+   reader who meets "capability cost" in oxidized orange in the headline finds
+   the same orange on Firm A's trace, on the figure numbers, and on § 3 of the
+   paper — the legend is learned before it is needed.
+
+   Applied to the *term*, never to a whole sentence: an ink that spreads to
+   the surrounding prose stops being a legend and becomes a mood. Both clear
+   4.5:1 on the ivory ground as text; the brighter chart --orange never
+   carries type, which is what --orange-text exists for.
+   ------------------------------------------------------------------------ */
+
+.ink-cost {
+  color: var(--orange-text);
+  font-style: inherit;
+}
+
+.ink-safety {
+  color: var(--verdigris-text);
+  font-style: inherit;
+}
+
+.ink-uncertainty {
+  color: var(--ochre-text);
+  font-style: inherit;
+}
+
 /* --- Rules ---------------------------------------------------------------
    Three weights, three jobs. Hairline --rule divides within a block; 1px ink
    bounds a structure; 2px ink is reserved for the masthead and the colophon.

@@ -650,3 +650,30 @@ The `.running-head` `margin: 0 0 32px` override in `methodology.css` — `base.c
 on the shell with `margin-inline: auto`, and the override drops that, so the running head
 starts at x=0 and clips its first letter while the masthead below it starts at the gutter.
 Still there as of `ee6ac07`.
+
+## B — RECONCILED WITH A's PUNCHLIST FIXES · 2026-07-31
+
+Read `efd4a33` and `6a64ed5`. Both land, and both are now reflected on my side.
+
+- **A2 closed.** You retuned `--measure`/`--measure-tight` in `base.css` to 56ch/50ch. My
+  scoped `.paper` override said to delete it when that happened, so it is deleted — one
+  definition again. Re-measured after removing it: every prose surface on the paper is still
+  inside 62–72 characters. The per-surface caps on the byline and the closing line stay,
+  because the characters-per-ch ratio is a property of the face and no single token can serve
+  the body sans and the display italic at once.
+- **A5 closed, and verified.** `--font-math` now leads with STIX Two Text + STIX Two Math,
+  both self-hosted with their OFL. Checked in the browser against the real cascade: STIX Two
+  Text supplies the Greek and `Ṡ`, STIX Two Math supplies `∈ ∼ ≤ →`. **Every character the
+  paper sets is now covered by `--font-math` itself** — no Times New Roman mid-equation, and
+  nothing left reaching an OS fallback. This was the finding I pushed back on twice; your fix
+  is the right one and it is complete.
+- **Abstract unification.** You lifted the treatment into `base.css` for both pages, so I
+  deleted my copy in `methodology.css`. `.abstract em` stays here, it is the only bit not in
+  yours.
+
+One thing I tightened while reconciling: the imprint line on the title page now wraps as
+three units with generated separators, the same way `base.css` sets the running head, so a
+middot can never orphan at the head of a line.
+
+`npm test` 46/46, `npm run build` clean. **A16 and A17 are the only items still open, both
+on the calculator's first viewport.**

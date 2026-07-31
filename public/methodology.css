@@ -21,26 +21,12 @@
    --measure even though the sheet's text column is far wider — the extra
    width belongs to plates, tables and equations, not to running text.
 
-   THE `ch` TRAP. base.css sets --measure: 68ch with the comment "62–72
-   characters. Never wider." A `ch` is the advance width of "0", and in both
-   Fira Sans and Newsreader the digits are appreciably wider than the average
-   lowercase letter — so 68ch renders as **83 characters** of body prose, not
-   68. Measured on the built page, not estimated: a 72-character reference
-   string set in the paragraph's own computed font is 528px wide, and the
-   paragraph box was 607px. Every prose surface on the page ran 83–90
-   characters, against a brief that caps it at 72 and calls the cap hard.
-
-   The values below are solved from that measurement — 56ch lands body prose
-   at ~68 characters and 50ch lands the display-serif abstract at ~68. They
-   are scoped to .paper rather than edited into base.css, which is Worker A's
-   file, and the calculator has the same defect for the same reason. Filed as
-   PUNCHLIST A2. When the token is retuned upstream, delete this block.
+   The scoped --measure override that lived here is gone: Worker A retuned the
+   token in base.css to the values solved on this page, so there is one
+   definition again. The per-surface caps below stay, because the characters-
+   per-ch ratio is a property of the face and no single token can serve the
+   body sans and the display italic at once.
    ------------------------------------------------------------------------ */
-
-.paper {
-  --measure: 56ch;
-  --measure-tight: 50ch;
-}
 
 .paper p,
 .paper li,
@@ -100,7 +86,18 @@
    and it is uncapped for the same reason the folio is. Held to the prose
    measure it broke "Priors / unvalidated" across two lines, which reads as an
    accident rather than as a stamp. */
+/* Separator on the preceding unit so the three parts wrap as units and a
+   middot never lands at the head of a line — the same treatment base.css
+   gives the running head. */
+.imprint span:not(:last-child)::after {
+  content: "·";
+  margin: 0 0.55em;
+  color: var(--rule-strong);
+}
+
 .paper .imprint {
+  display: flex;
+  flex-wrap: wrap;
   max-width: none;
   margin: var(--s2) 0 0;
   color: var(--muted);
@@ -122,22 +119,6 @@
   font-weight: 600;
   font-variant-caps: all-small-caps;
   letter-spacing: var(--track-caps);
-}
-
-/* The abstract carries the paper. It is set larger than body text, in the
-   display serif, on the tight measure — 62 characters rather than 68, because
-   a longer line at this size makes the return sweep hard to track. */
-.abstract p {
-  max-width: var(--measure-tight);
-  margin: 0 0 var(--s4);
-  font-family: var(--font-display);
-  font-size: clamp(1.14rem, 1.7vw, 1.4rem);
-  line-height: 1.42;
-  text-wrap: pretty;
-}
-
-.abstract p:last-child {
-  margin-bottom: 0;
 }
 
 .abstract em {

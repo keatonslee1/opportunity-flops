@@ -545,6 +545,35 @@ input {
   outline-offset: 2px;
 }
 
+/* ── Page context ────────────────────────────────────────────────────── */
+
+.page-context {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 0.72rem;
+  min-width: 0;
+}
+
+.page-context-label {
+  flex: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: var(--rule-strong);
+}
+
+.page-context-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 /* ── Footer ──────────────────────────────────────────────────────────── */
 
 .footer {

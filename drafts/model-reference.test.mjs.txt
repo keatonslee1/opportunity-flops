@@ -1,0 +1,124 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import {
+  MODEL_CONSTANTS,
+  SCENARIOS,
+  assumptionDefinitions,
+  defaultAssumptions,
+  runModel,
+} from "../public/model.js";
+
+test("assumption definitions form a valid UI contract", () => {
+  assert.ok(assumptionDefinitions.length > 0);
+
+  for (const definition of assumptionDefinitions) {
+    assert.ok(definition.key, "every definition needs a key");
+    assert.ok(definition.label, `${definition.key} needs a label`);
+    assert.ok(definition.min < definition.max, `${definition.key} range is inverted`);
+    assert.ok(
+      definition.value >= definition.min && definition.value <= definition.max,
+      `${definition.key} default sits outside its range`,
+    );
+    assert.equal(typeof definition.scale, "number");
+  }
+
+  const keys = assumptionDefinitions.map((d) => d.key);
+  assert.equal(new Set(keys).size, keys.length, "keys must be unique");
+});
+
+test("runModel returns a populated result for every scenario", () => {
+  const result = runModel(defaultAssumptions());
+
+  assert.equal(result.status, "ok");
+  assert.ok(Array.isArray(result.series));
+  assert.ok(result.series.length > 0);
+
+  for (const scenario of SCENARIOS) {
+    const out = result.scenarios[scenario.key];
+    assert.ok(out, `missing scenario ${scenario.key}`);
+    assert.ok(out.points.length > 0);
+    assert.ok(Number.isFinite(out.headline.capabilityLagMonths));
+    assert.ok(Number.isFinite(out.headline.cumulativeLossTrillions));
+  }
+});
+
+test("the no-reallocation scenario is a true baseline", () => {
+  const { scenarios } = runModel(defaultAssumptions());
+  const none = scenarios.none;
+
+  assert.equal(none.progressMultiplier, 1);
+  assert.ok(Math.abs(none.headline.capabilityLagMonths) < 1e-9);
+  assert.ok(Math.abs(none.headline.cumulativeLossTrillions) < 1e-9);
+});
+
+test("coordinated reallocation costs more than unilateral", () => {
+  const { scenarios, comparison } = runModel(defaultAssumptions());
+
+  assert.ok(
+    scenarios.coordinated.headline.capabilityLagMonths >
+      scenarios.unilateral.headline.capabilityLagMonths,
+    "a common policy should slow the frontier more than one firm acting alone",
+  );
+  assert.ok(comparison.coordinationMultiple > 1);
+});
+
+test("more reallocation and longer duration both increase the lag", () => {
+  const base = defaultAssumptions();
+
+  const more = runModel({ ...base, computeReallocated: 40 });
+  const less = runModel({ ...base, computeReallocated: 5 });
+  assert.ok(
+    more.scenarios.coordinated.headline.capabilityLagMonths >
+      less.scenarios.coordinated.headline.capabilityLagMonths,
+  );
+
+  const longer = runModel({ ...base, durationMonths: 48 });
+  const shorter = runModel({ ...base, durationMonths: 6 });
+  assert.ok(
+    longer.scenarios.coordinated.headline.capabilityLagMonths >
+      shorter.scenarios.coordinated.headline.capabilityLagMonths,
+  );
+});
+
+test("full spillover makes reallocation costless", () => {
+  const result = runModel({ ...defaultAssumptions(), spillover: 100 });
+  assert.ok(Math.abs(result.scenarios.coordinated.headline.capabilityLagMonths) < 1e-9);
+});
+
+test("out-of-range and missing assumptions are clamped, not propagated", () => {
+  const result = runModel({ computeReallocated: 9999, durationMonths: -5 });
+
+  assert.equal(result.normalised.computeReallocated, 0.5);
+  assert.equal(result.normalised.durationMonths, 1);
+  for (const value of Object.values(result.normalised)) {
+    assert.ok(Number.isFinite(value));
+  }
+});
+
+test("capability lags software progress because slowdowns compound", () => {
+  const { scenarios } = runModel(defaultAssumptions());
+  const coordinated = scenarios.coordinated;
+
+  assert.ok(
+    coordinated.headline.capabilityLagMonths > coordinated.headline.softwareLagMonths,
+    "software slowdown should compound into a larger capability gap",
+  );
+});
+
+test("chart series are aligned across scenarios", () => {
+  const result = runModel(defaultAssumptions());
+  const expected = MODEL_CONSTANTS.projectionYears * MODEL_CONSTANTS.stepsPerYear + 1;
+
+  assert.equal(result.series.length, expected);
+  assert.equal(result.series[0].year, MODEL_CONSTANTS.policyStartYear);
+  assert.equal(
+    result.series[result.series.length - 1].year,
+    MODEL_CONSTANTS.policyStartYear + MODEL_CONSTANTS.projectionYears,
+  );
+
+  for (const row of result.series) {
+    assert.equal(row.none.t, row.unilateral.t);
+    assert.equal(row.none.t, row.coordinated.t);
+  }
+});

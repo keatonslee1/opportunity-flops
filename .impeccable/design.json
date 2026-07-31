@@ -46,7 +46,7 @@
       "refersTo": "reset-button",
       "description": "Quiet utility action for restoring calculator defaults.",
       "html": "<button class=\"ds-reset-button\" type=\"button\">Reset</button>",
-      "css": ".ds-reset-button { min-width: 54px; min-height: 36px; padding: 0 11px; border: 1px solid #86919a; border-radius: 3px; color: #101b2b; background: transparent; font: 500 0.75rem Barlow, sans-serif; cursor: pointer; } .ds-reset-button:hover { background: #fbfcfb; } .ds-reset-button:focus-visible { outline: 3px solid rgba(36,91,150,.32); outline-offset: 2px; }"
+      "css": ".ds-reset-button { min-width: 54px; min-height: 36px; padding: 0 11px; border: 1px solid #86919a; border-radius: 3px; color: #101b2b; background: transparent; font: 500 0.75rem Barlow, sans-serif; cursor: pointer; } .ds-reset-button:hover { background: #fbfcfb; } .ds-reset-button:focus-visible { outline: 3px solid #245b96; outline-offset: 2px; }"
     },
     {
       "name": "Selected Scenario",
@@ -54,14 +54,14 @@
       "refersTo": "scenario-selected",
       "description": "Two-line scenario row with a visible selected state.",
       "html": "<label class=\"ds-scenario\"><input type=\"radio\" checked><span><strong>Both firms</strong><small>Common commitment</small></span></label>",
-      "css": ".ds-scenario { display: block; color: #101b2b; cursor: pointer; font-family: Barlow, sans-serif; } .ds-scenario input { position: absolute; opacity: 0; pointer-events: none; } .ds-scenario span { min-height: 53px; display: grid; grid-template-columns: 88px 1fr; align-items: center; padding: 8px 12px; border: 1px solid #86919a; border-radius: 4px; background: #fbfcfb; box-shadow: 0 5px 16px rgba(25,39,50,.07); } .ds-scenario strong { font-size: .83rem; } .ds-scenario small { color: #556070; font-size: .74rem; } .ds-scenario:hover span { background: rgba(255,255,255,.72); } .ds-scenario input:focus-visible + span { outline: 3px solid rgba(36,91,150,.32); outline-offset: 2px; }"
+      "css": ".ds-scenario { display: block; color: #101b2b; cursor: pointer; font-family: Barlow, sans-serif; } .ds-scenario input { position: absolute; opacity: 0; pointer-events: none; } .ds-scenario span { min-height: 53px; display: grid; grid-template-columns: 88px 1fr; align-items: center; padding: 8px 12px; border: 1px solid #86919a; border-radius: 4px; background: #fbfcfb; box-shadow: 0 5px 16px rgba(25,39,50,.07); } .ds-scenario strong { font-size: .83rem; } .ds-scenario small { color: #556070; font-size: .74rem; } .ds-scenario:hover span { background: rgba(255,255,255,.72); } .ds-scenario input:focus-visible + span { outline: 3px solid #245b96; outline-offset: 2px; }"
     },
     {
       "name": "Cobalt Range Control",
       "kind": "input",
       "description": "Direct-manipulation assumption control with a telemetry value.",
       "html": "<label class=\"ds-range\"><span>Compute reallocated</span><output>20%</output><input type=\"range\" min=\"0\" max=\"50\" value=\"20\"></label>",
-      "css": ".ds-range { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; color: #101b2b; font: 600 .85rem Barlow, sans-serif; } .ds-range output { color: #245b96; font: 700 .7rem ui-monospace, monospace; letter-spacing: .055em; } .ds-range input { grid-column: 1 / -1; width: 100%; accent-color: #245b96; cursor: pointer; } .ds-range input:focus-visible { outline: 3px solid rgba(36,91,150,.32); outline-offset: 2px; }"
+      "css": ".ds-range { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; color: #101b2b; font: 600 .85rem Barlow, sans-serif; } .ds-range output { color: #245b96; font: 700 .7rem ui-monospace, monospace; letter-spacing: .055em; } .ds-range input { grid-column: 1 / -1; width: 100%; accent-color: #245b96; cursor: pointer; } .ds-range input:focus-visible { outline: 3px solid #245b96; outline-offset: 2px; }"
     },
     {
       "name": "Workspace Shell",
@@ -73,8 +73,8 @@
     {
       "name": "Trajectory Legend",
       "kind": "custom",
-      "description": "Monospace legend that preserves trace identity and illustrative status.",
-      "html": "<div class=\"ds-legend\"><span><i class=\"ds-baseline\"></i>Baseline</span><span><i class=\"ds-firm-a\"></i>Firm A</span><span><i class=\"ds-firm-b\"></i>Firm B</span><em>Illustrative preview</em></div>",
+      "description": "Monospace legend that preserves trace identity and uncalibrated sensitivity status.",
+      "html": "<div class=\"ds-legend\"><span><i class=\"ds-baseline\"></i>Baseline</span><span><i class=\"ds-firm-a\"></i>Firm A</span><span><i class=\"ds-firm-b\"></i>Firm B</span><em>Modeled sensitivity · not a forecast</em></div>",
       "css": ".ds-legend { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; color: #344451; font: 400 .7rem ui-monospace, monospace; letter-spacing: .055em; text-transform: uppercase; } .ds-legend span { display: inline-flex; align-items: center; gap: 7px; } .ds-legend i { width: 24px; border-top: 2px solid; } .ds-legend .ds-baseline { border-color: #101b2b; border-top-style: dashed; } .ds-legend .ds-firm-a { border-color: #c84e2f; } .ds-legend .ds-firm-b { border-color: #245b96; } .ds-legend em { margin-left: auto; color: #9f381f; font-style: normal; }"
     }
   ],
@@ -95,7 +95,7 @@
     ],
     "dos": [
       "Do keep assumptions, plots, statuses, and caveats in one continuous analytical workspace.",
-      "Do preserve the orange text/chart-stroke distinction and label illustrative geometry explicitly.",
+      "Do preserve the orange text/chart-stroke distinction and label modeled sensitivity output as uncalibrated.",
       "Do reserve synchronized trace and sweep animation for initial entry and discrete scenario changes; keep continuous slider feedback immediate and respect reduced-motion preferences.",
       "Do use rules, typography, and tonal changes before adding elevation."
     ],
@@ -103,7 +103,7 @@
       "Don't split the calculator into a grid of individually elevated cards.",
       "Don't use accent color as decoration or rely on color alone to communicate state.",
       "Don't introduce playful mascot, flip-flop, or character illustration into the instrument world.",
-      "Don't present illustrative chart geometry as validated output or empirical results."
+      "Don't present sensitivity output as an empirical estimate or absolute forecast."
     ]
   }
 }

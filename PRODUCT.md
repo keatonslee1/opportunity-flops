@@ -27,10 +27,12 @@ The tool is used during policy analysis, research discussion, presentations, and
 ## Capabilities and Constraints
 
 - The existing application is a dependency-light static web interface served by Node.
-- The economic model is being developed separately behind the existing `runModel(assumptions)` boundary in `public/model.js`.
-- The interface must support one-firm and two-firm comparisons without coupling presentation logic to unfinished equations.
-- Interim chart values must be explicitly labeled as illustrative and must not be presented as model findings.
-- Model assumptions, equations, uncertainty, and sensitivity should remain inspectable as the model matures.
+- Katherine's reduced-form model is implemented behind the `runModel(assumptions)` boundary in `public/model.js`.
+- The model holds capability-oriented R&D compute fixed, applies the policy share to that compute, propagates the change through software progress, and translates software into a capability index while holding training compute equal.
+- The interface supports no-reallocation, one-firm, and two-firm comparisons using the same model equations.
+- The source parameter table defines roles and statuses for `A`, `β`, `γ`, `α`, and `δ`, but does not provide numerical Low, Medium, or High calibrations. Current preset values are working placeholders and must be labeled as such.
+- The baseline software path is normalized from index 100 in 2026 to 200 in 2034. Outputs describe policy divergence from that reference path, not a forecast of absolute progress.
+- Model assumptions, equations, uncertainty, and sensitivity must remain inspectable as the model matures.
 
 ## Brand Commitments
 
@@ -42,13 +44,14 @@ The tool is used during policy analysis, research discussion, presentations, and
 
 - Stable model/UI contract in `public/model.js` and `test/model-contract.test.mjs`.
 - Current product and methodology copy in `public/index.html`.
-- No validated numerical model output is available yet; the interface must not fabricate empirical results.
+- Katherine's updated model specification and parameter-role table in `Epistemic Security Ideas for Hacking the Think Tank (1).pdf`.
+- No validated parameter calibration is available yet; the interface must not present sensitivity outputs as empirical estimates or forecasts.
 
 ## Product Principles
 
 - Make assumptions as visible as outputs.
 - Compare policies in one continuous analytical workspace.
-- Distinguish illustrative interface data from validated model results.
+- Distinguish implemented equations from unvalidated parameter calibration.
 - Preserve a stable handoff boundary for the modeling work.
 - Prefer interpretability and direct manipulation over decorative complexity.
 

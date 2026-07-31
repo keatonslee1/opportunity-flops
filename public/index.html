@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Opportunity FLOPs is an interactive policy calculator for exploring frontier AI compute reallocation scenarios."
+      content="Opportunity FLOPs models how reallocating capability R&D compute to alignment changes software progress and frontier AI capability paths."
     />
     <title>Opportunity FLOPs — Compute tradeoff calculator</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -25,7 +28,7 @@
       </a>
       <div class="topbar-status" aria-label="Project status">
         <span class="status-light" aria-hidden="true"></span>
-        Research preview
+        Sensitivity model online
       </div>
       <nav aria-label="Primary navigation">
         <a href="#calculator">Calculator</a>
@@ -40,21 +43,21 @@
           <h1 id="page-title">What does a safety commitment cost in frontier progress?</h1>
           <p>
             Compare no reallocation, unilateral action, and a coordinated policy.
-            Adjust the assumptions and inspect how the projected trajectories separate.
+            Set the compute commitment and inspect how Katherine's reduced-form model propagates it through software progress to frontier capability.
           </p>
         </div>
         <dl class="model-readiness">
           <div>
-            <dt>Interface</dt>
-            <dd>Operational</dd>
+            <dt>Equations</dt>
+            <dd>Integrated</dd>
           </div>
           <div>
-            <dt>Economic model</dt>
-            <dd>Integration pending</dd>
+            <dt>Calibration</dt>
+            <dd>Sensitivity only</dd>
           </div>
           <div>
-            <dt>Chart data</dt>
-            <dd>Illustrative</dd>
+            <dt>Outputs</dt>
+            <dd>Comparative indices</dd>
           </div>
         </dl>
       </section>
@@ -86,12 +89,24 @@
 
           <div id="assumption-controls"></div>
 
+          <section class="parameter-readout" aria-labelledby="active-preset-title">
+            <div>
+              <h3 id="active-preset-title">Active sensitivity</h3>
+              <span id="preset-name">Central sensitivity</span>
+            </div>
+            <dl>
+              <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.30</dd></div>
+              <div><dt>Feedback · γ</dt><dd id="gamma-value">0.40</dd></div>
+              <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.70</dd></div>
+            </dl>
+          </section>
+
           <div class="rack-note">
             <svg viewBox="0 0 20 20" aria-hidden="true">
               <circle cx="10" cy="10" r="8.25"></circle>
               <path d="M10 8v5M10 5.5v.5"></path>
             </svg>
-            <p>Controls currently drive illustrative geometry, not validated model results.</p>
+            <p>The equations are implemented. Working preset values are placeholders because the source table defines parameter roles, but not numerical calibrations.</p>
           </div>
         </aside>
 
@@ -101,8 +116,8 @@
               <h2 id="results-title">Baseline versus policy</h2>
             </div>
             <div class="headline-output">
-              <span>Estimated delay</span>
-              <strong id="headline-result">Awaiting model</strong>
+              <span>2034 capability gap</span>
+              <strong id="headline-result">Running model</strong>
             </div>
           </header>
 
@@ -110,29 +125,25 @@
             <span><i class="legend-line baseline"></i>Baseline</span>
             <span><i class="legend-line firm-a"></i>Firm A</span>
             <span><i class="legend-line firm-b"></i>Firm B</span>
-            <span class="legend-disclaimer">Illustrative preview</span>
+            <span class="legend-disclaimer">Modeled sensitivity · not a forecast</span>
           </div>
+
+          <p class="model-error" id="model-error" role="alert" hidden></p>
 
           <article class="chart-block" aria-labelledby="software-chart-title">
             <div class="chart-heading">
               <div>
                 <h3 id="software-chart-title">Software progress</h3>
-                <p>Relative research output index</p>
+                <p>Software-efficiency level index · 2026 = 100</p>
               </div>
-              <output id="software-gap">Preview only</output>
+              <output id="software-gap">Running model</output>
             </div>
             <div class="chart-frame">
               <svg class="trajectory-chart" id="software-chart" viewBox="0 0 800 300" role="img" aria-labelledby="software-svg-title software-svg-desc">
-                <title id="software-svg-title">Illustrative software progress trajectories</title>
-                <desc id="software-svg-desc">Baseline, Firm A, and Firm B trajectories from 2026 through 2034. These are interface demonstration values, not model results.</desc>
-                <g class="plot-grid" aria-hidden="true">
-                  <path d="M68 34H768M68 96H768M68 158H768M68 220H768"></path>
-                  <path d="M68 34V244M243 34V244M418 34V244M593 34V244M768 34V244"></path>
-                </g>
-                <g class="axis-labels" aria-hidden="true">
-                  <text x="50" y="39" text-anchor="end">220</text><text x="50" y="101" text-anchor="end">180</text><text x="50" y="163" text-anchor="end">140</text><text x="50" y="225" text-anchor="end">100</text>
-                  <text x="68" y="270">2026</text><text x="243" y="270">2028</text><text x="418" y="270">2030</text><text x="593" y="270">2032</text><text x="768" y="270" text-anchor="end">2034</text>
-                </g>
+                <title id="software-svg-title">Modeled software progress trajectories</title>
+                <desc id="software-svg-desc">Modeled baseline, Firm A, and Firm B software progress indices from 2026 through 2034.</desc>
+                <path class="plot-grid" id="software-grid" aria-hidden="true"></path>
+                <g class="axis-labels" id="software-axes" aria-hidden="true"></g>
                 <path class="gap-area" id="software-area"></path>
                 <path class="trace trace-baseline" id="software-baseline"></path>
                 <path class="trace trace-a" id="software-a"></path>
@@ -148,22 +159,16 @@
             <div class="chart-heading">
               <div>
                 <h3 id="capability-chart-title">Frontier capability</h3>
-                <p>Relative capability index</p>
+                <p>Training-compute-normalized index · 2026 = 100</p>
               </div>
-              <output id="capability-gap">Preview only</output>
+              <output id="capability-gap">Running model</output>
             </div>
             <div class="chart-frame">
               <svg class="trajectory-chart" id="capability-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-svg-title capability-svg-desc">
-                <title id="capability-svg-title">Illustrative frontier capability trajectories</title>
-                <desc id="capability-svg-desc">Baseline, Firm A, and Firm B trajectories from 2026 through 2034. These are interface demonstration values, not model results.</desc>
-                <g class="plot-grid" aria-hidden="true">
-                  <path d="M68 34H768M68 96H768M68 158H768M68 220H768"></path>
-                  <path d="M68 34V244M243 34V244M418 34V244M593 34V244M768 34V244"></path>
-                </g>
-                <g class="axis-labels" aria-hidden="true">
-                  <text x="50" y="39" text-anchor="end">220</text><text x="50" y="101" text-anchor="end">180</text><text x="50" y="163" text-anchor="end">140</text><text x="50" y="225" text-anchor="end">100</text>
-                  <text x="68" y="270">2026</text><text x="243" y="270">2028</text><text x="418" y="270">2030</text><text x="593" y="270">2032</text><text x="768" y="270" text-anchor="end">2034</text>
-                </g>
+                <title id="capability-svg-title">Modeled frontier capability trajectories</title>
+                <desc id="capability-svg-desc">Modeled baseline, Firm A, and Firm B frontier capability indices from 2026 through 2034.</desc>
+                <path class="plot-grid" id="capability-grid" aria-hidden="true"></path>
+                <g class="axis-labels" id="capability-axes" aria-hidden="true"></g>
                 <path class="gap-area" id="capability-area"></path>
                 <path class="trace trace-baseline" id="capability-baseline"></path>
                 <path class="trace trace-a" id="capability-a"></path>
@@ -176,17 +181,17 @@
           </article>
 
           <div class="comparison-strip" aria-label="Scenario comparison status">
-            <div>
+            <div data-scenario="baseline">
               <span>No reallocation</span>
-              <strong>Reference path</strong>
+              <strong id="baseline-status">0.0% capability gap</strong>
             </div>
-            <div>
+            <div data-scenario="unilateral">
               <span>Unilateral</span>
-              <strong id="unilateral-status">Firm A diverges</strong>
+              <strong id="unilateral-status">Calculating</strong>
             </div>
-            <div>
+            <div data-scenario="coordinated">
               <span>Coordinated</span>
-              <strong id="coordinated-status">Both firms diverge</strong>
+              <strong id="coordinated-status">Calculating</strong>
             </div>
           </div>
         </section>
@@ -194,17 +199,64 @@
 
       <section class="methodology" id="methodology" aria-labelledby="methodology-title">
         <div>
-          <h2 id="methodology-title">A transparent reduced-form model</h2>
+          <h2 id="methodology-title">The model is simple on purpose</h2>
           <p>
-            The planned model combines an ideas-production function, diminishing returns to research inputs,
-            and an assumed macroeconomic productivity pathway. Its purpose is comparison—not point prediction.
+            It connects one policy choice to two modeled consequences. The equations are implemented as written; the numerical presets remain exploratory until an empirical calibration is supplied.
           </p>
         </div>
-        <ol>
-          <li><strong>Allocate</strong><span>Move a share of capability-oriented R&amp;D compute to alignment.</span></li>
-          <li><strong>Propagate</strong><span>Estimate how the change affects software and frontier progress.</span></li>
-          <li><strong>Compare</strong><span>Read unilateral and coordinated paths against the same baseline.</span></li>
-        </ol>
+        <div class="model-specification">
+          <ol>
+            <li><strong>Allocate</strong><span>Policy compute is <i>C</i><sub>R</sub><sup>P</sup> = (1 − <i>x</i>)<i>C</i><sub>R</sub>. Training compute stays unchanged.</span></li>
+            <li><strong>Propagate</strong><span>Software follows d<i>S</i>/d<i>t</i> = <i>A C</i><sub>R</sub><sup>β</sup><i>S</i><sup>γ</sup>.</span></li>
+            <li><strong>Translate</strong><span>Capability follows <i>M</i> = <i>C</i><sub>T</sub><sup>α</sup><i>S</i><sup>δ</sup>, so the training-compute term cancels in the policy comparison.</span></li>
+            <li><strong>Compare</strong><span>Capability gap = 1 − (<i>S</i><sub>P</sub>/<i>S</i><sub>B</sub>)<sup>δ</sup>.</span></li>
+          </ol>
+
+          <div class="preset-matrix">
+            <h3>Sensitivity presets</h3>
+            <table>
+              <caption>Working placeholder sets used by the impact control</caption>
+              <thead><tr><th>Case</th><th>β</th><th>γ</th><th>δ</th></tr></thead>
+              <tbody>
+                <tr><th>Low</th><td>0.15</td><td>0.20</td><td>0.50</td></tr>
+                <tr><th>Medium</th><td>0.30</td><td>0.40</td><td>0.70</td></tr>
+                <tr><th>High</th><td>0.50</td><td>0.60</td><td>0.90</td></tr>
+              </tbody>
+            </table>
+            <p>Software begins at index 100. The baseline is normalized to index 200 in 2034, so the charts communicate policy divergence—not a dated forecast of absolute capability. The normalization absorbs <i>A</i>; unchanged training compute makes <i>α</i> cancel from relative outputs.</p>
+          </div>
+
+          <details class="parameter-contract">
+            <summary>Inspect the full parameter contract</summary>
+            <div class="parameter-contract-table" tabindex="0" role="region" aria-label="Full model parameter contract">
+              <table>
+                <thead><tr><th>Symbol</th><th>Role</th><th>Source status</th><th>Implementation</th></tr></thead>
+                <tbody>
+                  <tr><th><i>x</i></th><td>R&amp;D compute reallocation share</td><td>User input</td><td>0%–50% slider</td></tr>
+                  <tr><th><i>z</i></th><td>Policy impact level</td><td>User input</td><td>Low / Medium / High</td></tr>
+                  <tr><th><i>C</i><sub>R,B</sub></th><td>Baseline capability-R&amp;D compute</td><td>Exogenous path</td><td>Fixed and normalized</td></tr>
+                  <tr><th><i>C</i><sub>R,P</sub></th><td>Policy capability-R&amp;D compute</td><td>Model-derived</td><td>(1 − <i>x</i>)<i>C</i><sub>R,B</sub></td></tr>
+                  <tr><th><i>A</i></th><td>Research productivity</td><td>Set by <i>z</i> / calibrated</td><td>Absorbed into baseline normalization</td></tr>
+                  <tr><th>β</th><td>R&amp;D-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Working placeholder</td></tr>
+                  <tr><th>γ</th><td>Software-feedback elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Working placeholder</td></tr>
+                  <tr data-parameter="S_B"><th><i>S</i><sub>B</sub>(<i>t</i>)</th><td>Baseline software level</td><td>Model-generated</td><td>Baseline software series</td></tr>
+                  <tr data-parameter="S_P"><th><i>S</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy software level</td><td>Model-generated</td><td>Firm policy series</td></tr>
+                  <tr><th><i>S</i><sub>0</sub></th><td>Initial software level</td><td>Fixed normalization</td><td>Index 100</td></tr>
+                  <tr><th><i>C</i><sub>T</sub></th><td>Frontier training compute</td><td>Exogenous path</td><td>Equal across scenarios</td></tr>
+                  <tr><th>α</th><td>Training-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Cancels from relative outputs</td></tr>
+                  <tr><th>δ</th><td>Software-to-capability elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Working placeholder</td></tr>
+                  <tr data-parameter="M_B"><th><i>M</i><sub>B</sub>(<i>t</i>)</th><td>Baseline capability level</td><td>Model-generated</td><td>Baseline capability series</td></tr>
+                  <tr data-parameter="M_P"><th><i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy capability level</td><td>Model-generated</td><td>Firm policy series</td></tr>
+                  <tr><th><i>M</i><sub>0</sub></th><td>Initial capability level</td><td>Fixed normalization</td><td>Index 100</td></tr>
+                  <tr><th><i>t</i></th><td>Time since policy start</td><td>Model index</td><td>2026–2034, quarterly</td></tr>
+                  <tr><th>SS</th><td>Software progress-rate slowdown</td><td>Model output</td><td>Shown above software chart</td></tr>
+                  <tr><th>SG</th><td>Software level gap</td><td>Model output</td><td>Returned in model contract</td></tr>
+                  <tr><th>CG</th><td>Capability gap</td><td>Model output</td><td>Shown above capability chart</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </div>
       </section>
     </main>
 

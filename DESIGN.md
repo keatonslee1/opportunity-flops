@@ -160,7 +160,7 @@ Form language is rectilinear and equipment-like. The calculator uses a single 22
 ### Buttons
 - **Shape:** Compact rectangular control with a 3px radius and 36px minimum height.
 - **Reset:** Transparent at rest with a strong rule; fills with the panel tone on hover.
-- **Focus:** A 3px translucent cobalt outline with a 2px offset.
+- **Focus:** A 3px solid cobalt outline with a 2px offset.
 
 ### Scenario Selectors
 - **Style:** Full-width rows with transparent borders at rest and a cool-white fill, strong border, and low state shadow when selected.
@@ -187,7 +187,7 @@ Form language is rectilinear and equipment-like. The calculator uses a single 22
 
 ### Do:
 - **Do** keep assumptions, plots, statuses, and caveats in one continuous analytical workspace.
-- **Do** preserve the orange text/chart-stroke distinction and label illustrative geometry explicitly.
+- **Do** preserve the orange text/chart-stroke distinction and label modeled sensitivity output as uncalibrated.
 - **Do** reserve synchronized trace and sweep animation for initial entry and discrete scenario changes; keep continuous slider feedback immediate and respect reduced-motion preferences.
 - **Do** use rules, typography, and tonal changes before adding elevation.
 
@@ -195,4 +195,4 @@ Form language is rectilinear and equipment-like. The calculator uses a single 22
 - **Don't** split the calculator into a grid of individually elevated cards.
 - **Don't** use accent color as decoration or rely on color alone to communicate state.
 - **Don't** introduce playful mascot, flip-flop, or character illustration into the instrument world.
-- **Don't** present illustrative chart geometry as validated output or empirical results.
+- **Don't** present sensitivity output as an empirical estimate or absolute forecast.

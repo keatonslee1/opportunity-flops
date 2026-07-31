@@ -187,7 +187,7 @@ Form language is rectilinear and equipment-like. The calculator uses a single 22
 
 ### Do:
 - **Do** keep assumptions, plots, statuses, and caveats in one continuous analytical workspace.
-- **Do** preserve the orange text/chart-stroke distinction and label modeled sensitivity output as uncalibrated.
+- **Do** preserve the orange text/chart-stroke distinction and label assumed-prior Monte Carlo sensitivity output as non-empirical.
 - **Do** reserve synchronized trace and sweep animation for initial entry and discrete scenario changes; keep continuous slider feedback immediate and respect reduced-motion preferences.
 - **Do** use rules, typography, and tonal changes before adding elevation.
 

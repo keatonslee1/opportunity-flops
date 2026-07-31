@@ -898,6 +898,47 @@ footer {
   text-transform: none;
 }
 
+.preset-matrix .distribution-inputs {
+  margin-top: 32px;
+}
+
+.calibration-protocol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 24px 0 0;
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule);
+}
+
+.calibration-protocol div {
+  min-width: 0;
+  padding: 12px;
+}
+
+.calibration-protocol div:first-child {
+  padding-left: 0;
+}
+
+.calibration-protocol div + div {
+  border-left: 1px solid var(--rule);
+}
+
+.calibration-protocol dt {
+  margin-bottom: 5px;
+  color: var(--muted);
+}
+
+.calibration-protocol dd {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Barlow", "Trebuchet MS", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  line-height: 1.35;
+  text-transform: none;
+}
+
 .preset-matrix p {
   margin: 16px 0 0;
   color: var(--muted);
@@ -1131,6 +1172,20 @@ footer p:first-child {
     padding-left: 0;
     border-top: 1px solid var(--rule);
     border-left: 0;
+  }
+
+  .calibration-protocol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .calibration-protocol div:nth-child(3) {
+    padding-left: 0;
+    border-top: 1px solid var(--rule);
+    border-left: 0;
+  }
+
+  .calibration-protocol div:nth-child(4) {
+    border-top: 1px solid var(--rule);
   }
 
   .methodology {

@@ -44,14 +44,30 @@ test("software output distinguishes the rate metric from the plotted level serie
   assert.match(appSource, /progress rates end/);
 });
 
-test("the full source table and placeholder calibration status remain explicit", () => {
+test("the full source table and Monte Carlo calibration status remain explicit", () => {
   for (const symbol of ["S_B", "S_P", "M_B", "M_P"]) {
     assert.match(pageSource, new RegExp(`data-parameter="${symbol}"`));
   }
 
-  assert.match(pageSource, /Working placeholder sets/);
+  assert.match(pageSource, /10,000 seeded triangular draws/);
+  assert.match(pageSource, /P10.*P50.*P90/);
+  assert.match(pageSource, /Seed 20260731/);
+  assert.match(pageSource, /Working triangular inputs/);
+  assert.match(pageSource, /0\.223/);
+  assert.match(pageSource, /0\.701/);
+  assert.match(pageSource, /0\.810/);
+  assert.doesNotMatch(pageSource, /Working placeholder/);
   assert.match(pageSource, /Source status/);
   assert.match(pageSource, /Set by <i>z<\/i> \/ calibrated/);
   assert.match(pageSource, /Model-generated/);
   assert.match(pageSource, /not a forecast/i);
+});
+
+test("the active Monte Carlo bundle displays three-decimal parameters", () => {
+  for (const parameter of ["beta", "gamma", "delta"]) {
+    assert.match(
+      appSource,
+      new RegExp(`calibration\\.${parameter}\\.toFixed\\(3\\)`),
+    );
+  }
 });

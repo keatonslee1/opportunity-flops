@@ -30,7 +30,8 @@ The tool is used during policy analysis, research discussion, presentations, and
 - Katherine's reduced-form model is implemented behind the `runModel(assumptions)` boundary in `public/model.js`.
 - The model holds capability-oriented R&D compute fixed, applies the policy share to that compute, propagates the change through software progress, and translates software into a capability index while holding training compute equal.
 - The interface supports no-reallocation, one-firm, and two-firm comparisons using the same model equations.
-- The source parameter table defines roles and statuses for `A`, `β`, `γ`, `α`, and `δ`, but does not provide numerical Low, Medium, or High calibrations. Current preset values are working placeholders and must be labeled as such.
+- The source parameter table defines roles and statuses for `A`, `β`, `γ`, `α`, and `δ`. The impact control now maps Low, Medium, and High to seeded marginal P10, P50, and P90 bundles derived from 10,000 triangular draws per parameter.
+- The triangular inputs (`β`: 0.15/0.30/0.50, `γ`: 0.20/0.40/0.60, `δ`: 0.50/0.70/0.90), percentile mapping, independence assumption, and seed are working modeling choices rather than Katherine-supplied empirical estimates.
 - The baseline software path is normalized from index 100 in 2026 to 200 in 2034. Outputs describe policy divergence from that reference path, not a forecast of absolute progress.
 - Model assumptions, equations, uncertainty, and sensitivity must remain inspectable as the model matures.
 
@@ -45,13 +46,13 @@ The tool is used during policy analysis, research discussion, presentations, and
 - Stable model/UI contract in `public/model.js` and `test/model-contract.test.mjs`.
 - Current product and methodology copy in `public/index.html`.
 - Katherine's updated model specification and parameter-role table in `Epistemic Security Ideas for Hacking the Think Tank (1).pdf`.
-- No validated parameter calibration is available yet; the interface must not present sensitivity outputs as empirical estimates or forecasts.
+- No validated empirical parameter calibration is available yet; the interface must present the Monte Carlo bundles as sensitivity cases derived from assumed priors, not as empirical estimates, joint outcome percentiles, or forecasts.
 
 ## Product Principles
 
 - Make assumptions as visible as outputs.
 - Compare policies in one continuous analytical workspace.
-- Distinguish implemented equations from unvalidated parameter calibration.
+- Distinguish implemented equations and reproducible Monte Carlo processing from unvalidated distribution assumptions.
 - Preserve a stable handoff boundary for the modeling work.
 - Prefer interpretability and direct manipulation over decorative complexity.
 

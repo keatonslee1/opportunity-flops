@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   assumptionDefinitions,
   impactPresets,
+  monteCarloCalibration,
   runModel,
 } from "../public/model.js";
 
@@ -13,6 +14,96 @@ function assertClose(actual, expected, tolerance = 1e-12) {
     `expected ${actual} to be within ${tolerance} of ${expected}`,
   );
 }
+
+test("model publishes the reproducible Monte Carlo calibration contract", () => {
+  assert.deepEqual(monteCarloCalibration, {
+    sampleCount: 10_000,
+    seed: 20_260_731,
+    randomGenerator: "Mulberry32",
+    drawOrder: ["beta", "gamma", "delta"],
+    quantileMethod: "linear interpolation at (n - 1)q",
+    parameterSampling: "independent marginal draws",
+    bundleConstruction: "rank-aligned marginal quantiles",
+    distributionStatus: "working assumptions",
+    quantiles: { low: 0.1, medium: 0.5, high: 0.9 },
+    distributions: {
+      beta: { min: 0.15, mode: 0.3, max: 0.5 },
+      gamma: { min: 0.2, mode: 0.4, max: 0.6 },
+      delta: { min: 0.5, mode: 0.7, max: 0.9 },
+    },
+  });
+});
+
+test("impact levels are seeded empirical P10, P50, and P90 parameter bundles", () => {
+  const expected = {
+    low: {
+      beta: 0.2225944032791555,
+      gamma: 0.28957074404343597,
+      delta: 0.5886460784649494,
+    },
+    medium: {
+      beta: 0.31261892100480526,
+      gamma: 0.3999351351280472,
+      delta: 0.7005358951277937,
+    },
+    high: {
+      beta: 0.4160608485069721,
+      gamma: 0.510705813410008,
+      delta: 0.8096371478233727,
+    },
+  };
+
+  for (const impactLevel of ["low", "medium", "high"]) {
+    for (const parameter of ["beta", "gamma", "delta"]) {
+      assertClose(
+        impactPresets[impactLevel][parameter],
+        expected[impactLevel][parameter],
+      );
+    }
+  }
+});
+
+test("Monte Carlo bundles remain ordered and inside every triangular support", () => {
+  for (const parameter of monteCarloCalibration.drawOrder) {
+    const distribution = monteCarloCalibration.distributions[parameter];
+    const values = ["low", "medium", "high"].map(
+      (impactLevel) => impactPresets[impactLevel][parameter],
+    );
+
+    assert.ok(distribution.min <= distribution.mode);
+    assert.ok(distribution.mode <= distribution.max);
+    assert.ok(values[0] >= distribution.min);
+    assert.ok(values[2] <= distribution.max);
+    assert.ok(values[0] < values[1]);
+    assert.ok(values[1] < values[2]);
+  }
+
+  assert.ok(monteCarloCalibration.distributions.gamma.max < 1);
+});
+
+test("seeded empirical bundles track their triangular target quantiles", () => {
+  const triangularQuantile = (probability, { min, mode, max }) => {
+    const probabilityAtMode = (mode - min) / (max - min);
+    return probability < probabilityAtMode
+      ? min + Math.sqrt(probability * (max - min) * (mode - min))
+      : max - Math.sqrt((1 - probability) * (max - min) * (max - mode));
+  };
+
+  for (const [impactLevel, probability] of Object.entries(
+    monteCarloCalibration.quantiles,
+  )) {
+    for (const parameter of monteCarloCalibration.drawOrder) {
+      assertClose(
+        impactPresets[impactLevel][parameter],
+        triangularQuantile(
+          probability,
+          monteCarloCalibration.distributions[parameter],
+        ),
+        0.005,
+      );
+    }
+  }
+});
 
 test("model publishes range and categorical assumption definitions", () => {
   assert.deepEqual(assumptionDefinitions, [
@@ -32,18 +123,13 @@ test("model publishes range and categorical assumption definitions", () => {
       label: "Impact sensitivity",
       value: "medium",
       options: [
-        { value: "low", label: "Low", description: "Lower elasticities" },
-        { value: "medium", label: "Medium", description: "Central sensitivity" },
-        { value: "high", label: "High", description: "Higher elasticities" },
+        { value: "low", label: "Low", description: "P10 parameter bundle" },
+        { value: "medium", label: "Medium", description: "P50 parameter bundle" },
+        { value: "high", label: "High", description: "P90 parameter bundle" },
       ],
     },
   ]);
 
-  assert.deepEqual(impactPresets, {
-    low: { beta: 0.15, gamma: 0.2, delta: 0.5 },
-    medium: { beta: 0.3, gamma: 0.4, delta: 0.7 },
-    high: { beta: 0.5, gamma: 0.6, delta: 0.9 },
-  });
 });
 
 test("model returns normalized defaults and quarterly normalized series", () => {
@@ -65,7 +151,7 @@ test("model returns normalized defaults and quarterly normalized series", () => 
   assert.equal(result.calibration.initialSoftware, 1);
   assert.equal(result.calibration.baselineSoftwareAtHorizon, 2);
   assert.equal(result.calibration.presetEmpirical, false);
-  assert.equal(result.calibration.label, "Central sensitivity");
+  assert.equal(result.calibration.label, "P50 parameter bundle");
   assertClose(
     result.calibration.k,
     (2 ** (1 - result.calibration.gamma) - 1)
@@ -94,6 +180,25 @@ test("model returns normalized defaults and quarterly normalized series", () => 
     }
   }
   assert.ok(Math.abs(result.series.software.baseline.at(-1) - 200) < 1e-12);
+});
+
+test("model returns the selected Monte Carlo bundle with its provenance", () => {
+  const result = runModel({ impactLevel: "medium" });
+
+  assert.equal(result.calibration.calibrationMethod, "assumed-prior Monte Carlo");
+  assert.equal(result.calibration.presetEmpirical, false);
+  assert.deepEqual(result.calibration.monteCarlo, {
+    sampleCount: 10_000,
+    seed: 20_260_731,
+    randomGenerator: "Mulberry32",
+    quantileMethod: "linear interpolation at (n - 1)q",
+    parameterSampling: "independent marginal draws",
+    bundleConstruction: "rank-aligned marginal quantiles",
+    selectedQuantile: 0.5,
+    selectedQuantileLabel: "P50",
+    distributionStatus: "working assumptions",
+    distributions: monteCarloCalibration.distributions,
+  });
 });
 
 test("all software and capability trajectories increase monotonically", () => {
@@ -360,12 +465,13 @@ test("model exposes rate series, metric timing, units, and calibration caveats",
     capability: "training-compute-normalized index (2026 = 100)",
     metrics: "fraction of baseline at 2034",
   });
-  assert.equal(result.caveats.length, 5);
+  assert.equal(result.caveats.length, 6);
   assert.match(result.caveats[0], /capability-R&D compute is fixed/i);
   assert.match(result.caveats[1], /training compute is unchanged/i);
   assert.match(result.caveats[2], /baseline is normalized/i);
   assert.match(result.caveats[3], /A is absorbed.*alpha.*cancels/i);
-  assert.match(result.caveats[4], /working placeholder values/i);
+  assert.match(result.caveats[4], /10,000.*triangular.*working assumptions/i);
+  assert.match(result.caveats[5], /rank-aligned.*P10.*P50.*P90.*not joint outcome/i);
 });
 
 test("initial software-rate slowdown equals one minus the policy multiplier", () => {

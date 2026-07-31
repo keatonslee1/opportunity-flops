@@ -53,7 +53,7 @@
           </div>
           <div>
             <dt>Calibration</dt>
-            <dd>Sensitivity only</dd>
+            <dd>10k seeded draws</dd>
           </div>
           <div>
             <dt>Outputs</dt>
@@ -95,12 +95,12 @@
           <section class="parameter-readout" aria-labelledby="active-preset-title">
             <div>
               <h3 id="active-preset-title">Active sensitivity</h3>
-              <span id="preset-name">Central sensitivity</span>
+              <span id="preset-name">P50 parameter bundle</span>
             </div>
             <dl>
-              <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.30</dd></div>
-              <div><dt>Feedback · γ</dt><dd id="gamma-value">0.40</dd></div>
-              <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.70</dd></div>
+              <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.313</dd></div>
+              <div><dt>Feedback · γ</dt><dd id="gamma-value">0.400</dd></div>
+              <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.701</dd></div>
             </dl>
           </section>
 
@@ -109,7 +109,7 @@
               <circle cx="10" cy="10" r="8.25"></circle>
               <path d="M10 8v5M10 5.5v.5"></path>
             </svg>
-            <p>The equations are implemented. Working preset values are placeholders because the source table defines parameter roles, but not numerical calibrations.</p>
+            <p>Each elasticity is calibrated from 10,000 seeded triangular draws. Low, Medium, and High select marginal P10, P50, and P90 bundles; the triangular inputs remain working assumptions.</p>
           </div>
         </aside>
 
@@ -204,7 +204,7 @@
         <div>
           <h2 id="methodology-title">The model is simple on purpose</h2>
           <p>
-            It connects one policy choice to two modeled consequences. The equations are implemented as written; the numerical presets remain exploratory until an empirical calibration is supplied.
+            It connects one policy choice to two modeled consequences. The equations are implemented as written; <i>z</i> selects a reproducible parameter bundle calibrated by Monte Carlo from explicit, non-empirical distribution assumptions.
           </p>
         </div>
         <div class="model-specification">
@@ -216,16 +216,34 @@
           </ol>
 
           <div class="preset-matrix">
-            <h3>Sensitivity presets</h3>
+            <h3>Monte Carlo parameter bundles</h3>
             <table>
-              <caption>Working placeholder sets used by the impact control</caption>
-              <thead><tr><th>Case</th><th>β</th><th>γ</th><th>δ</th></tr></thead>
+              <caption>Marginal P10 / P50 / P90 bundles from 10,000 seeded triangular draws</caption>
+              <thead><tr><th><i>z</i></th><th>β</th><th>γ</th><th>δ</th></tr></thead>
               <tbody>
-                <tr><th>Low</th><td>0.15</td><td>0.20</td><td>0.50</td></tr>
-                <tr><th>Medium</th><td>0.30</td><td>0.40</td><td>0.70</td></tr>
-                <tr><th>High</th><td>0.50</td><td>0.60</td><td>0.90</td></tr>
+                <tr><th>Low · P10</th><td>0.223</td><td>0.290</td><td>0.589</td></tr>
+                <tr><th>Medium · P50</th><td>0.313</td><td>0.400</td><td>0.701</td></tr>
+                <tr><th>High · P90</th><td>0.416</td><td>0.511</td><td>0.810</td></tr>
               </tbody>
             </table>
+
+            <table class="distribution-inputs">
+              <caption>Working triangular inputs—not Katherine-supplied empirical estimates</caption>
+              <thead><tr><th>Parameter</th><th>Minimum</th><th>Mode</th><th>Maximum</th></tr></thead>
+              <tbody>
+                <tr><th>β</th><td>0.15</td><td>0.30</td><td>0.50</td></tr>
+                <tr><th>γ</th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
+                <tr><th>δ</th><td>0.50</td><td>0.70</td><td>0.90</td></tr>
+              </tbody>
+            </table>
+
+            <dl class="calibration-protocol" aria-label="Monte Carlo protocol">
+              <div><dt>Samples</dt><dd>10,000 per parameter</dd></div>
+              <div><dt>Seed</dt><dd>Seed 20260731</dd></div>
+              <div><dt>Sampling</dt><dd>Independent draws</dd></div>
+              <div><dt>Quantiles</dt><dd>Linear at (<i>n</i> - 1)<i>q</i></dd></div>
+            </dl>
+            <p>The bundles rank-align each parameter's marginal percentile. They are sensitivity cases, not joint outcome percentiles or empirical estimates. Seeded calibration makes the same <i>z</i> selection reproduce the same parameter set on every run.</p>
             <p>Software begins at index 100. The baseline is normalized to index 200 in 2034, so the charts communicate policy divergence—not a dated forecast of absolute capability. The normalization absorbs <i>A</i>; unchanged training compute makes <i>α</i> cancel from relative outputs.</p>
           </div>
 
@@ -236,18 +254,18 @@
                 <thead><tr><th>Symbol</th><th>Role</th><th>Source status</th><th>Implementation</th></tr></thead>
                 <tbody>
                   <tr><th><i>x</i></th><td>R&amp;D compute reallocation share</td><td>User input</td><td>0%–50% slider</td></tr>
-                  <tr><th><i>z</i></th><td>Policy impact level</td><td>User input</td><td>Low / Medium / High</td></tr>
+                  <tr><th><i>z</i></th><td>Policy impact level</td><td>User input</td><td>Marginal P10 / P50 / P90 bundle</td></tr>
                   <tr><th><i>C</i><sub>R,B</sub></th><td>Baseline capability-R&amp;D compute</td><td>Exogenous path</td><td>Fixed and normalized</td></tr>
                   <tr><th><i>C</i><sub>R,P</sub></th><td>Policy capability-R&amp;D compute</td><td>Model-derived</td><td>(1 − <i>x</i>)<i>C</i><sub>R,B</sub></td></tr>
                   <tr><th><i>A</i></th><td>Research productivity</td><td>Set by <i>z</i> / calibrated</td><td>Absorbed into baseline normalization</td></tr>
-                  <tr><th>β</th><td>R&amp;D-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Working placeholder</td></tr>
-                  <tr><th>γ</th><td>Software-feedback elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Working placeholder</td></tr>
+                  <tr><th>β</th><td>R&amp;D-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
+                  <tr><th>γ</th><td>Software-feedback elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
                   <tr data-parameter="S_B"><th><i>S</i><sub>B</sub>(<i>t</i>)</th><td>Baseline software level</td><td>Model-generated</td><td>Baseline software series</td></tr>
                   <tr data-parameter="S_P"><th><i>S</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy software level</td><td>Model-generated</td><td>Firm policy series</td></tr>
                   <tr><th><i>S</i><sub>0</sub></th><td>Initial software level</td><td>Fixed normalization</td><td>Index 100</td></tr>
                   <tr><th><i>C</i><sub>T</sub></th><td>Frontier training compute</td><td>Exogenous path</td><td>Equal across scenarios</td></tr>
                   <tr><th>α</th><td>Training-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Cancels from relative outputs</td></tr>
-                  <tr><th>δ</th><td>Software-to-capability elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Working placeholder</td></tr>
+                  <tr><th>δ</th><td>Software-to-capability elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
                   <tr data-parameter="M_B"><th><i>M</i><sub>B</sub>(<i>t</i>)</th><td>Baseline capability level</td><td>Model-generated</td><td>Baseline capability series</td></tr>
                   <tr data-parameter="M_P"><th><i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy capability level</td><td>Model-generated</td><td>Firm policy series</td></tr>
                   <tr><th><i>M</i><sub>0</sub></th><td>Initial capability level</td><td>Fixed normalization</td><td>Index 100</td></tr>

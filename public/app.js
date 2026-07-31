@@ -323,9 +323,9 @@ function renderChart(kind, result, shouldAnimate = true) {
 }
 
 function updateCalibrationReadout(calibration) {
-  document.querySelector("#beta-value").textContent = calibration.beta.toFixed(2);
-  document.querySelector("#gamma-value").textContent = calibration.gamma.toFixed(2);
-  document.querySelector("#delta-value").textContent = calibration.delta.toFixed(2);
+  document.querySelector("#beta-value").textContent = calibration.beta.toFixed(3);
+  document.querySelector("#gamma-value").textContent = calibration.gamma.toFixed(3);
+  document.querySelector("#delta-value").textContent = calibration.delta.toFixed(3);
   document.querySelector("#preset-name").textContent = calibration.label;
 }
 

@@ -549,6 +549,73 @@ function renderResult(shouldAnimate = true) {
   }
 }
 
+// ── Figure carousel ────────────────────────────────────────────────────
+
+/**
+ * Moves the plate track and keeps the selector, the position readout and the
+ * accessibility tree in step.
+ *
+ * The carousel deliberately owns none of the rendering. All six plates are
+ * drawn on every `renderResult`, exactly as they were when they were stacked;
+ * this only decides which one you are looking at. That keeps the model wiring
+ * and the chart tests independent of the presentation, and it means switching
+ * figures costs a transform rather than a redraw.
+ */
+function initCarousel() {
+  const track = document.querySelector("#carousel-track");
+  const tabs = [...document.querySelectorAll(".carousel-tab")];
+  const slides = [...document.querySelectorAll(".carousel-slide")];
+  const previous = document.querySelector("#carousel-prev");
+  const next = document.querySelector("#carousel-next");
+  const position = document.querySelector("#carousel-position");
+
+  if (!track || !slides.length || !tabs.length) return;
+
+  let current = 0;
+
+  function show(index, moveFocus = false) {
+    current = Math.min(Math.max(index, 0), slides.length - 1);
+    track.style.transform = `translateX(${current * -100}%)`;
+    position.textContent = `Figure ${current + 1} of ${slides.length}`;
+
+    slides.forEach((slide, slideIndex) => {
+      slide.setAttribute("aria-hidden", String(slideIndex !== current));
+    });
+
+    tabs.forEach((tab, tabIndex) => {
+      const selected = tabIndex === current;
+      tab.setAttribute("aria-selected", String(selected));
+      // Roving tabindex: the selector is one tab stop, and the arrow keys
+      // move within it. Six separate stops would push the comparison strip
+      // six presses further away for anyone using the keyboard.
+      tab.tabIndex = selected ? 0 : -1;
+    });
+
+    // The track does not wrap, so the ends are real stops.
+    previous.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+
+    if (moveFocus) tabs[current].focus();
+  }
+
+  tabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => show(index));
+  });
+
+  document.querySelector("#carousel-tabs").addEventListener("keydown", (event) => {
+    const steps = { ArrowRight: 1, ArrowLeft: -1, Home: -slides.length, End: slides.length };
+    const step = steps[event.key];
+    if (step === undefined) return;
+    event.preventDefault();
+    show(Math.min(Math.max(current + step, 0), slides.length - 1), true);
+  });
+
+  previous.addEventListener("click", () => show(current - 1));
+  next.addEventListener("click", () => show(current + 1));
+
+  show(0);
+}
+
 // ── Permalink ──────────────────────────────────────────────────────────
 
 /**
@@ -629,3 +696,4 @@ if (restoredScenario) restoredScenario.checked = true;
 // parameters becomes the configuration actually being displayed.
 syncPermalink();
 renderResult();
+initCarousel();

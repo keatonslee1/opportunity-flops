@@ -303,7 +303,7 @@ figcaption,
 /* Small caps sit at cap height with a large x-height; lining figures beside
    them stand a head taller and break the line. Old-style figures match. */
 .label,
-.runninghead,
+.running-head,
 .folio,
 .section-mark {
   font-variant-numeric: oldstyle-nums;
@@ -463,12 +463,18 @@ h4 {
    Every page carries the paper's running head above a hairline rule, in
    tracked small caps. It is the first thing that says "this is a document,
    not a landing page".
+
+   The separators are generated rather than typed, so the four parts stay
+   four parts: they wrap as units at narrow widths and a stray middot never
+   ends up orphaned at the head of a line.
    ------------------------------------------------------------------------ */
 
-.runninghead {
+.running-head {
   width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
   margin: 0 auto;
   padding: var(--s2) 0 5px;
+  display: flex;
+  flex-wrap: wrap;
   border-bottom: 1px solid var(--rule);
   color: var(--muted);
   font-size: var(--t-micro);
@@ -476,6 +482,18 @@ h4 {
   font-variant-caps: all-small-caps;
   letter-spacing: var(--track-wide);
   line-height: 1.4;
+}
+
+.running-head span + span::before {
+  content: "\00B7";
+  margin: 0 0.6em 0 0.45em;
+  color: var(--rule-strong);
+}
+
+/* The paper's own title carries the ink. */
+.running-head span:first-child {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 /* --- Shell: masthead ----------------------------------------------------- */
@@ -551,10 +569,15 @@ h4 {
 }
 
 /* --- Shell: registration marks -------------------------------------------
-   Press targets at the four corners of the sheet, sitting in the trim margin
-   outside the type area. Positioned against <main>, not the viewport, so
-   they can never land on a plate. Removed below 1020px, where the gutter is
-   no longer a margin and there is nowhere honest to put them.
+   Press targets at the four corners of the sheet, in the trim margin outside
+   the type area. Hairline, 16px, aria-hidden, purely structural — if they
+   read as decoration they are too big.
+
+   z-index: -1 is load-bearing, not tidiness. It puts the marks behind all
+   content, which is what makes the White Plate Rule structural: a mark
+   cannot print on top of a plate, because every plate carries an opaque
+   --plate background. Removed below 1020px, where the gutter is no longer a
+   margin and there is nowhere honest to put them.
    ------------------------------------------------------------------------ */
 
 main {
@@ -563,16 +586,25 @@ main {
   margin-inline: auto;
 }
 
-.sheet-marks {
-  position: absolute;
-  inset: -20px;
+.reg-marks {
+  position: fixed;
+  inset: 10px;
   z-index: -1;
   pointer-events: none;
-  background-image: var(--reg-mark), var(--reg-mark), var(--reg-mark), var(--reg-mark);
-  background-position: left top, right top, left bottom, right bottom;
-  background-repeat: no-repeat;
-  background-size: 16px 16px;
 }
+
+.reg-mark {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-image: var(--reg-mark);
+  background-repeat: no-repeat;
+}
+
+.reg-mark-tl { left: 0; top: 0; }
+.reg-mark-tr { right: 0; top: 0; }
+.reg-mark-bl { left: 0; bottom: 0; }
+.reg-mark-br { right: 0; bottom: 0; }
 
 /* --- Shell: the sheet grid -----------------------------------------------
    One grid, used identically on both pages: a persistent 200px margin column
@@ -602,8 +634,12 @@ main {
    heading is a web one. */
 .section-mark {
   grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--s1);
   margin: 0;
-  padding-top: 4px;
+  padding-top: 6px;
   color: var(--muted);
   font-family: var(--font-body);
   font-size: var(--t-label);
@@ -613,12 +649,12 @@ main {
   text-align: right;
 }
 
-.section-mark b {
-  display: block;
+.section-no {
   color: var(--ink);
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 400;
+  font-variant-numeric: lining-nums;
   letter-spacing: 0;
 }
 
@@ -646,51 +682,54 @@ main {
 /* --- Footnote apparatus --------------------------------------------------
    Superscript markers in prose, notes hung in the margin column at ≥1020px,
    collapsing to inline asides below that. Never dropped.
+
+   `.fn-ref` is set on a <sup>, which already carries vertical-align: super
+   and font-size: smaller. These declarations replace those values rather
+   than compounding with them — a marker raised twice clears the ascender and
+   collides with the line above.
    ------------------------------------------------------------------------ */
 
 .fn-ref {
   font-family: var(--font-body);
-  font-size: 0.62em;
+  font-size: 0.64em;
   font-variant-numeric: lining-nums;
   font-weight: 600;
-  line-height: 1;
+  line-height: 0;
   vertical-align: super;
+}
+
+.fn-ref a {
+  padding: 0 0.15em;
   color: var(--orange-text);
   text-decoration: none;
 }
 
-.fn-ref:hover {
+.fn-ref a:hover,
+.fn-ref a:focus-visible {
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.note {
-  grid-column: 1;
-  display: grid;
-  grid-template-columns: 1.4em minmax(0, 1fr);
-  gap: 0 6px;
-  margin: 0;
-  padding-top: 3px;
-  border-top: 1px solid var(--rule);
-  color: var(--muted);
-  font-size: var(--t-micro);
-  line-height: 1.5;
-  hanging-punctuation: first;
-}
-
-.note-no {
+/* The note's own number, hung to the left of its first line so the note text
+   aligns as a block — the printed convention, and the reason the marker is
+   findable when scanning the margin. */
+.fn-no {
   color: var(--orange-text);
+  font-family: var(--font-body);
   font-size: var(--t-label);
   font-variant-numeric: lining-nums;
   font-weight: 700;
 }
 
-.note p {
-  margin: 0;
+.fn-back {
+  float: left;
+  margin-right: 0.45em;
+  text-decoration: none;
 }
 
-.note p + p {
-  margin-top: var(--s1);
+.fn-back:hover .fn-no {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* --- Figure plates -------------------------------------------------------
@@ -901,20 +940,20 @@ main {
 }
 
 /* --- Shell: folio --------------------------------------------------------
-   The foot of the sheet: section mark, short title, and the ordinal in the
-   printed convention. Sits above the colophon on both pages.
+   Section mark, short title, and the ordinal in the printed convention. A
+   scrolling document's section is the analogue of a printed page, so the
+   paper sets one at the foot of every section; the calculator sets one at
+   the foot of the sheet.
    ------------------------------------------------------------------------ */
 
 .folio {
-  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
-  margin: var(--s7) auto 0;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  justify-content: space-between;
   gap: var(--s2) var(--s4);
+  margin: var(--s5) 0 0;
   padding-top: 5px;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--rule);
   color: var(--muted);
   font-size: var(--t-micro);
   font-weight: 500;
@@ -922,9 +961,24 @@ main {
   letter-spacing: var(--track-wide);
 }
 
-.folio b {
+.folio-mark {
   color: var(--ink);
   font-weight: 600;
+}
+
+/* Pushed to the trailing edge, the way a page number sits at the outer
+   corner of the folio line. */
+.folio-no {
+  margin-left: auto;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+/* The sheet's own folio, at the foot of the page above the colophon. */
+.folio-sheet {
+  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
+  margin: var(--s7) auto 0;
+  border-top-color: var(--ink);
 }
 
 /* --- Shell: colophon ----------------------------------------------------- */
@@ -1049,7 +1103,7 @@ footer p:first-child {
   to { opacity: 1; }
 }
 
-.runninghead {
+.running-head {
   animation: fade 520ms var(--ease-out) both;
 }
 
@@ -1111,7 +1165,7 @@ footer p:first-child {
   }
 
   /* No trim margin left to print them in. */
-  .sheet-marks {
+  .reg-marks {
     display: none;
   }
 }
@@ -1126,7 +1180,7 @@ footer p:first-child {
     gap: var(--s2) var(--s4);
   }
 
-  .runninghead {
+  .running-head {
     font-size: 0.58rem;
     letter-spacing: 0.12em;
   }

@@ -4,6 +4,13 @@ import test from "node:test";
 
 const appSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 const pageSource = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
+// The methodology write-up lives on its own route so the calculator page can be
+// the instrument alone. Assertions below are addressed to whichever page now
+// owns the text, so coverage is unchanged by the split.
+const methodologySource = await readFile(
+  new URL("../public/methodology.html", import.meta.url),
+  "utf8",
+);
 
 test("the results bay presents the six approved chart questions in order", () => {
   const chartHeadings = [
@@ -125,24 +132,44 @@ test("chart summaries and narration match each plotted quantity", () => {
   assert.match(appSource, /safety benefit percentages/);
 });
 
-test("the full source table and Monte Carlo calibration status remain explicit", () => {
-  for (const symbol of ["S_B", "S_P", "M_B", "M_P"]) {
-    assert.match(pageSource, new RegExp(`data-parameter="${symbol}"`));
-  }
-
+test("the calculator page keeps its calibration disclosure beside the controls", () => {
   assert.match(pageSource, /10,000 seeded triangular draws/);
   assert.match(pageSource, /P10.*P50.*P90/);
-  assert.match(pageSource, /Seed 20260731/);
-  assert.match(pageSource, /Working triangular inputs/);
-  assert.match(pageSource, /0\.223/);
   assert.match(pageSource, /0\.701/);
-  assert.match(pageSource, /0\.810/);
-  assert.match(pageSource, /0\.509/);
-  assert.doesNotMatch(pageSource, /Working placeholder/);
-  assert.match(pageSource, /Source status/);
-  assert.match(pageSource, /Set by <i>z<\/i> \/ calibrated/);
-  assert.match(pageSource, /Model-generated/);
+  assert.match(pageSource, /0\.400/);
   assert.match(pageSource, /not a forecast/i);
+  assert.doesNotMatch(pageSource, /Working placeholder/);
+});
+
+test("the methodology page carries the full source table and Monte Carlo status", () => {
+  for (const symbol of ["S_B", "S_P", "M_B", "M_P"]) {
+    assert.match(methodologySource, new RegExp(`data-parameter="${symbol}"`));
+  }
+
+  assert.match(methodologySource, /10,000 seeded triangular draws/);
+  assert.match(methodologySource, /P10.*P50.*P90/);
+  assert.match(methodologySource, /Seed 20260731/);
+  assert.match(methodologySource, /Working triangular inputs/);
+  assert.match(methodologySource, /0\.223/);
+  assert.match(methodologySource, /0\.701/);
+  assert.match(methodologySource, /0\.810/);
+  // λ joined the bundles with the risk channel; it is drawn like the other
+  // three but from a prior this implementation chose, so the page has to keep
+  // saying so rather than presenting it as supplied.
+  assert.match(methodologySource, /0\.509/);
+  assert.match(methodologySource, /working prior/);
+  assert.doesNotMatch(methodologySource, /Working placeholder/);
+  assert.match(methodologySource, /Source status/);
+  assert.match(methodologySource, /Set by <i>z<\/i> \/ calibrated/);
+  assert.match(methodologySource, /Model-generated/);
+});
+
+test("the two pages stay linked and the methodology page stays script-free", () => {
+  assert.match(pageSource, /href="\/methodology"/);
+  assert.match(methodologySource, /href="\/"/);
+
+  // app.js assumes the calculator DOM and would throw on a page without it.
+  assert.doesNotMatch(methodologySource, /app\.js/);
 });
 
 test("the active Monte Carlo bundle displays four three-decimal parameters", () => {

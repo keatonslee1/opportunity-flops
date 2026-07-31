@@ -92,9 +92,13 @@ test("derived-benefit charts use zero-based percentage axes", () => {
     );
   }
 
-  assert.match(appSource, /const fallbackMaximum = 0\.03/);
-  assert.match(appSource, /chart\.domainKind === "fraction"/);
-  assert.match(appSource, /`\$\{\(value \* 100\)\.toFixed\(0\)\}%`/);
+  // The axis maths moved to public/scale.js so it can be exercised directly
+  // rather than asserted against by grepping source text. The behaviour these
+  // three lines used to approximate — zero-pinned difference axes, percentage
+  // tick labels — is covered properly in test/scale.test.mjs.
+  assert.match(appSource, /from "\.\/scale\.js"/);
+  assert.match(appSource, /chartDomain\(series, chart\)/);
+  assert.match(appSource, /formatTickValue\(value, chart, domain\.step\)/);
 });
 
 test("categorical sensitivity changes replay the discrete chart transition", () => {

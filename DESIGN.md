@@ -1,9 +1,9 @@
 ---
 name: Opportunity FLOPs
-description: Flight-test telemetry workspace for inspectable AI R&D policy scenarios.
+description: Scientific monograph for inspectable AI R&D policy scenarios.
 colors:
-  cool-paper: "#f4f6f5"
-  instrument-panel: "#fbfcfb"
+  paper: "oklch(96% 0.012 88)"
+  plate: "#fbfcfb"
   midnight-ink: "#101b2b"
   muted-slate: "#556070"
   fine-rule: "#c8d0d4"
@@ -13,66 +13,71 @@ colors:
   orange-wash: "#f0d5ca"
   cobalt-trace: "#245b96"
   cobalt-wash: "#d7e3ef"
-  ready-green: "#2e7253"
 typography:
   display:
-    fontFamily: "Barlow, Trebuchet MS, sans-serif"
-    fontSize: "clamp(2.65rem, 5.6vw, 5.75rem)"
-    fontWeight: 500
-    lineHeight: 0.98
-    letterSpacing: "-0.04em"
-  headline:
-    fontFamily: "Barlow, Trebuchet MS, sans-serif"
-    fontSize: "clamp(2rem, 3.5vw, 3.4rem)"
-    fontWeight: 500
+    fontFamily: "Newsreader, Iowan Old Style, Charter, Georgia, serif"
+    fontSize: "clamp(2.6rem, 5.2vw, 4.75rem)"
+    fontWeight: 400
     lineHeight: 1.02
-    letterSpacing: "-0.04em"
+    letterSpacing: "-0.02em"
+  headline:
+    fontFamily: "Newsreader, Iowan Old Style, Charter, Georgia, serif"
+    fontSize: "clamp(1.9rem, 3.2vw, 2.9rem)"
+    fontWeight: 400
+    lineHeight: 1.05
   title:
-    fontFamily: "Barlow, Trebuchet MS, sans-serif"
-    fontSize: "1.35rem"
-    fontWeight: 600
+    fontFamily: "Newsreader, Iowan Old Style, Charter, Georgia, serif"
+    fontSize: "1.3rem"
+    fontWeight: 500
     lineHeight: 1.15
-    letterSpacing: "-0.025em"
+  math:
+    fontFamily: "Newsreader, Times New Roman, Georgia, serif"
+    fontStyle: "italic"
   body:
     fontFamily: "Barlow, Trebuchet MS, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.55
+    lineHeight: 1.5
   label:
+    fontFamily: "Barlow, Trebuchet MS, sans-serif"
+    fontSize: "0.7rem"
+    fontWeight: 600
+    fontVariantCaps: "all-small-caps"
+    letterSpacing: "0.09em"
+  readout:
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
     fontSize: "0.7rem"
-    fontWeight: 500
-    lineHeight: 1.2
+    fontVariantNumeric: "tabular-nums"
     letterSpacing: "0.055em"
-rounded:
-  control: "3px"
-  selection: "4px"
+    textTransform: "uppercase"
 spacing:
-  xs: "8px"
-  sm: "14px"
-  md: "18px"
-  lg: "24px"
-  xl: "28px"
+  s1: "8px"
+  s2: "12px"
+  s3: "16px"
+  s4: "24px"
+  s5: "32px"
+  s6: "48px"
+  s7: "72px"
+  s8: "96px"
+  s9: "144px"
 components:
   reset-button:
     backgroundColor: "transparent"
     textColor: "{colors.midnight-ink}"
     typography: "{typography.label}"
-    rounded: "{rounded.control}"
-    padding: "0 11px"
-    height: "36px"
+    border: "1px solid {colors.midnight-ink}"
+    padding: "0 12px"
+    height: "34px"
   scenario-selected:
-    backgroundColor: "{colors.instrument-panel}"
-    textColor: "{colors.midnight-ink}"
-    rounded: "{rounded.selection}"
-    padding: "8px 12px"
+    backgroundColor: "{colors.plate}"
+    borderLeft: "2px solid {colors.midnight-ink}"
+    padding: "8px 12px 8px 14px"
   control-rack:
-    backgroundColor: "#e9edef"
-    textColor: "{colors.midnight-ink}"
-    padding: "28px 26px"
+    backgroundColor: "{colors.paper}"
+    borderRight: "1px solid {colors.midnight-ink}"
+    padding: "32px 24px"
   results-bay:
-    backgroundColor: "{colors.instrument-panel}"
-    textColor: "{colors.midnight-ink}"
+    backgroundColor: "{colors.plate}"
     padding: "28px clamp(24px, 3.4vw, 54px) 36px"
 ---
 
@@ -80,119 +85,190 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Flight-Test Telemetry Rack"**
+**Creative North Star: "The Scientific Monograph"**
 
-Opportunity FLOPs is an analytically serious instrument workspace: cool-white equipment surfaces, midnight ink, fine plot rules, and calibrated accent traces keep assumptions and outputs in one continuous field. The composition should feel operated rather than browsed—dense enough for research, but quiet enough that state changes and caveats remain legible.
+Opportunity FLOPs is a printed research paper you can operate. Ivory stock,
+printer's ink, numbered figure plates, and caveats hung in the margin. The
+composition should feel *read* as much as used — the calculator is the
+instrument, and `/methodology` is the paper it belongs to.
 
-The visual hierarchy comes from typography, dividers, tonal surfaces, and synchronized plot motion. Decoration is subordinate to evidence; every bright color or animated sweep should carry status, comparison, or interaction meaning.
+Hierarchy comes from typography and rules. There are no drop shadows and no
+cards: printed figures do not cast a shadow, and a page that leans on
+elevation to separate its parts has not earned the separation typographically.
 
 **Key Characteristics:**
-- Continuous rack-and-results workspace rather than a card grid.
-- Cool-white panels with clipped equipment-case geometry and fine rules.
-- Cobalt controls and traces, oxidized-orange comparison strokes, and a darker orange reserved for readable text.
-- Synchronized chart redraw and sweep motion for authored entrances and discrete scenario changes, with immediate slider feedback and a reduced-motion fallback.
+- Serif display and mathematics against a humanist sans body — contrast on
+  structure, not on two near-identical sans faces.
+- A warm ivory ground with cool-white plate stock inset into it. The two
+  surfaces must stay visibly distinct; the pre-redesign pair differed by about
+  two percent lightness and read as washed out.
+- Four numbered plates, captioned below in the printed convention.
+- Controls that travel with the reader, because the results column is roughly
+  three times their height.
 
 ## Colors
 
-The palette separates cool instrument neutrals from two functional trace colors, with darker orange text kept distinct from the brighter orange used for plotted geometry.
+Cool instrument neutrals against a warm ground, with two functional trace
+colors and a darker orange reserved for text.
 
 ### Primary
-- **Oxidized Orange:** Policy-comparison strokes and active visual traces.
-- **Accessible Orange Text:** Warnings, result text, and disclaimers where the brighter chart orange does not provide sufficient text contrast.
+- **Oxidized Orange:** Policy-comparison strokes, figure numbers, active traces.
+- **Accessible Orange Text:** Warnings, result text, and disclaimers where the
+  brighter chart orange lacks text contrast.
 
 ### Secondary
-- **Cobalt Trace:** Interactive controls, range fills, and the second-firm trajectory.
+- **Cobalt Trace:** Interactive controls, range fills, focus rings, and the
+  second-firm trajectory.
 
 ### Neutral
-- **Cool Paper:** Page field beneath the instrument workspace.
-- **Instrument Panel:** Primary results surface and selected-control fill.
-- **Midnight Ink:** Main text and baseline trajectory.
+- **Paper:** Warm ivory ground for the page and the control margin.
+- **Plate:** Cool-white stock for the results bay and figure plates.
+- **Midnight Ink:** Body text, structural rules, and the baseline trajectory.
 - **Muted Slate:** Explanatory copy and secondary labels.
-- **Fine Rule / Strong Rule:** Plot grid, dividers, and structural boundaries.
+- **Fine Rule / Strong Rule:** Plot grid, dividers, and internal boundaries.
 
 ### Named Rules
 
-**The Trace/Text Separation Rule.** Oxidized orange draws comparison geometry; accessible orange carries text. Do not swap their jobs.
+**The Frozen Plate Rule.** `--ink`, `--panel`, `--rule`, `--rule-strong`,
+`--orange`, `--orange-soft` and `--blue` are read directly by the chart rules.
+They keep their exact legacy values so the four plots render unchanged.
+Retuning any of them silently alters the plots. If a surface needs a new
+value, add a token — do not edit these.
 
-**The Color Carries State Rule.** Accent color indicates scenario, status, or direct manipulation; it is not ambient decoration.
+**The White Plate Rule.** Figure plates stay near-white. The frozen traces were
+chosen against that ground; tinting it shifts their apparent contrast.
+
+**The Trace/Text Separation Rule.** Oxidized orange draws comparison geometry;
+accessible orange carries text. Do not swap their jobs.
+
+**The Color Carries State Rule.** Accent color indicates scenario, status, or
+direct manipulation; it is never ambient decoration.
 
 ## Typography
 
-**Display Font:** Barlow (with Trebuchet MS and sans-serif fallbacks)
-**Body Font:** Barlow (with Trebuchet MS and sans-serif fallbacks)
-**Label/Mono Font:** UI monospace (with SFMono-Regular, Menlo, Monaco, Consolas, and monospace fallbacks)
+**Display / Math:** Newsreader, self-hosted as a variable woff2 in roman and
+italic, weights 200–800.
+**Body / UI:** Barlow, self-hosted in 400, 500, 600, 700.
+**Readout:** UI monospace.
 
-**Character:** Self-hosted Barlow in weights 400, 500, 600, and 700 keeps prose and headings compact and technical without becoming austere. Tabular readouts and plot labels switch to monospace, uppercase, and measured tracking.
+**Character:** Newsreader carries the thesis, section headings, figure titles
+and all mathematics. Barlow carries body copy, controls and small-caps labels.
+
+**Newsreader has no Greek.** β, γ, δ and α resolve through `--font-math`, whose
+fallback deliberately leads with a Greek-capable serif. Do not point
+`--font-math` at `--font-display`.
 
 ### Hierarchy
-- **Display:** Large, tightly tracked Barlow for the first-view thesis.
-- **Headline:** Compact responsive Barlow for major explanatory sections.
-- **Title:** Semibold Barlow for rack, results, and methodology headings.
-- **Body:** Regular Barlow for explanations and assumptions.
-- **Label:** Uppercase monospace for telemetry, legends, outputs, and chart metadata.
+- **Display:** Newsreader for the first-view thesis.
+- **Headline / Title:** Newsreader for section and figure headings.
+- **Math:** Newsreader italic for variables and equations.
+- **Body:** Barlow at a 24px baseline.
+- **Label:** Barlow small-caps with open tracking for descriptive labels.
+- **Readout:** Uppercase tabular monospace for values only.
 
 ### Named Rules
 
-**The Readout Rule.** Use monospace only for values, legends, status, and axis metadata; narrative remains in Barlow.
+**The Readout Rule.** Monospace carries values and readouts. It does not carry
+narrative, subtitles, or legends — monospace used as shorthand for "technical"
+is the tell of a design that has not chosen a voice.
 
 ## Layout
 
-The page uses a centered fluid container capped at 1460px with 24px outer gutters. The calculator is a single bordered workspace: a 350px control rack beside a flexible results bay, narrowing to 300px at 1020px and stacking at 760px. Major explanatory sections use asymmetric two-column grids, while internal rhythm repeatedly uses 8px, 14px, 18px, 24px, and 28px steps. Mobile removes the clipped corner, stacks comparison rows, and expands axis labels for legibility without introducing horizontal page overflow.
+A centered container capped at 1460px with 24px gutters. `base.css` provides a
+`.sheet` grid — a 200px margin column beside the text column — which collapses
+below 1020px, where hanging notes become inline asides rather than disappearing.
+
+The calculator is one apparatus: a 350px control margin beside a flexible
+results bay, narrowing to 300px at 1020px and stacking at 760px. Internal
+rhythm uses the 8/12/16/24/32/48/72/96/144 scale.
 
 ## Elevation & Depth
 
-The system is flat by default. Depth comes from cool tonal layering and rule hierarchy; one broad, low-contrast shadow lifts the complete calculator workspace, while selected scenario rows use a smaller state shadow.
-
-### Shadow Vocabulary
-- **Workspace Lift:** A diffuse shadow under the unified calculator, never under every subsection.
-- **Selection Lift:** A restrained shadow for the active scenario row.
+**There is no elevation.** Depth comes from the ivory/white surface change and
+from rule weight — hairline `--rule` for internal divisions, 1px `--ink` for
+structural boundaries, 2px `--ink` for the masthead and colophon. The only
+remaining `box-shadow` declarations are zero-blur hairlines used to draw crisp
+rules, not to lift anything.
 
 ### Named Rules
 
-**The One Instrument Rule.** Elevate the calculator as one apparatus; do not turn its internal rack, charts, or comparison cells into floating cards.
+**The One Instrument Rule.** The calculator is one apparatus. Do not turn its
+margin, plates, or comparison cells into floating cards.
 
 ## Shapes
 
-Form language is rectilinear and equipment-like. The calculator uses a single 22px clipped top-right corner at desktop widths; controls use only 2–4px rounding, plot lines terminate square, and most structure is expressed with 1px rules. Circular geometry is reserved for the small readiness light and sweep marker.
+Rectilinear throughout. Controls are square-cornered; plot lines terminate
+square; structure is expressed with 1px rules. Circular geometry is reserved
+for the sweep marker.
 
 ## Components
 
 ### Buttons
-- **Shape:** Compact rectangular control with a 3px radius and 36px minimum height.
-- **Reset:** Transparent at rest with a strong rule; fills with the panel tone on hover.
-- **Focus:** A 3px solid cobalt outline with a 2px offset.
+- **Shape:** Square-cornered, 34px minimum height, small-caps label.
+- **Reset / Copy link:** Ink rule at rest, inverting to ink-on-paper on hover.
+- **Focus:** 3px solid cobalt outline at 2px offset.
 
 ### Scenario Selectors
-- **Style:** Full-width rows with transparent borders at rest and a cool-white fill, strong border, and low state shadow when selected.
-- **Content:** Short bold option label paired with muted explanatory copy; state is conveyed by more than color alone.
+- **Style:** Full-width rows; the active row takes a 2px left ink rule, a plate
+  fill, and bolder label weight. State survives greyscale.
+
+### Impact Sensitivity
+- **Style:** Three cells; the active cell inverts to paper-on-ink.
 
 ### Range Controls
-- **Style:** Three-pixel cobalt progress track with a narrow rectangular thumb edged by the panel tone.
-- **Behavior:** Value output is uppercase monospace; fill and all four charts update from the same input event.
+- **Style:** 3px cobalt progress track with a narrow rectangular thumb.
+- **Behavior:** Value output is uppercase monospace; fill and all four plates
+  update from the same input event.
 
-### Cards / Containers
-- **Corner Style:** Near-square internal corners and one clipped outer workspace corner.
-- **Background:** Tonal separation between the pale rack and cool-white results bay.
-- **Shadow Strategy:** Only the complete workspace and selected scenario receive elevation.
-- **Border:** Fine internal rules and stronger perimeter rules.
+### Figure Plates
+- **Structure:** Live readout on a rule above the plot; caption below carrying
+  figure number, title, then the plotted quantity.
+- **Numbering:** Fig. 1–4 in oxidized orange small-caps.
+
+### Control Margin
+- **Behavior:** The margin keeps full-height ivory; an inner wrapper sticks to
+  the viewport and scrolls independently when it exceeds the window. Disabled
+  below 761px, where the layout stacks.
 
 ### Navigation
-- **Style:** Quiet Barlow links in dark slate; hover and keyboard focus shift to orange and add an offset underline. Desktop navigation hides at the mobile breakpoint.
+- **Style:** Small-caps links; the current page is underlined via
+  `aria-current`. Hover and focus shift to orange. Navigation **wraps** at
+  mobile widths — it must never be hidden.
 
 ### Trajectory Plots
-- **Style:** Fine gray grid, dashed midnight baseline, oxidized-orange Firm A trace, cobalt Firm B trace, and a soft orange comparison area.
-- **Motion:** Traces redraw over 720ms while a synchronized sweep crosses over 760ms on initial load and discrete scenario changes. Continuous slider input updates the paths immediately without replaying either animation. Motion is effectively disabled when reduced motion is requested.
+- **Style:** Fine gray grid, dashed midnight baseline, oxidized-orange Firm A
+  trace, cobalt Firm B trace, soft orange comparison area.
+- **Motion:** Traces redraw over 720ms with a synchronized 760ms sweep on entry
+  and discrete scenario changes. Continuous slider input updates paths
+  immediately without replaying either. Disabled under reduced motion.
+
+## Motion
+
+One orchestrated page-load reveal in reading order — title, lead, status rule,
+apparatus — using opacity and transform only, on `--ease-out`.
+
+**The Containing Block Rule.** The apparatus fades but never translates. Any
+transform value creates a containing block, identity matrices included, which
+breaks the sticky control margin inside it.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep assumptions, plots, statuses, and caveats in one continuous analytical workspace.
-- **Do** preserve the orange text/chart-stroke distinction and label assumed-prior Monte Carlo sensitivity output as non-empirical.
-- **Do** reserve synchronized trace and sweep animation for initial entry and discrete scenario changes; keep continuous slider feedback immediate and respect reduced-motion preferences.
-- **Do** use rules, typography, and tonal changes before adding elevation.
+- **Do** keep assumptions, plates, statuses, and caveats in one continuous
+  analytical field.
+- **Do** preserve the orange text/chart-stroke distinction and label Monte
+  Carlo output as non-empirical.
+- **Do** reach for a rule, a weight change, or a surface change before reaching
+  for a shadow.
+- **Do** respect reduced-motion preferences.
 
 ### Don't:
-- **Don't** split the calculator into a grid of individually elevated cards.
-- **Don't** use accent color as decoration or rely on color alone to communicate state.
-- **Don't** introduce playful mascot, flip-flop, or character illustration into the instrument world.
-- **Don't** present sensitivity output as an empirical estimate or absolute forecast.
+- **Don't** retune the frozen chart tokens or tint the figure plates.
+- **Don't** add drop shadows or wrap sections in cards.
+- **Don't** use monospace for narrative text.
+- **Don't** use accent color as decoration or rely on color alone for state.
+- **Don't** hide navigation or functionality at mobile widths.
+- **Don't** introduce playful mascot, flip-flop, or character illustration.
+- **Don't** present sensitivity output as an empirical estimate or forecast.
+- **Don't** assert liveness the system does not have. The model is synchronous
+  arithmetic; it is never "online".

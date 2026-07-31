@@ -1,8 +1,8 @@
 /* ==========================================================================
    Opportunity FLOPs — / (the calculator)
-   Loaded after base.css, which owns fonts, tokens, the page shell, the
-   masthead and the colophon. This file owns everything inside <main> on the
-   calculator page and nothing else.
+   Loaded after base.css, which owns fonts, tokens, the page shell, the sheet
+   grid, and every shared primitive. This file owns everything inside <main>
+   on the calculator page and nothing else.
 
    THE SIX CHART PLATES ARE FROZEN. Every rule under "Chart plates — frozen"
    below is reproduced verbatim from the pre-redesign stylesheet, and the
@@ -12,7 +12,7 @@
    ========================================================================== */
 
 /* Uppercase monospace is reserved for values, legends and readouts — never
-   for narrative. Descriptive labels use Barlow small-caps instead. */
+   for narrative. Descriptive labels use small caps instead. */
 .headline-output span,
 .plate-readout output,
 .comparison-strip span,
@@ -21,35 +21,33 @@
 .parameter-readout dd {
   font-family: var(--font-mono);
   font-size: var(--t-label);
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums lining-nums;
   letter-spacing: 0.055em;
   text-transform: uppercase;
 }
 
-.model-readiness dt,
 .legend {
   font-family: var(--font-body);
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--track-caps);
 }
 
-/* --- Abstract ------------------------------------------------------------ */
+/* --- Frontmatter ---------------------------------------------------------
+   The first viewport is the head of a paper: title, abstract at measure, the
+   status hung in the margin, then Plate I. The old two-column split left a
+   third of the viewport empty beside the headline and pinned a three-up KPI
+   row to the bottom of that void; the row is gone (brief §2 names it) and its
+   three facts are the margin's status note now.
+   ------------------------------------------------------------------------ */
 
-/*
- * The abstract runs the full measure rather than sitting beside a floating
- * status list. The old two-column split left roughly a third of the first
- * viewport empty to the right of the headline, and pinned the status list to
- * the bottom of that void. Setting the status as a run-in metadata strip
- * beneath the text — the way a paper carries its masthead line — removes the
- * hole and gives the three values a rule to sit on.
- */
-.intro {
-  padding: clamp(56px, 7vw, 104px) 0 clamp(40px, 5vw, 64px);
+.frontmatter {
+  padding: clamp(40px, 5vw, 72px) 0 clamp(32px, 4vw, 56px);
+  row-gap: var(--s5);
 }
 
-.intro h1 {
+.frontmatter h1 {
   max-width: 15em;
   margin: 0;
   font-family: var(--font-display);
@@ -60,56 +58,198 @@
   text-wrap: balance;
 }
 
-.intro > div > p {
-  max-width: 62ch;
+.abstract {
+  max-width: var(--measure);
   margin: var(--s4) 0 0;
   color: var(--muted);
   font-size: var(--t-lead);
   line-height: 1.6;
 }
 
-.model-readiness {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: var(--s6) 0 0;
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--rule);
-}
-
-.model-readiness div {
-  min-width: 0;
-  padding: var(--s2) var(--s4) var(--s3) 0;
-}
-
-.model-readiness div + div {
-  padding-left: var(--s4);
-  border-left: 1px solid var(--rule);
-}
-
-.model-readiness dt {
-  margin-bottom: 7px;
-  color: var(--muted);
-}
-
-.model-readiness dd {
+.frontmatter .marginalia p {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
 }
 
-/* --- The apparatus ------------------------------------------------------- */
+/* --- Plate I — the compute bank ------------------------------------------
+   The thesis as a picture, and the only image on the page that moves. A
+   hundred unit marks stand for frontier R&D compute; the committed share
+   flips to alignment mark by mark as the policy slider moves.
 
-/*
- * The apparatus is one object, not a grid of floating cards: an ivory margin
- * of controls cut from the page itself, and the plates inset on white stock
- * beside it. Depth comes from the ink rule between them. There is no drop
- * shadow anywhere on this page — printed figures do not cast one, and the old
- * diffuse shadow was the last thing making this read as a web dashboard.
- */
+   Greyscale survival is structural: a capability mark is a solid bar, an
+   alignment mark is a hollow one. The ink changes and the fill changes, so the
+   flip is legible with no colour at all.
+
+   Not a card: no radius, no shadow, no fill behind it. It sits directly on
+   the ivory with a rule above and below, the way a plate is dropped into a
+   printed page.
+   ------------------------------------------------------------------------ */
+
+.compute-plate {
+  margin: var(--s5) 0 0;
+  padding: 0;
+  border-top: 2px solid var(--ink);
+}
+
+.compute-plate-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  padding: 6px 0 var(--s3);
+}
+
+.plate-no {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-caps);
+}
+
+/* The one place fluoro appears on this page: the plate's own device. It is
+   art, it carries no value, and at 2.7:1 it could not carry one. */
+.plate-device {
+  margin-left: 0.35em;
+  padding: 0 0.4em;
+  background: var(--fluoro);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.compute-plate-head .readout {
+  color: var(--ink);
+}
+
+/* The screen prints behind the marks — a halftone tint on the ivory, which is
+   allowed, rather than on a figure plate, which is not.
+
+   It is screened in ink, not in a spot colour. The field is the total stock of
+   frontier R&D compute and the marks are its division, so the ground is
+   structure and takes the structural ink. It was ochre for one draft, which
+   was wrong: ochre means uncertainty, and there is nothing uncertain about the
+   denominator. An ink used because a surface looked empty is a defect. */
+.compute-bank {
+  position: relative;
+  padding: var(--s3) 0 var(--s4);
+}
+
+.compute-screen {
+  position: absolute;
+  inset: 0;
+  background-color: var(--ink);
+  -webkit-mask-image: var(--screen-10);
+  mask-image: var(--screen-10);
+  -webkit-mask-size: 8px 8px;
+  mask-size: 8px 8px;
+  pointer-events: none;
+}
+
+.compute-marks {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Each unit carries both drawings and shows one. Swapping visibility rather
+   than repainting a single rect means the two states are separately
+   describable — and it is what lets the alignment mark be a different *shape*
+   rather than the same shape in a different ink. */
+.mark-capability {
+  fill: var(--orange);
+  stroke: none;
+}
+
+.mark-alignment {
+  fill: none;
+  stroke: var(--verdigris);
+  stroke-width: 2;
+}
+
+/* Hollow against solid is what makes the flip survive greyscale — the fill
+   changes, not just the ink. A crossbar was tried as extra insurance and cut:
+   at unit scale it turned each mark into something that read as a character
+   rather than a quantity. */
+.unit[data-role="capability"] .mark-alignment {
+  display: none;
+}
+
+.unit[data-role="alignment"] .mark-capability {
+  display: none;
+}
+
+.compute-plate figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  padding-top: var(--s2);
+  border-top: 1px solid var(--ink);
+}
+
+.compute-plate figcaption h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 500;
+}
+
+.compute-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px var(--s2);
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-caps);
+}
+
+.key-mark {
+  width: 11px;
+  height: 15px;
+}
+
+.key-mark + .key-mark {
+  margin-left: var(--s2);
+}
+
+.key-capability {
+  background: var(--orange);
+}
+
+.key-alignment {
+  border: 2px solid var(--verdigris);
+}
+
+.key-note {
+  color: var(--rule-strong);
+  font-weight: 500;
+}
+
+/* --- The apparatus -------------------------------------------------------
+   One object, not a grid of floating cards: an ivory margin of controls cut
+   from the page itself, and the plate bay beside it. Depth comes from the ink
+   rule between them. The rack keeps no fill of its own, so the page's grain
+   runs straight through it and only the plates stay clean.
+   ------------------------------------------------------------------------ */
+
 .calculator {
+  padding-bottom: var(--s5);
+}
+
+.apparatus {
   display: grid;
   grid-template-columns: 350px minmax(0, 1fr);
-  background: var(--plate);
   border: 1px solid var(--ink);
 }
 
@@ -122,7 +262,6 @@
  */
 .control-rack {
   padding: var(--s5) 0;
-  background: var(--paper);
   border-right: 1px solid var(--ink);
 }
 
@@ -130,9 +269,8 @@
   padding-inline: var(--s4);
 }
 
-/* The margin keeps its full-height ivory; only the contents travel. Capped to
-   the viewport with its own scroll so a short window can still reach the
-   calibration note at the bottom of the rack.
+/* Only the contents travel. Capped to the viewport with its own scroll so a
+   short window can still reach the calibration note at the bottom of the rack.
 
    Range syntax, not min-width: 761px. The stacking rules below use
    max-width: 760px, so a min-width of 761 left every fractional width between
@@ -152,16 +290,17 @@
   }
 }
 
-.rack-heading,
-.results-header {
+.rack-heading {
   display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  align-items: center;
 }
 
 .rack-heading h2,
 .results-header h2 {
+  flex: 1 1 auto;
+  min-width: 0;
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--t-title);
@@ -169,51 +308,19 @@
   line-height: 1.15;
 }
 
-.reset-button {
-  min-width: 54px;
-  min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--ink);
-  color: var(--ink);
-  background: transparent;
-  font-size: var(--t-label);
-  font-weight: 600;
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: background 140ms var(--ease-out), color 140ms var(--ease-out);
-}
-
-.reset-button:hover {
-  background: var(--ink);
-  color: var(--paper);
-}
-
-/*
- * Two buttons no longer fit beside the heading at the rack's fixed width, so
- * this row wraps and the actions drop below the title rather than squeezing it
- * into a clipped two-line block.
- */
-.rack-heading {
-  flex-wrap: wrap;
-  gap: 12px 16px;
-  align-items: center;
-}
-
-.rack-heading > div {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 .rack-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--s1);
   margin-left: auto;
 }
 
+.rack-actions .button {
+  min-height: 34px;
+}
+
 .scenario-control {
-  margin: 32px 0 0;
+  margin: var(--s5) 0 0;
   padding: 0;
   border: 0;
 }
@@ -227,7 +334,7 @@
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--track-caps);
 }
 
 .scenario-control label {
@@ -284,14 +391,14 @@
 }
 
 #assumption-controls {
-  margin-top: 32px;
+  margin-top: var(--s5);
   border-top: 1px solid var(--ink);
 }
 
 .control {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px 16px;
+  gap: 10px var(--s3);
   padding: 22px 0;
   border-bottom: 1px solid var(--rule);
 }
@@ -305,7 +412,7 @@
 
 .control output {
   color: var(--blue);
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .choice-control {
@@ -317,7 +424,7 @@
 }
 
 .choice-control legend {
-  margin-bottom: 12px;
+  margin-bottom: var(--s2);
   padding: 0;
 }
 
@@ -382,9 +489,50 @@
   line-height: 1.15;
 }
 
-.control input[type="range"] {
+/* --- Range control -------------------------------------------------------
+   The progress track used to be a two-stop CSS gradient — a gradient standing
+   in for two rectangles. Gradients are out of the system, and two rectangles
+   is what the drawing wanted anyway, so the track is now drawn as two elements
+   behind a transparent input: a full-width rule in --rule-strong and a filled
+   length in cobalt sized to --fill.
+
+   This also fixes a real inconsistency. `::-moz-range-progress` gave Firefox
+   a filled track while WebKit got the gradient, so the two engines were
+   drawing the same control by different means and drifting apart by a pixel
+   at the ends. One drawing now, in both.
+   ------------------------------------------------------------------------ */
+
+.range {
   --fill: 40%;
+  position: relative;
   grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  height: 26px;
+}
+
+.range-track,
+.range-fill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 3px;
+  margin-top: -1.5px;
+  pointer-events: none;
+}
+
+.range-track {
+  width: 100%;
+  background: var(--rule-strong);
+}
+
+.range-fill {
+  width: var(--fill);
+  background: var(--blue);
+}
+
+.control input[type="range"] {
+  position: relative;
   width: 100%;
   height: 26px;
   margin: 0;
@@ -395,7 +543,7 @@
 
 .control input[type="range"]::-webkit-slider-runnable-track {
   height: 3px;
-  background: linear-gradient(90deg, var(--blue) var(--fill), var(--rule-strong) var(--fill));
+  background: transparent;
 }
 
 .control input[type="range"]::-webkit-slider-thumb {
@@ -405,23 +553,20 @@
   appearance: none;
   border: 2px solid var(--panel);
   background: var(--blue);
+  /* Zero blur: a hairline rule around the thumb, not an elevation. */
   box-shadow: 0 0 0 1px var(--blue);
 }
 
 .control input[type="range"]::-moz-range-track {
   height: 3px;
-  background: var(--rule-strong);
-}
-
-.control input[type="range"]::-moz-range-progress {
-  height: 3px;
-  background: var(--blue);
+  background: transparent;
 }
 
 .control input[type="range"]::-moz-range-thumb {
   width: 12px;
   height: 18px;
   border: 2px solid var(--panel);
+  border-radius: 0;
   background: var(--blue);
   box-shadow: 0 0 0 1px var(--blue);
 }
@@ -435,7 +580,7 @@
 .parameter-readout > div {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--s3);
   align-items: baseline;
 }
 
@@ -454,13 +599,13 @@
 }
 
 .parameter-readout dl {
-  margin: 12px 0 0;
+  margin: var(--s2) 0 0;
 }
 
 .parameter-readout dl div {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
+  gap: var(--s2);
   padding: 8px 0;
   border-top: 1px solid var(--rule);
 }
@@ -470,8 +615,9 @@
  * uppercase mapping to Greek as readily as to Latin — so uppercasing rendered
  * them as Β, Γ and Δ. Those are different symbols: Δ conventionally means
  * "change in", so the capability elasticity was being displayed as its own
- * derivative. The label sets in Barlow at normal case; monospace stays on the
- * values, which is all the Readout Rule ever asked for.
+ * derivative. The label sets at normal case; monospace stays on the values,
+ * which is all the Readout Rule ever asked for. The Greek now resolves in the
+ * body face itself rather than falling back mid-line.
  */
 .parameter-readout dt {
   color: var(--muted);
@@ -484,38 +630,33 @@
 .parameter-readout dd {
   margin: 0;
   color: var(--ink);
-  font-weight: 700;
+  font-weight: 500;
 }
 
+/* The old note carried a circled-i icon beside it. An off-the-shelf info glyph
+   is exactly the kind of borrowed furniture the direction rules out, and the
+   sentence was doing all the work on its own. */
 .rack-note {
-  display: flex;
-  gap: 10px;
-  margin-top: 26px;
+  margin: 26px 0 0;
+  padding-top: var(--s2);
+  border-top: 1px solid var(--rule);
   color: var(--muted);
-}
-
-.rack-note svg {
-  width: 19px;
-  min-width: 19px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.35;
-}
-
-.rack-note p {
-  margin: 0;
   font-size: 0.74rem;
   line-height: 1.5;
 }
 
-/* --- Results bay --------------------------------------------------------- */
+/* --- Plate bay ----------------------------------------------------------- */
 
 .results-bay {
   min-width: 0;
-  padding: 28px clamp(24px, 3.4vw, 54px) 36px;
+  padding: var(--s4) clamp(var(--s4), 3.4vw, 54px) var(--s5);
+  background: var(--plate);
 }
 
 .results-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3) var(--s4);
   align-items: end;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--ink);
@@ -576,8 +717,24 @@
   color: var(--orange-text);
 }
 
+.cursor-hint {
+  margin: 0 0 var(--s3);
+  padding-top: var(--s2);
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+.cursor-hint kbd {
+  padding: 0 5px;
+  border: 1px solid var(--rule-strong);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
 .model-error {
-  margin: 12px 0 0;
+  margin: var(--s2) 0 0;
   padding: 11px 12px;
   border: 1px solid var(--orange);
   color: var(--orange-text);
@@ -590,24 +747,45 @@
  * Each plot is a numbered plate. The live readout sits on a rule above it so
  * the current value is visible on arrival, and the caption sits below in the
  * printed convention — figure number, title, then the quantity being plotted.
+ *
+ * base.css gives .plate its stock and its border. Inside the bay the plates
+ * already sit on plate stock, so the border would be a box drawn around a box:
+ * they are separated by a rule instead, which is the one thing this system
+ * uses for separation.
  */
 .plate {
-  margin: 0;
-  padding-top: var(--s4);
+  position: relative;
+  padding: var(--s4) 0 var(--s2);
+  border: 0;
+  background: transparent;
 }
 
 .plate + .plate {
   margin-top: var(--s5);
+  border-top: 1px solid var(--rule);
 }
 
-.plate-readout {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--s2) var(--s4);
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--rule);
+.plate:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+/* The plate the reader is pointing at takes a cobalt rule down its leading
+   edge, hung in the bay's gutter. Drawn as a pseudo-element that is always
+   present and only changes colour: giving .is-cursored a border or padding
+   instead would reflow all six plates every time the pointer crossed one. */
+.plate::before {
+  content: "";
+  position: absolute;
+  left: -16px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+}
+
+.plate.is-cursored::before {
+  background: var(--blue);
 }
 
 .plate-readout output {
@@ -615,9 +793,16 @@
   margin-left: auto;
 }
 
+/* The value at the year rule. Ink, not muted — while the rule is up this is
+   the number the reader is actually reading. */
+.plate-readout output.is-cursored {
+  color: var(--ink);
+  font-weight: 500;
+}
+
 /* Plates whose two series are not Firm A and Firm B name them here. These are
-   descriptive labels rather than values, so they set in Barlow small-caps like
-   the shared legend — monospace stays on the readouts. */
+   descriptive labels rather than values, so they set in small caps like the
+   shared legend — monospace stays on the readouts. */
 .chart-series-legend {
   display: flex;
   flex-wrap: wrap;
@@ -627,7 +812,7 @@
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--track-caps);
 }
 
 .chart-series-legend span {
@@ -642,40 +827,140 @@
   overflow: hidden;
 }
 
-.plate figcaption {
+/* --- The year rule -------------------------------------------------------
+   The signature moment. Hover or focus on any plate raises this at the same
+   year on all six at once. Cobalt because cobalt is the ink of direct
+   manipulation everywhere else on the page.
+   ------------------------------------------------------------------------ */
+
+.year-rule-line {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.year-rule-tick {
+  fill: var(--blue);
+}
+
+/* --- Comparison strip ---------------------------------------------------- */
+
+.comparison-strip {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  column-gap: var(--s3);
-  align-items: baseline;
-  padding-top: var(--s2);
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: var(--s4);
   border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
 }
 
-.fig-no {
-  margin: 0;
-  color: var(--orange-text);
-  font-family: var(--font-body);
-  font-size: var(--t-label);
-  font-weight: 700;
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
-  white-space: nowrap;
+.comparison-strip div {
+  min-width: 0;
+  padding: var(--s3) 18px 18px 0;
 }
 
-.plate figcaption h3 {
+.comparison-strip div + div {
+  padding-left: 18px;
+  border-left: 1px solid var(--rule);
+}
+
+/* The active scenario is marked with a rule and a bracket rather than a tonal
+   fill: muted label text on a colour wash reads washed out, and a mark
+   survives greyscale and colour-blind rendering where a wash does not. */
+.comparison-strip div.is-active {
+  box-shadow: inset 0 3px 0 0 var(--blue);
+}
+
+.comparison-strip div.is-active span {
+  color: var(--blue);
+}
+
+/* Drawn, not typed. The body face ships no ▸, so the glyph would have fallen
+   back to a system font mid-line. */
+.comparison-strip div.is-active strong::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: 7px;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid var(--blue);
+  vertical-align: 1px;
+}
+
+.comparison-strip span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+.comparison-strip strong {
+  font-size: 0.84rem;
+}
+
+/* --- Two channels --------------------------------------------------------
+   Sits after the instrument as the bridge to the paper: you use the tool,
+   then see what it does and does not cover.
+   ------------------------------------------------------------------------ */
+
+.channels-section {
+  padding: clamp(56px, 7vw, 104px) 0 clamp(32px, 4vw, 56px);
+  row-gap: var(--s4);
+}
+
+.channels-head h2 {
+  max-width: 14em;
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.12rem;
-  font-weight: 500;
+  font-size: var(--t-headline);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
 }
 
-.fig-sub {
-  grid-column: 2;
-  max-width: 62ch;
-  margin: 4px 0 0;
+.channels-head > p {
+  max-width: var(--measure);
+  margin: var(--s4) 0 0;
   color: var(--muted);
-  font-size: var(--t-small);
-  line-height: 1.45;
+  line-height: 1.6;
+}
+
+.channels-head a {
+  color: var(--orange-text);
+  text-underline-offset: 4px;
+}
+
+.channels-section .channels {
+  margin-top: var(--s6);
+}
+
+/* --- Entrance ------------------------------------------------------------
+   The first viewport arrives in reading order: title, abstract, status,
+   Plate I, then the apparatus. The apparatus fades without translating — a
+   transform on it would create a containing block and break the sticky rack
+   inside. That is the Containing Block Rule, and it is why .apparatus takes
+   `fade` and never `rise`.
+   ------------------------------------------------------------------------ */
+
+.frontmatter h1 {
+  animation: rise 640ms var(--ease-out) 60ms both;
+}
+
+.abstract {
+  animation: rise 640ms var(--ease-out) 140ms both;
+}
+
+.frontmatter .marginalia {
+  animation: rise 640ms var(--ease-out) 200ms both;
+}
+
+.compute-plate {
+  animation: rise 640ms var(--ease-out) 260ms both;
+}
+
+.apparatus {
+  animation: fade 720ms var(--ease-out) 340ms both;
 }
 
 /* ==========================================================================
@@ -775,118 +1060,10 @@
    End frozen block
    ========================================================================== */
 
-.comparison-strip {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin-top: 24px;
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
-}
-
-.comparison-strip div {
-  min-width: 0;
-  padding: 16px 18px 18px 0;
-}
-
-.comparison-strip div + div {
-  padding-left: 18px;
-  border-left: 1px solid var(--rule);
-}
-
-/* The active scenario is marked with a rule and a bracket rather than a tonal
-   fill: muted label text on a colour wash reads washed out, and a mark
-   survives greyscale and colour-blind rendering where a wash does not. */
-.comparison-strip div.is-active {
-  box-shadow: inset 0 3px 0 0 var(--blue);
-}
-
-.comparison-strip div.is-active span {
-  color: var(--blue);
-}
-
-.comparison-strip div.is-active strong::before {
-  content: "\25B8\00A0";
-  color: var(--blue);
-}
-
-.comparison-strip span {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--muted);
-}
-
-.comparison-strip strong {
-  font-size: 0.84rem;
-}
-
-/* --- Two channels --------------------------------------------------------
-   Sits after the instrument as the bridge to the paper: you use the tool,
-   then see what it does and does not cover.
-   ------------------------------------------------------------------------ */
-
-.channels-section {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: clamp(40px, 6vw, 96px);
-  align-items: start;
-  padding: clamp(64px, 8vw, 112px) 0 clamp(32px, 4vw, 56px);
-}
-
-.channels-head h2 {
-  max-width: 14em;
-  margin: var(--s2) 0 0;
-  font-family: var(--font-display);
-  font-size: var(--t-headline);
-  font-weight: 400;
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-}
-
-.channels-head > p:last-child {
-  max-width: 54ch;
-  margin: var(--s4) 0 0;
-  color: var(--muted);
-  line-height: 1.6;
-}
-
-.channels-head a {
-  color: var(--orange-text);
-  text-underline-offset: 4px;
-}
-
-@media (max-width: 900px) {
-  .channels-section {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s6);
-  }
-}
-
-/* --- Entrance ------------------------------------------------------------
-   The first viewport arrives in reading order: title, lead, status rule, then
-   the apparatus. The apparatus fades without translating — a transform on it
-   would create a containing block and break the sticky rack inside.
-   ------------------------------------------------------------------------ */
-
-.intro h1 {
-  animation: rise 640ms var(--ease-out) 60ms both;
-}
-
-.intro > div > p {
-  animation: rise 640ms var(--ease-out) 140ms both;
-}
-
-.model-readiness {
-  animation: rise 640ms var(--ease-out) 210ms both;
-}
-
-.calculator {
-  animation: fade 720ms var(--ease-out) 280ms both;
-}
-
 /* --- Responsive ---------------------------------------------------------- */
 
 @media (max-width: 1020px) {
-  .calculator {
+  .apparatus {
     grid-template-columns: 300px minmax(0, 1fr);
   }
 
@@ -897,20 +1074,20 @@
   .results-bay {
     padding-inline: 22px;
   }
+
+  .frontmatter {
+    padding-top: clamp(32px, 4vw, 56px);
+  }
 }
 
 @media (max-width: 760px) {
-  .intro {
-    padding-top: 56px;
-  }
-
-  .calculator {
-    grid-template-columns: 1fr;
+  .apparatus {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .control-rack {
     border-right: 0;
-    border-bottom: 1px solid var(--rule-strong);
+    border-bottom: 1px solid var(--ink);
   }
 
   .scenario-control label span {
@@ -957,21 +1134,14 @@
   }
 }
 
-/* Three columns of status stop being readable once each one wraps to two
-   lines; below this the strip becomes a stacked list of rules. */
+/* At this width a hundred unit marks in four rows are 3px wide and read as a
+   texture rather than a count. The bank restacks to eight rows so a mark stays
+   a mark, which is the entire point of an Isotype array. */
 @media (max-width: 560px) {
-  .model-readiness {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .model-readiness div {
-    padding-right: 0;
-  }
-
-  .model-readiness div + div {
-    padding-left: 0;
-    border-top: 1px solid var(--rule);
-    border-left: 0;
+  .compute-plate-head,
+  .compute-plate figcaption {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .results-header {

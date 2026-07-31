@@ -13,17 +13,34 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="stylesheet" href="/base.css" />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/print.css" media="print" />
   </head>
   <body>
     <!--
-      THESIS: A printed research monograph you can operate makes policy tradeoffs inspectable and refuses the generic card-dashboard scaffold.
-      OWN-WORLD: Ivory stock and printer's ink, serif display and mathematics, numbered figure plates on cool-white paper, caveats hung in the margin, structure carried by rules rather than elevation.
-      STORY: Configure a reallocation policy, inspect its capability cost and its safety benefit across six numbered plates, then follow the caption through to the paper at /methodology.
-      FIRST VIEWPORT: A full-measure abstract over a run-in status rule, leading into the apparatus — an ivory margin of controls beside the plates.
-      FORM: Scientific monograph. The six plates are frozen; the page is designed around them.
+      THESIS: A research institute's working paper you can operate. The apparatus of print — running head, folio, § marks in the margin, numbered plates, hung footnotes, old-style figures in prose — carries a policy model that would otherwise be a dashboard.
+      OWN-WORLD: Warm ivory stock under a paper-grain screen, cool-white plates inset into it, press registration marks in the trim margin. Six spot inks, each with one fixed meaning: orange is capability cost, cobalt is coordination, verdigris is safety benefit, ochre is uncertainty. Tints are halftone dot screens and overlaps multiply like real spot inks. Fluoro pink appears only in drawn art, never on a mark or a control.
+      STORY: Read the thesis as a picture — a hundred unit marks of frontier R&D compute, the reallocated share flipping from orange to verdigris under your hand — then work the same policy through six plates and follow the caption to the paper at /methodology.
+      FIRST VIEWPORT: Running head over the masthead, an abstract at a 66-character measure with its status hung in the margin, then Plate I: the live compute bank, which is the whole argument in one image.
+      SIGNATURE MOMENT: Hovering or keyboard-focusing any plate raises a vertical rule at that year across all six plates at once, each reporting its own value on its own readout line.
+      FORM: Working paper. The six plots are frozen; the page is designed around them.
       FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
     -->
+    <div class="reg-marks" aria-hidden="true">
+      <span class="reg-mark reg-mark-tl"></span>
+      <span class="reg-mark reg-mark-tr"></span>
+      <span class="reg-mark reg-mark-bl"></span>
+      <span class="reg-mark reg-mark-br"></span>
+    </div>
+
     <a class="skip-link" href="#top">Skip to content</a>
+
+    <p class="running-head" aria-hidden="true">
+      <span>Opportunity FLOPs</span>
+      <span>Working Paper 01</span>
+      <span>Reallocation of capability compute</span>
+      <span>July 2026</span>
+    </p>
+
     <header class="topbar">
       <a class="wordmark" href="/" aria-label="Opportunity FLOPs home">
         <span>Opportunity</span><strong>FLOPs</strong>
@@ -36,307 +53,387 @@
     </header>
 
     <main id="top">
-      <section class="intro" aria-labelledby="page-title">
-        <div>
-          <h1 id="page-title">What does a safety commitment cost in frontier progress?</h1>
+      <section class="frontmatter sheet" aria-labelledby="page-title">
+        <!--
+          This replaces the old readiness list: three <dt>/<dd> pairs in a
+          three-up grid, which is a KPI chip row however it is labelled. The
+          same three facts belong in the margin as the paper's status, which is
+          where a status note belongs.
+        -->
+        <aside class="marginalia" aria-label="Build status">
+          <strong>Status</strong>
           <p>
-            Compare no reallocation, unilateral action, and a coordinated policy.
-            Set the compute commitment and inspect how Katherine's reduced-form model propagates it through software progress, frontier capability, and AI risk.
+            Both channels integrated. Sensitivity calibrated from 10,000 seeded
+            triangular draws. Outputs are comparative indices against a
+            normalized baseline — not a forecast.
           </p>
-        </div>
-        <dl class="model-readiness">
-          <div>
-            <dt>Equations</dt>
-            <dd>Integrated</dd>
-          </div>
-          <div>
-            <dt>Calibration</dt>
-            <dd>10k seeded draws</dd>
-          </div>
-          <div>
-            <dt>Outputs</dt>
-            <dd>Comparative indices</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section class="calculator" id="calculator" aria-label="Compute tradeoff calculator">
-        <aside class="control-rack" aria-labelledby="assumptions-title">
-          <!--
-            The inner wrapper is what sticks. Six plates make the results
-            column far taller than the controls, so without this you would have
-            to scroll back up to change an assumption you are looking at.
-          -->
-          <div class="rack-inner">
-            <div class="rack-heading">
-              <div>
-                <h2 id="assumptions-title">Policy assumptions</h2>
-              </div>
-              <div class="rack-actions">
-                <button class="reset-button" id="copy-link" type="button">Copy link</button>
-                <button class="reset-button" id="reset-controls" type="button">Reset</button>
-              </div>
-            </div>
-
-            <fieldset class="scenario-control">
-              <legend>Participation</legend>
-              <label>
-                <input type="radio" name="scenario" value="baseline" />
-                <span><strong>None</strong><small>No firm reallocates</small></span>
-              </label>
-              <label>
-                <input type="radio" name="scenario" value="unilateral" />
-                <span><strong>One firm</strong><small>Firm A reallocates</small></span>
-              </label>
-              <label>
-                <input type="radio" name="scenario" value="coordinated" checked />
-                <span><strong>Both firms</strong><small>Common commitment</small></span>
-              </label>
-            </fieldset>
-
-            <div id="assumption-controls"></div>
-
-            <section class="parameter-readout" aria-labelledby="active-preset-title">
-              <div>
-                <h3 id="active-preset-title">Active sensitivity</h3>
-                <span id="preset-name">P50 parameter bundle</span>
-              </div>
-              <dl>
-                <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.313</dd></div>
-                <div><dt>Feedback · γ</dt><dd id="gamma-value">0.400</dd></div>
-                <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.701</dd></div>
-                <div><dt>Alignment effectiveness · λ</dt><dd id="lambda-value">0.400</dd></div>
-              </dl>
-            </section>
-
-            <div class="rack-note">
-              <svg viewBox="0 0 20 20" aria-hidden="true">
-                <circle cx="10" cy="10" r="8.25"></circle>
-                <path d="M10 8v5M10 5.5v.5"></path>
-              </svg>
-              <p>Each sensitivity parameter is calibrated from 10,000 seeded triangular draws. Low, Medium, and High select marginal P10, P50, and P90 bundles; the triangular inputs remain working assumptions.</p>
-            </div>
-          </div>
         </aside>
 
+        <h1 id="page-title">What does a safety commitment cost in frontier progress?</h1>
+
+        <p class="abstract">
+          A policy that moves a share of frontier AI R&amp;D compute from capability
+          research to alignment buys safety at a price in capability. This calculator
+          implements the reduced-form model end to end — the capability channel and the
+          safety channel both — and reports the trade across six numbered plates. Set the
+          commitment, choose whether one firm or both adopt it, and read the cost against
+          the benefit on a common baseline. The sensitivity bundles are marginal
+          percentiles of assumed priors: working cases, not empirical estimates.
+        </p>
+
         <!--
-          The live region is the headline alone. It used to wrap this whole
-          section — headline, legend, all six plates and the comparison strip —
-          while the slider re-renders on every input event, so dragging it
-          queued the entire results bay for announcement on each tick. The six
-          plate outputs are implicitly role="status" as well, which nested a
-          second layer of live regions inside the first.
+          Plate I — the thesis as a picture, and the one image on the page that
+          moves. A hundred unit marks stand for frontier R&D compute; the share
+          the reader commits flips to alignment, mark by mark, as the policy
+          slider moves. The flip is a fill change as well as an ink change, so
+          it survives greyscale. Marks are drawn by app.js.
         -->
-        <section class="results-bay" aria-labelledby="results-title">
-          <header class="results-header">
-            <div>
-              <h2 id="results-title">Baseline versus policy</h2>
-            </div>
-            <div class="headline-output" aria-live="polite" aria-atomic="true">
-              <span>2034 capability gap</span>
-              <strong id="headline-result">Running model</strong>
-            </div>
-          </header>
-
-          <div class="legend" aria-label="Chart legend">
-            <span><i class="legend-line baseline"></i>Baseline</span>
-            <span><i class="legend-line firm-a"></i>Firm A</span>
-            <span><i class="legend-line firm-b"></i>Firm B</span>
-            <span class="legend-disclaimer">Modeled sensitivity · not a forecast</span>
+        <figure class="compute-plate bleed" aria-labelledby="compute-plate-title">
+          <div class="compute-plate-head">
+            <p class="plate-no">Plate <span class="plate-device" aria-hidden="true">I</span></p>
+            <p class="readout" id="compute-plate-readout" aria-live="polite">
+              Frontier R&amp;D compute · 100 units
+            </p>
           </div>
 
-          <p class="model-error" id="model-error" role="alert" hidden></p>
-
-          <figure class="plate" aria-labelledby="software-chart-title">
-            <div class="plate-readout">
-              <output id="software-gap" aria-live="off">Running model</output>
-            </div>
-            <div class="chart-frame">
-              <svg class="trajectory-chart" id="software-chart" viewBox="0 0 800 300" role="img" aria-labelledby="software-svg-title software-svg-desc">
-                <title id="software-svg-title">Modeled software efficiency-level trajectories</title>
-                <desc id="software-svg-desc">Modeled baseline, Firm A, and Firm B software efficiency-level indices from 2026 through 2034.</desc>
-                <path class="plot-grid" id="software-grid" aria-hidden="true"></path>
-                <g class="axis-labels" id="software-axes" aria-hidden="true"></g>
-                <path class="gap-area" id="software-area"></path>
-                <path class="trace trace-baseline" id="software-baseline"></path>
-                <path class="trace trace-a" id="software-a"></path>
-                <path class="trace trace-b" id="software-b"></path>
-                <g class="sweep" id="software-sweep" aria-hidden="true">
-                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
-                </g>
-              </svg>
-            </div>
-            <figcaption>
-              <p class="fig-no">Fig. 1</p>
-              <h3 id="software-chart-title">Software efficiency level</h3>
-              <p class="fig-sub">Software-efficiency level index · 2026 = 100</p>
-            </figcaption>
-          </figure>
-
-          <figure class="plate" aria-labelledby="slowdown-chart-title">
-            <div class="plate-readout">
-              <output id="slowdown-gap" aria-live="off">Running model</output>
-            </div>
-            <div class="chart-frame">
-              <svg class="trajectory-chart" id="slowdown-chart" viewBox="0 0 800 300" role="img" aria-labelledby="slowdown-svg-title slowdown-svg-desc">
-                <title id="slowdown-svg-title">Modeled software progress slowdown</title>
-                <desc id="slowdown-svg-desc">Modeled percentage slowdown in baseline, Firm A, and Firm B software progress rates from 2026 through 2034. Zero means no slowdown relative to baseline.</desc>
-                <path class="plot-grid" id="slowdown-grid" aria-hidden="true"></path>
-                <g class="axis-labels" id="slowdown-axes" aria-hidden="true"></g>
-                <path class="gap-area" id="slowdown-area"></path>
-                <path class="trace trace-baseline" id="slowdown-baseline"></path>
-                <path class="trace trace-a" id="slowdown-a"></path>
-                <path class="trace trace-b" id="slowdown-b"></path>
-                <g class="sweep" id="slowdown-sweep" aria-hidden="true">
-                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
-                </g>
-              </svg>
-            </div>
-            <figcaption>
-              <p class="fig-no">Fig. 2</p>
-              <h3 id="slowdown-chart-title">Software progress slowdown</h3>
-              <p class="fig-sub"><i>SS</i>(<i>t</i>) = 1 − <i>Ṡ</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>Ṡ</i><sub>B</sub>(<i>t</i>) · percent</p>
-            </figcaption>
-          </figure>
-
-          <figure class="plate" aria-labelledby="capability-chart-title">
-            <div class="plate-readout">
-              <output id="capability-gap" aria-live="off">Running model</output>
-            </div>
-            <div class="chart-frame">
-              <svg class="trajectory-chart" id="capability-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-svg-title capability-svg-desc">
-                <title id="capability-svg-title">Modeled frontier capability trajectories</title>
-                <desc id="capability-svg-desc">Modeled baseline, Firm A, and Firm B frontier capability indices from 2026 through 2034.</desc>
-                <path class="plot-grid" id="capability-grid" aria-hidden="true"></path>
-                <g class="axis-labels" id="capability-axes" aria-hidden="true"></g>
-                <path class="gap-area" id="capability-area"></path>
-                <path class="trace trace-baseline" id="capability-baseline"></path>
-                <path class="trace trace-a" id="capability-a"></path>
-                <path class="trace trace-b" id="capability-b"></path>
-                <g class="sweep" id="capability-sweep" aria-hidden="true">
-                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
-                </g>
-              </svg>
-            </div>
-            <figcaption>
-              <p class="fig-no">Fig. 3</p>
-              <h3 id="capability-chart-title">Frontier capability</h3>
-              <p class="fig-sub">Training-compute-normalized index · 2026 = 100</p>
-            </figcaption>
-          </figure>
-
-          <figure class="plate" aria-labelledby="capability-gap-chart-title">
-            <div class="plate-readout">
-              <output id="capability-gap-series-output" aria-live="off">Running model</output>
-            </div>
-            <div class="chart-frame">
-              <svg class="trajectory-chart" id="capability-gap-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-gap-svg-title capability-gap-svg-desc">
-                <title id="capability-gap-svg-title">Modeled AI capability gap</title>
-                <desc id="capability-gap-svg-desc">Modeled percentage gaps in baseline, Firm A, and Firm B capability from 2026 through 2034. Zero means no gap relative to baseline.</desc>
-                <path class="plot-grid" id="capability-gap-grid" aria-hidden="true"></path>
-                <g class="axis-labels" id="capability-gap-axes" aria-hidden="true"></g>
-                <path class="gap-area" id="capability-gap-area"></path>
-                <path class="trace trace-baseline" id="capability-gap-baseline"></path>
-                <path class="trace trace-a" id="capability-gap-a"></path>
-                <path class="trace trace-b" id="capability-gap-b"></path>
-                <g class="sweep" id="capability-gap-sweep" aria-hidden="true">
-                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
-                </g>
-              </svg>
-            </div>
-            <figcaption>
-              <p class="fig-no">Fig. 4</p>
-              <h3 id="capability-gap-chart-title">AI capability gap</h3>
-              <p class="fig-sub"><i>CG</i>(<i>t</i>) = 1 − <i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>M</i><sub>B</sub>(<i>t</i>) · percent</p>
-            </figcaption>
-          </figure>
-
-          <figure class="plate" aria-labelledby="risk-chart-title">
-            <div class="plate-readout">
-              <div class="chart-series-legend" aria-label="AI risk chart legend">
-                <span><i class="legend-line baseline"></i>Baseline</span>
-                <span><i class="legend-line firm-a"></i>Policy projection</span>
-              </div>
-              <output id="risk-output" aria-live="off">Running model</output>
-            </div>
-            <div class="chart-frame">
-              <svg class="trajectory-chart" id="risk-chart" viewBox="0 0 800 300" role="img" aria-labelledby="risk-svg-title risk-svg-desc">
-                <title id="risk-svg-title">Modeled AI risk over time</title>
-                <desc id="risk-svg-desc">Modeled normalized baseline and policy-projection AI risk indices from 2026 through 2034.</desc>
-                <path class="plot-grid" id="risk-grid" aria-hidden="true"></path>
-                <g class="axis-labels" id="risk-axes" aria-hidden="true"></g>
-                <path class="gap-area" id="risk-area"></path>
-                <path class="trace trace-baseline" id="risk-baseline"></path>
-                <path class="trace trace-a" id="risk-projection"></path>
-                <path class="trace trace-b" id="risk-unused"></path>
-                <g class="sweep" id="risk-sweep" aria-hidden="true">
-                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
-                </g>
-              </svg>
-            </div>
-            <figcaption>
-              <p class="fig-no">Fig. 5</p>
-              <h3 id="risk-chart-title">AI risk over time</h3>
-              <p class="fig-sub">AI risk index · <i>R</i>(<i>t</i>) · normalized baseline = 100</p>
-            </figcaption>
-          </figure>
-
-          <figure class="plate" aria-labelledby="safety-benefit-chart-title">
-            <div class="plate-readout">
-              <div class="chart-series-legend" aria-label="Safety benefit chart legend">
-                <span><i class="legend-line baseline"></i>Baseline (0%)</span>
-                <span><i class="legend-line firm-a"></i>Policy projection</span>
-              </div>
-              <output id="safety-benefit-output" aria-live="off">Running model</output>
-            </div>
-            <div class="chart-frame">
-              <svg class="trajectory-chart" id="safety-benefit-chart" viewBox="0 0 800 300" role="img" aria-labelledby="safety-benefit-svg-title safety-benefit-svg-desc">
-                <title id="safety-benefit-svg-title">Modeled safety benefit over time</title>
-                <desc id="safety-benefit-svg-desc">Modeled baseline zero-percent and policy-projection safety benefit from 2026 through 2034.</desc>
-                <path class="plot-grid" id="safety-benefit-grid" aria-hidden="true"></path>
-                <g class="axis-labels" id="safety-benefit-axes" aria-hidden="true"></g>
-                <path class="gap-area" id="safety-benefit-area"></path>
-                <path class="trace trace-baseline" id="safety-benefit-baseline"></path>
-                <path class="trace trace-a" id="safety-benefit-projection"></path>
-                <path class="trace trace-b" id="safety-benefit-unused"></path>
-                <g class="sweep" id="safety-benefit-sweep" aria-hidden="true">
-                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
-                </g>
-              </svg>
-            </div>
-            <figcaption>
-              <p class="fig-no">Fig. 6</p>
-              <h3 id="safety-benefit-chart-title">Safety benefit over time</h3>
-              <p class="fig-sub"><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>) / <i>R</i><sub>B</sub>(<i>t</i>) · percent</p>
-            </figcaption>
-          </figure>
-
-          <div class="comparison-strip" aria-label="Scenario comparison status">
-            <div data-scenario="baseline">
-              <span>No reallocation</span>
-              <strong id="baseline-status">0.0% capability gap</strong>
-            </div>
-            <div data-scenario="unilateral">
-              <span>Unilateral</span>
-              <strong id="unilateral-status">Calculating</strong>
-            </div>
-            <div data-scenario="coordinated">
-              <span>Coordinated</span>
-              <strong id="coordinated-status">Calculating</strong>
-            </div>
+          <div class="compute-bank ink-field">
+            <div class="compute-screen" aria-hidden="true"></div>
+            <svg
+              class="compute-marks"
+              id="compute-marks"
+              viewBox="0 0 750 50"
+              preserveAspectRatio="xMidYMid meet"
+              aria-hidden="true"
+            ></svg>
           </div>
-        </section>
+
+          <figcaption>
+            <h2 id="compute-plate-title">The reallocation, at unit scale</h2>
+            <p class="compute-key">
+              <span class="key-mark key-capability" aria-hidden="true"></span>
+              Capability R&amp;D
+              <span class="key-mark key-alignment" aria-hidden="true"></span>
+              Alignment R&amp;D
+              <span class="key-note">One mark = one per cent of frontier R&amp;D compute</span>
+            </p>
+          </figcaption>
+        </figure>
       </section>
 
-      <section class="channels-section" aria-labelledby="channels-title">
+      <section class="calculator sheet" id="calculator" aria-label="Compute tradeoff calculator">
+        <div class="apparatus bleed">
+          <aside class="control-rack" aria-labelledby="assumptions-title">
+            <!--
+              The inner wrapper is what sticks. Six plates make the results
+              column far taller than the controls, so without this you would have
+              to scroll back up to change an assumption you are looking at.
+            -->
+            <div class="rack-inner">
+              <div class="rack-heading">
+                <h2 id="assumptions-title">Policy assumptions</h2>
+                <div class="rack-actions">
+                  <button class="button" id="copy-link" type="button">Copy link</button>
+                  <button class="button" id="reset-controls" type="button">Reset</button>
+                </div>
+              </div>
+
+              <fieldset class="scenario-control">
+                <legend>Participation</legend>
+                <label>
+                  <input type="radio" name="scenario" value="baseline" />
+                  <span><strong>None</strong><small>No firm reallocates</small></span>
+                </label>
+                <label>
+                  <input type="radio" name="scenario" value="unilateral" />
+                  <span><strong>One firm</strong><small>Firm A reallocates</small></span>
+                </label>
+                <label>
+                  <input type="radio" name="scenario" value="coordinated" checked />
+                  <span><strong>Both firms</strong><small>Common commitment</small></span>
+                </label>
+              </fieldset>
+
+              <div id="assumption-controls"></div>
+
+              <section class="parameter-readout" aria-labelledby="active-preset-title">
+                <div>
+                  <h3 id="active-preset-title">Active sensitivity</h3>
+                  <span id="preset-name">P50 parameter bundle</span>
+                </div>
+                <dl>
+                  <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.313</dd></div>
+                  <div><dt>Feedback · γ</dt><dd id="gamma-value">0.400</dd></div>
+                  <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.701</dd></div>
+                  <div><dt>Alignment effectiveness · λ</dt><dd id="lambda-value">0.400</dd></div>
+                </dl>
+              </section>
+
+              <p class="rack-note">
+                Each sensitivity parameter is calibrated from 10,000 seeded triangular draws.
+                Low, Medium and High select marginal P10, P50 and P90 bundles;
+                the triangular inputs remain working assumptions.
+              </p>
+            </div>
+          </aside>
+
+          <!--
+            The live region is the headline alone. It used to wrap this whole
+            section — headline, legend, all six plates and the comparison strip —
+            while the slider re-renders on every input event, so dragging it
+            queued the entire results bay for announcement on each tick. The six
+            plate outputs are implicitly role="status" as well, which nested a
+            second layer of live regions inside the first.
+          -->
+          <section class="results-bay" aria-labelledby="results-title">
+            <header class="results-header">
+              <h2 id="results-title">Baseline versus policy</h2>
+              <div class="headline-output" aria-live="polite" aria-atomic="true">
+                <span>2034 capability gap</span>
+                <strong id="headline-result">Running model</strong>
+              </div>
+            </header>
+
+            <div class="legend" aria-label="Chart legend">
+              <span><i class="legend-line baseline"></i>Baseline</span>
+              <span><i class="legend-line firm-a"></i>Firm A</span>
+              <span><i class="legend-line firm-b"></i>Firm B</span>
+              <span class="legend-disclaimer">Modeled sensitivity · not a forecast</span>
+            </div>
+
+            <!--
+              The signature moment's instructions. Discoverable in the page
+              rather than only in a tooltip, and the same sentence a screen
+              reader gets from the plate group labels.
+            -->
+            <p class="cursor-hint" id="cursor-hint">
+              Point at any plate — or focus one and use <kbd>←</kbd> <kbd>→</kbd> — to raise
+              a year rule across all six.
+            </p>
+
+            <p class="model-error" id="model-error" role="alert" hidden></p>
+
+            <div class="plate-bay" id="plate-bay">
+              <figure class="plate" aria-labelledby="software-chart-title" tabindex="0" data-chart="software">
+                <div class="plate-readout">
+                  <output id="software-gap" aria-live="off">Running model</output>
+                </div>
+                <div class="chart-frame">
+                  <svg class="trajectory-chart" id="software-chart" viewBox="0 0 800 300" role="img" aria-labelledby="software-svg-title software-svg-desc">
+                    <title id="software-svg-title">Modeled software efficiency-level trajectories</title>
+                    <desc id="software-svg-desc">Modeled baseline, Firm A, and Firm B software efficiency-level indices from 2026 through 2034.</desc>
+                    <path class="plot-grid" id="software-grid" aria-hidden="true"></path>
+                    <g class="axis-labels" id="software-axes" aria-hidden="true"></g>
+                    <path class="gap-area" id="software-area"></path>
+                    <path class="trace trace-baseline" id="software-baseline"></path>
+                    <path class="trace trace-a" id="software-a"></path>
+                    <path class="trace trace-b" id="software-b"></path>
+                    <g class="year-rule" id="software-year-rule" aria-hidden="true" hidden>
+                      <path class="year-rule-line" d="M68 34V244"></path>
+                      <rect class="year-rule-tick" x="65" y="30" width="6" height="6"></rect>
+                    </g>
+                    <g class="sweep" id="software-sweep" aria-hidden="true">
+                      <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                    </g>
+                  </svg>
+                </div>
+                <figcaption>
+                  <p class="fig-no">Fig. 1</p>
+                  <h3 id="software-chart-title">Software efficiency level</h3>
+                  <p class="fig-sub">Software-efficiency level index · 2026 = 100</p>
+                </figcaption>
+              </figure>
+
+              <figure class="plate" aria-labelledby="slowdown-chart-title" tabindex="0" data-chart="softwareSlowdown">
+                <div class="plate-readout">
+                  <output id="slowdown-gap" aria-live="off">Running model</output>
+                </div>
+                <div class="chart-frame">
+                  <svg class="trajectory-chart" id="slowdown-chart" viewBox="0 0 800 300" role="img" aria-labelledby="slowdown-svg-title slowdown-svg-desc">
+                    <title id="slowdown-svg-title">Modeled software progress slowdown</title>
+                    <desc id="slowdown-svg-desc">Modeled percentage slowdown in baseline, Firm A, and Firm B software progress rates from 2026 through 2034. Zero means no slowdown relative to baseline.</desc>
+                    <path class="plot-grid" id="slowdown-grid" aria-hidden="true"></path>
+                    <g class="axis-labels" id="slowdown-axes" aria-hidden="true"></g>
+                    <path class="gap-area" id="slowdown-area"></path>
+                    <path class="trace trace-baseline" id="slowdown-baseline"></path>
+                    <path class="trace trace-a" id="slowdown-a"></path>
+                    <path class="trace trace-b" id="slowdown-b"></path>
+                    <g class="year-rule" id="slowdown-year-rule" aria-hidden="true" hidden>
+                      <path class="year-rule-line" d="M68 34V244"></path>
+                      <rect class="year-rule-tick" x="65" y="30" width="6" height="6"></rect>
+                    </g>
+                    <g class="sweep" id="slowdown-sweep" aria-hidden="true">
+                      <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                    </g>
+                  </svg>
+                </div>
+                <figcaption>
+                  <p class="fig-no">Fig. 2</p>
+                  <h3 id="slowdown-chart-title">Software progress slowdown</h3>
+                  <p class="fig-sub"><i>SS</i>(<i>t</i>) = 1 − <i>Ṡ</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>Ṡ</i><sub>B</sub>(<i>t</i>) · percent</p>
+                </figcaption>
+              </figure>
+
+              <figure class="plate" aria-labelledby="capability-chart-title" tabindex="0" data-chart="capability">
+                <div class="plate-readout">
+                  <output id="capability-gap" aria-live="off">Running model</output>
+                </div>
+                <div class="chart-frame">
+                  <svg class="trajectory-chart" id="capability-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-svg-title capability-svg-desc">
+                    <title id="capability-svg-title">Modeled frontier capability trajectories</title>
+                    <desc id="capability-svg-desc">Modeled baseline, Firm A, and Firm B frontier capability indices from 2026 through 2034.</desc>
+                    <path class="plot-grid" id="capability-grid" aria-hidden="true"></path>
+                    <g class="axis-labels" id="capability-axes" aria-hidden="true"></g>
+                    <path class="gap-area" id="capability-area"></path>
+                    <path class="trace trace-baseline" id="capability-baseline"></path>
+                    <path class="trace trace-a" id="capability-a"></path>
+                    <path class="trace trace-b" id="capability-b"></path>
+                    <g class="year-rule" id="capability-year-rule" aria-hidden="true" hidden>
+                      <path class="year-rule-line" d="M68 34V244"></path>
+                      <rect class="year-rule-tick" x="65" y="30" width="6" height="6"></rect>
+                    </g>
+                    <g class="sweep" id="capability-sweep" aria-hidden="true">
+                      <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                    </g>
+                  </svg>
+                </div>
+                <figcaption>
+                  <p class="fig-no">Fig. 3</p>
+                  <h3 id="capability-chart-title">Frontier capability</h3>
+                  <p class="fig-sub">Training-compute-normalized index · 2026 = 100</p>
+                </figcaption>
+              </figure>
+
+              <figure class="plate" aria-labelledby="capability-gap-chart-title" tabindex="0" data-chart="capabilityGap">
+                <div class="plate-readout">
+                  <output id="capability-gap-series-output" aria-live="off">Running model</output>
+                </div>
+                <div class="chart-frame">
+                  <svg class="trajectory-chart" id="capability-gap-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-gap-svg-title capability-gap-svg-desc">
+                    <title id="capability-gap-svg-title">Modeled AI capability gap</title>
+                    <desc id="capability-gap-svg-desc">Modeled percentage gaps in baseline, Firm A, and Firm B capability from 2026 through 2034. Zero means no gap relative to baseline.</desc>
+                    <path class="plot-grid" id="capability-gap-grid" aria-hidden="true"></path>
+                    <g class="axis-labels" id="capability-gap-axes" aria-hidden="true"></g>
+                    <path class="gap-area" id="capability-gap-area"></path>
+                    <path class="trace trace-baseline" id="capability-gap-baseline"></path>
+                    <path class="trace trace-a" id="capability-gap-a"></path>
+                    <path class="trace trace-b" id="capability-gap-b"></path>
+                    <g class="year-rule" id="capability-gap-year-rule" aria-hidden="true" hidden>
+                      <path class="year-rule-line" d="M68 34V244"></path>
+                      <rect class="year-rule-tick" x="65" y="30" width="6" height="6"></rect>
+                    </g>
+                    <g class="sweep" id="capability-gap-sweep" aria-hidden="true">
+                      <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                    </g>
+                  </svg>
+                </div>
+                <figcaption>
+                  <p class="fig-no">Fig. 4</p>
+                  <h3 id="capability-gap-chart-title">AI capability gap</h3>
+                  <p class="fig-sub"><i>CG</i>(<i>t</i>) = 1 − <i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>M</i><sub>B</sub>(<i>t</i>) · percent</p>
+                </figcaption>
+              </figure>
+
+              <figure class="plate" aria-labelledby="risk-chart-title" tabindex="0" data-chart="risk">
+                <div class="plate-readout">
+                  <div class="chart-series-legend" aria-label="AI risk chart legend">
+                    <span><i class="legend-line baseline"></i>Baseline</span>
+                    <span><i class="legend-line firm-a"></i>Policy projection</span>
+                  </div>
+                  <output id="risk-output" aria-live="off">Running model</output>
+                </div>
+                <div class="chart-frame">
+                  <svg class="trajectory-chart" id="risk-chart" viewBox="0 0 800 300" role="img" aria-labelledby="risk-svg-title risk-svg-desc">
+                    <title id="risk-svg-title">Modeled AI risk over time</title>
+                    <desc id="risk-svg-desc">Modeled normalized baseline and policy-projection AI risk indices from 2026 through 2034.</desc>
+                    <path class="plot-grid" id="risk-grid" aria-hidden="true"></path>
+                    <g class="axis-labels" id="risk-axes" aria-hidden="true"></g>
+                    <path class="gap-area" id="risk-area"></path>
+                    <path class="trace trace-baseline" id="risk-baseline"></path>
+                    <path class="trace trace-a" id="risk-projection"></path>
+                    <path class="trace trace-b" id="risk-unused"></path>
+                    <g class="year-rule" id="risk-year-rule" aria-hidden="true" hidden>
+                      <path class="year-rule-line" d="M68 34V244"></path>
+                      <rect class="year-rule-tick" x="65" y="30" width="6" height="6"></rect>
+                    </g>
+                    <g class="sweep" id="risk-sweep" aria-hidden="true">
+                      <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                    </g>
+                  </svg>
+                </div>
+                <figcaption>
+                  <p class="fig-no">Fig. 5</p>
+                  <h3 id="risk-chart-title">AI risk over time</h3>
+                  <p class="fig-sub">AI risk index · <i>R</i>(<i>t</i>) · normalized baseline = 100</p>
+                </figcaption>
+              </figure>
+
+              <figure class="plate" aria-labelledby="safety-benefit-chart-title" tabindex="0" data-chart="safetyBenefit">
+                <div class="plate-readout">
+                  <div class="chart-series-legend" aria-label="Safety benefit chart legend">
+                    <span><i class="legend-line baseline"></i>Baseline (0%)</span>
+                    <span><i class="legend-line firm-a"></i>Policy projection</span>
+                  </div>
+                  <output id="safety-benefit-output" aria-live="off">Running model</output>
+                </div>
+                <div class="chart-frame">
+                  <svg class="trajectory-chart" id="safety-benefit-chart" viewBox="0 0 800 300" role="img" aria-labelledby="safety-benefit-svg-title safety-benefit-svg-desc">
+                    <title id="safety-benefit-svg-title">Modeled safety benefit over time</title>
+                    <desc id="safety-benefit-svg-desc">Modeled baseline zero-percent and policy-projection safety benefit from 2026 through 2034.</desc>
+                    <path class="plot-grid" id="safety-benefit-grid" aria-hidden="true"></path>
+                    <g class="axis-labels" id="safety-benefit-axes" aria-hidden="true"></g>
+                    <path class="gap-area" id="safety-benefit-area"></path>
+                    <path class="trace trace-baseline" id="safety-benefit-baseline"></path>
+                    <path class="trace trace-a" id="safety-benefit-projection"></path>
+                    <path class="trace trace-b" id="safety-benefit-unused"></path>
+                    <g class="year-rule" id="safety-benefit-year-rule" aria-hidden="true" hidden>
+                      <path class="year-rule-line" d="M68 34V244"></path>
+                      <rect class="year-rule-tick" x="65" y="30" width="6" height="6"></rect>
+                    </g>
+                    <g class="sweep" id="safety-benefit-sweep" aria-hidden="true">
+                      <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                    </g>
+                  </svg>
+                </div>
+                <figcaption>
+                  <p class="fig-no">Fig. 6</p>
+                  <h3 id="safety-benefit-chart-title">Safety benefit over time</h3>
+                  <p class="fig-sub"><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>) / <i>R</i><sub>B</sub>(<i>t</i>) · percent</p>
+                </figcaption>
+              </figure>
+            </div>
+
+            <p class="sr-only" id="year-cursor-announce" aria-live="polite"></p>
+
+            <div class="comparison-strip" aria-label="Scenario comparison status">
+              <div data-scenario="baseline">
+                <span>No reallocation</span>
+                <strong id="baseline-status">0.0% capability gap</strong>
+              </div>
+              <div data-scenario="unilateral">
+                <span>Unilateral</span>
+                <strong id="unilateral-status">Calculating</strong>
+              </div>
+              <div data-scenario="coordinated">
+                <span>Coordinated</span>
+                <strong id="coordinated-status">Calculating</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="channels-section sheet" aria-labelledby="channels-title">
+        <div class="section-mark">
+          <span class="section-no">§&#8201;7</span>
+        </div>
+
         <div class="channels-head">
-          <p class="label">The wider model</p>
           <h2 id="channels-title">Reallocation runs down two channels</h2>
           <p>
             Moving R&amp;D compute to alignment does two things at once: it slows capability, and it buys safety.
-            Both channels are now modelled — the cost in Fig. 1–4, the benefit in Fig. 5–6 — so the tradeoff can be read in one place rather than inferred from half of it.
-            The two rest on different footing, though: the safety channel holds baseline risk at a normalized 100 and draws λ from a working prior, because the specification supplies neither a shape for <i>R</i><sub>B</sub>(<i>t</i>) nor empirical bounds for λ.
-            <a href="/methodology">Read the methodology</a>.
+            Both channels are modelled — the cost in Fig. 1–4, the benefit in Fig. 5–6 — so the tradeoff can be read in one place rather than inferred from half of it.
+            The two rest on different footing, though: the safety channel holds baseline risk at a normalized 100 and draws <i>λ</i> from a working prior, because the specification supplies neither a shape for <i>R</i><sub>B</sub>(<i>t</i>) nor empirical bounds for <i>λ</i>.
+            <a href="/methodology#part-7">Read the methodology</a>.
           </p>
         </div>
 
@@ -364,6 +461,12 @@
           </div>
         </figure>
       </section>
+
+      <p class="folio folio-sheet" aria-hidden="true">
+        <span class="folio-mark">Plate I</span>
+        <span class="folio-title">The compute tradeoff calculator</span>
+        <span class="folio-no numeric">1&#8202;/&#8202;2</span>
+      </p>
     </main>
 
     <footer>

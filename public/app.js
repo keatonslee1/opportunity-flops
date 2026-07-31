@@ -155,6 +155,15 @@ const plot = {
   bottom: 244,
 };
 
+// The plate each chart is drawn on, and the year rule that crosses it. Looked
+// up by convention rather than listed six more times in the config above: the
+// ids are already derivable from the chart svg's own id.
+for (const [kind, chart] of Object.entries(charts)) {
+  chart.kind = kind;
+  chart.plate = chart.svg?.closest(".plate") ?? null;
+  chart.yearRule = document.querySelector(`#${chart.svg.id.replace("-chart", "")}-year-rule`);
+}
+
 function formatValue(definition, value) {
   return `${value}${definition.suffix ?? ""}`;
 }
@@ -163,9 +172,12 @@ function formatPercent(value) {
   return `${(Math.max(0, value) * 100).toFixed(1)}%`;
 }
 
+// The fill is a real element, not a gradient stop. --fill sizes it, and it
+// lives on the wrapper so the track, the fill and the thumb all read one
+// value. See the range-control note in styles.css.
 function updateRangeFill(input) {
   const progress = ((Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100;
-  input.style.setProperty("--fill", `${progress}%`);
+  (input.closest(".range") ?? input).style.setProperty("--fill", `${progress}%`);
 }
 
 function createRangeControl(definition) {
@@ -179,6 +191,14 @@ function createRangeControl(definition) {
   const value = document.createElement("output");
   value.textContent = formatValue(definition, assumptions[definition.key]);
 
+  const slot = document.createElement("span");
+  slot.className = "range";
+
+  const track = document.createElement("span");
+  track.className = "range-track";
+  const fill = document.createElement("span");
+  fill.className = "range-fill";
+
   const input = document.createElement("input");
   input.type = "range";
   input.min = definition.min;
@@ -186,6 +206,8 @@ function createRangeControl(definition) {
   input.step = definition.step;
   input.value = assumptions[definition.key];
   input.setAttribute("aria-label", definition.label);
+
+  slot.append(track, fill, input);
   updateRangeFill(input);
 
   input.addEventListener("input", () => {
@@ -193,10 +215,14 @@ function createRangeControl(definition) {
     value.textContent = formatValue(definition, input.value);
     updateRangeFill(input);
     syncPermalink();
+    // Dragging updates the paths immediately and does not replay the draw.
+    // The chart-recorder animation is reserved for entry and for discrete
+    // scenario changes; replaying it on every input event would make the
+    // instrument feel like it was rebooting under the reader's hand.
     renderResult(false);
   });
 
-  row.append(title, value, input);
+  row.append(title, value, slot);
   controls.append(row);
   controlInputs.set(definition.key, { definition, input, value, type: "range" });
 }
@@ -542,11 +568,285 @@ function renderResult(shouldAnimate = true) {
     renderChart("risk", result, shouldAnimate);
     renderChart("safetyBenefit", result, shouldAnimate);
     updateComparisonStrip(result);
+
+    latestResult = result;
+    renderComputeBank();
+    // The rule stays where the reader put it across a re-render; only the
+    // numbers under it change. Moving it back to a default on every slider
+    // tick would mean losing your place every time you adjusted anything.
+    if (cursorIndex !== null) applyYearCursor(false);
   } catch (error) {
     modelError.textContent = `The model could not run: ${error.message}. Reset the assumptions and try again.`;
     modelError.hidden = false;
     headline.textContent = "Model error";
   }
+}
+
+// ── Plate I — the compute bank ─────────────────────────────────────────
+//
+// A hundred unit marks standing for frontier R&D compute, one per cent each.
+// The committed share flips from capability to alignment mark by mark under
+// the policy slider. The flip is a fill change as well as an ink change —
+// solid bar to hollow bar with a crossbar — so the picture still reads with
+// no colour at all, which is what the greyscale requirement actually needs.
+//
+// The marks are decorative and aria-hidden; the count beside them is the text
+// equivalent, and it is the live region.
+
+const computeMarksSvg = document.querySelector("#compute-marks");
+const computePlateReadout = document.querySelector("#compute-plate-readout");
+
+// Fifty marks to a row, two rows. The slider tops out at 50 per cent, so a
+// full commitment is exactly the top row — the control's whole range and the
+// picture's top line are the same statement.
+const COMPUTE_UNITS = 100;
+const COMPUTE_COLUMNS = 50;
+const MARK = { width: 9, height: 20, pitchX: 15, pitchY: 26, originX: 3, originY: 4 };
+
+const computeMarks = [];
+
+function buildComputeBank() {
+  if (!computeMarksSvg) return;
+
+  const fragment = document.createDocumentFragment();
+
+  for (let index = 0; index < COMPUTE_UNITS; index += 1) {
+    const column = index % COMPUTE_COLUMNS;
+    const row = Math.floor(index / COMPUTE_COLUMNS);
+    const x = MARK.originX + column * MARK.pitchX;
+    const y = MARK.originY + row * MARK.pitchY;
+
+    const unit = svgElement("g", { class: "unit", "data-role": "capability" });
+    unit.append(
+      svgElement("rect", {
+        class: "mark-capability", x, y, width: MARK.width, height: MARK.height,
+      }),
+      // Inset by half the stroke so the hollow mark occupies exactly the same
+      // footprint as the solid one and the bank does not shimmer on flip.
+      svgElement("rect", {
+        class: "mark-alignment",
+        x: x + 1, y: y + 1, width: MARK.width - 2, height: MARK.height - 2,
+      }),
+    );
+    fragment.append(unit);
+    computeMarks.push(unit);
+  }
+
+  computeMarksSvg.append(fragment);
+}
+
+function renderComputeBank() {
+  if (!computeMarks.length) return;
+
+  // The slider is a percentage and there are a hundred marks, so one step of
+  // the control is exactly one mark. That correspondence is the whole reason
+  // the bank is a hundred units and not fifty.
+  const reallocated = scenario === "baseline"
+    ? 0
+    : Math.round(Math.min(100, Math.max(0, assumptions.computeReallocated)));
+
+  for (const [index, unit] of computeMarks.entries()) {
+    unit.dataset.role = index < reallocated ? "alignment" : "capability";
+  }
+
+  computePlateReadout.textContent = reallocated === 0
+    ? "Frontier R&D compute · 100 units to capability"
+    : `Frontier R&D compute · ${reallocated} to alignment · ${100 - reallocated} to capability`;
+}
+
+// ── The year cursor ────────────────────────────────────────────────────
+//
+// The signature moment. Pointing at or focusing any plate raises a vertical
+// rule at that year across all six at once, and every plate reports its own
+// value for that year on its own readout line.
+//
+// Deliberately not gated behind prefers-reduced-motion. The rule does not
+// animate — it is a readout, and the reduced-motion gate is for motion. Taking
+// it away would remove a way of reading the figures from exactly the readers
+// most likely to depend on it. What the gate does disable, in renderChart, is
+// the chart-recorder draw.
+
+const plateBay = document.querySelector("#plate-bay");
+const yearAnnounce = document.querySelector("#year-cursor-announce");
+
+let latestResult = null;
+let cursorIndex = null;
+
+function yearCount() {
+  return latestResult?.series.years.length ?? 0;
+}
+
+// The model samples quarterly, but the axis is labelled in whole years and the
+// reader thinks in whole years. Without this the rule moved a quarter at a
+// time and the readout printed "2034" for four consecutive presses, so an
+// arrow key looked broken. Derived from the data rather than hardcoded to 4,
+// because the sampling interval belongs to the model, not to this file.
+function yearStep() {
+  const years = latestResult?.series.years;
+  if (!years || years.length < 2) return 1;
+  return Math.max(1, Math.round(1 / (years[1] - years[0])));
+}
+
+function formatAt(chart, value) {
+  return chart.domainKind === "fraction"
+    ? `${(value * 100).toFixed(1)}%`
+    : value.toFixed(1);
+}
+
+function cursorReadout(chart, index) {
+  const series = latestResult.series[chart.seriesKey];
+  const year = Math.round(latestResult.series.years[index]);
+  const at = (values) => formatAt(chart, values[index]);
+
+  if (chart.projectionOnly) {
+    return `${year} · ${at(series.policy)} · base ${at(series.baseline)}`;
+  }
+  if (scenario === "baseline") {
+    return `${year} · ${at(series.baseline)}`;
+  }
+  if (scenario === "unilateral") {
+    return `${year} · A ${at(series.firmA)} · base ${at(series.baseline)}`;
+  }
+  return `${year} · A/B ${at(series.firmA)} · base ${at(series.baseline)}`;
+}
+
+function applyYearCursor(announce) {
+  const count = yearCount();
+
+  for (const chart of Object.values(charts)) {
+    if (cursorIndex === null || !count) {
+      chart.yearRule.hidden = true;
+      chart.plate?.classList.remove("is-cursored");
+      chart.output.classList.remove("is-cursored");
+      continue;
+    }
+
+    const x = xPosition(cursorIndex, count);
+    chart.yearRule.setAttribute("transform", `translate(${(x - plot.left).toFixed(1)} 0)`);
+    chart.yearRule.hidden = false;
+    chart.plate?.classList.add("is-cursored");
+    chart.output.classList.add("is-cursored");
+    chart.output.textContent = cursorReadout(chart, cursorIndex);
+  }
+
+  if (cursorIndex === null) {
+    // Put the summary values back; they are what the plate says at rest.
+    if (latestResult) {
+      for (const kind of Object.keys(charts)) renderChart(kind, latestResult, false);
+    }
+    yearAnnounce.textContent = "";
+    return;
+  }
+
+  if (announce) {
+    const year = Math.round(latestResult.series.years[cursorIndex]);
+    yearAnnounce.textContent = `Year ${year}. ${
+      Object.values(charts)
+        .map((chart) => `${chart.plate?.querySelector("figcaption h3")?.textContent ?? chart.kind}, ${chart.output.textContent}`)
+        .join(". ")
+    }.`;
+  }
+}
+
+function setYearCursor(index, { announce = false } = {}) {
+  const count = yearCount();
+  if (!count) return;
+
+  const step = yearStep();
+  const next = index === null
+    ? null
+    : Math.min(count - 1, Math.max(0, Math.round(index / step) * step));
+
+  if (next === cursorIndex) {
+    // Re-announcing an unchanged year still matters: a keyboard reader who
+    // holds ArrowLeft at the start of the series needs to hear that it did
+    // not move, rather than silence.
+    if (announce && next !== null) applyYearCursor(true);
+    return;
+  }
+  cursorIndex = next;
+  applyYearCursor(announce);
+}
+
+// Maps a client x onto a year index using the plot's own geometry, so the
+// rule lands on a sampled year rather than wherever the pointer happens to be.
+function indexFromPointer(chartSvg, clientX) {
+  const count = yearCount();
+  if (!count) return null;
+
+  const rect = chartSvg.getBoundingClientRect();
+  if (!rect.width) return null;
+
+  const viewBoxX = ((clientX - rect.left) / rect.width) * 800;
+  const ratio = (viewBoxX - plot.left) / (plot.right - plot.left);
+  return Math.round(Math.min(1, Math.max(0, ratio)) * (count - 1));
+}
+
+function chartFromEvent(event) {
+  const plate = event.target.closest?.(".plate");
+  if (!plate) return null;
+  return charts[plate.dataset.chart] ?? null;
+}
+
+if (plateBay) {
+  plateBay.addEventListener("pointermove", (event) => {
+    // Touch drags are scrolls. Tapping still works, via click below.
+    if (event.pointerType === "touch") return;
+    const chart = chartFromEvent(event);
+    if (!chart) return;
+    setYearCursor(indexFromPointer(chart.svg, event.clientX));
+  });
+
+  plateBay.addEventListener("pointerleave", (event) => {
+    if (event.pointerType === "touch") return;
+    setYearCursor(null);
+  });
+
+  plateBay.addEventListener("click", (event) => {
+    const chart = chartFromEvent(event);
+    if (!chart) return;
+    setYearCursor(indexFromPointer(chart.svg, event.clientX), { announce: true });
+  });
+
+  // Focusing a plate puts the rule on the horizon year — the one the headline
+  // quotes — so a keyboard reader lands somewhere meaningful rather than at
+  // the left edge where every series is still identical.
+  plateBay.addEventListener("focusin", (event) => {
+    if (!event.target.classList?.contains("plate")) return;
+    if (cursorIndex === null) setYearCursor(yearCount() - 1, { announce: true });
+  });
+
+  plateBay.addEventListener("keydown", (event) => {
+    if (!event.target.classList?.contains("plate")) return;
+
+    const count = yearCount();
+    if (!count) return;
+    const from = cursorIndex ?? count - 1;
+    const step = yearStep();
+
+    switch (event.key) {
+      case "ArrowLeft":
+        setYearCursor(from - step, { announce: true });
+        break;
+      case "ArrowRight":
+        setYearCursor(from + step, { announce: true });
+        break;
+      case "Home":
+        setYearCursor(0, { announce: true });
+        break;
+      case "End":
+        setYearCursor(count - 1, { announce: true });
+        break;
+      case "Escape":
+        setYearCursor(null);
+        return;
+      default:
+        return;
+    }
+
+    // Arrow keys would otherwise scroll the plate bay out from under the rule.
+    event.preventDefault();
+  });
 }
 
 // ── Permalink ──────────────────────────────────────────────────────────
@@ -620,6 +920,7 @@ resetButton.addEventListener("click", () => {
 });
 
 createControls();
+buildComputeBank();
 
 // Reflect a scenario restored from the URL in the participation radios.
 const restoredScenario = scenarioInputs.find((input) => input.value === scenario);

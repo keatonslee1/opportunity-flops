@@ -2,10 +2,45 @@
  * Side panel styling.
  *
  * Tokens mirror the site's `public/styles.css` and DESIGN.md so the panel reads
- * as the same instrument, compressed to a ~320–500px column. Barlow is not
- * bundled: the panel uses the same declared fallback stack, so it picks up
- * Barlow when the reader has it installed and Trebuchet MS otherwise.
+ * as the same instrument, compressed to a ~320–500px column.
+ *
+ * Barlow is bundled in `fonts/` (copied from `public/assets/fonts/`, with the
+ * OFL notice the licence requires). An extension has no network guarantee and
+ * no shared cache with the site, so relying on a fallback stack meant the panel
+ * usually rendered in Trebuchet MS and looked like a different product.
  */
+
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-SemiBold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("fonts/Barlow-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
 
 :root {
   color-scheme: light;

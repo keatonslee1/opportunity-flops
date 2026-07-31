@@ -112,10 +112,21 @@
   border: 1px solid var(--ink);
 }
 
+/*
+ * The horizontal padding belongs to .rack-inner, not to .control-rack.
+ * overflow-y: auto makes a box clip on BOTH axes, so with the padding on the
+ * outer element the controls sat flush against the scroll container's edge and
+ * their focus rings — 3px of outline at a 2px offset — were cut off on the
+ * left. Insetting the content inside the scrolling box gives the ring room.
+ */
 .control-rack {
-  padding: var(--s5) var(--s4);
+  padding: var(--s5) 0;
   background: var(--paper);
   border-right: 1px solid var(--ink);
+}
+
+.rack-inner {
+  padding-inline: var(--s4);
 }
 
 /* The margin keeps its full-height ivory; only the contents travel. Capped to
@@ -830,7 +841,7 @@
     grid-template-columns: 300px minmax(0, 1fr);
   }
 
-  .control-rack {
+  .rack-inner {
     padding-inline: 20px;
   }
 

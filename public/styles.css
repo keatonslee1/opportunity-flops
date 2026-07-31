@@ -26,12 +26,29 @@
   text-transform: uppercase;
 }
 
+.legend,
+.chart-series-legend,
+.choice-option small {
+  font-variant-numeric: lining-nums;
+}
+
 .legend {
   font-family: var(--font-body);
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
   letter-spacing: var(--track-caps);
+}
+
+/* These two carry values, not sentences, and they change under the reader's
+   hand — the headline on every slider tick. Without tabular figures the number
+   re-widths as it counts and the whole line shifts. They keep the body face
+   rather than going monospace: they are headline figures, and the Readout Rule
+   is about not using monospace as a costume, not about forcing it onto every
+   digit. Tabular lining is the readout figure style either way. */
+.headline-output strong,
+.comparison-strip strong {
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* --- Frontmatter ---------------------------------------------------------

@@ -42,7 +42,7 @@ export const monteCarloCalibration = deepFreeze({
   sampleCount: 10_000,
   seed: 20_260_731,
   randomGenerator: "Mulberry32",
-  drawOrder: ["beta", "gamma", "delta"],
+  drawOrder: ["beta", "gamma", "delta", "lambda"],
   quantileMethod: "linear interpolation at (n - 1)q",
   parameterSampling: "independent marginal draws",
   bundleConstruction: "rank-aligned marginal quantiles",
@@ -52,6 +52,7 @@ export const monteCarloCalibration = deepFreeze({
     beta: { min: 0.15, mode: 0.3, max: 0.5 },
     gamma: { min: 0.2, mode: 0.4, max: 0.6 },
     delta: { min: 0.5, mode: 0.7, max: 0.9 },
+    lambda: { min: 0.2, mode: 0.4, max: 0.6 },
   },
 });
 
@@ -99,8 +100,24 @@ function calibrateImpactPresets() {
   );
   const quantilesByParameter = {};
 
+  const establishedDrawOrder = ["beta", "gamma", "delta"];
+  const extensionParameters = monteCarloCalibration.drawOrder.filter(
+    (parameter) => !establishedDrawOrder.includes(parameter),
+  );
+
+  // Preserve the already-published beta/gamma/delta stream when the bundle is
+  // extended. New parameters consume the deterministic stream afterward.
   for (let drawIndex = 0; drawIndex < monteCarloCalibration.sampleCount; drawIndex += 1) {
-    for (const parameter of monteCarloCalibration.drawOrder) {
+    for (const parameter of establishedDrawOrder) {
+      samplesByParameter[parameter].push(sampleTriangular(
+        random(),
+        monteCarloCalibration.distributions[parameter],
+      ));
+    }
+  }
+
+  for (const parameter of extensionParameters) {
+    for (let drawIndex = 0; drawIndex < monteCarloCalibration.sampleCount; drawIndex += 1) {
       samplesByParameter[parameter].push(sampleTriangular(
         random(),
         monteCarloCalibration.distributions[parameter],
@@ -189,7 +206,9 @@ function normalizeAssumptions(inputAssumptions) {
 
 export function runModel(inputAssumptions = {}) {
   const assumptions = normalizeAssumptions(inputAssumptions);
-  const { beta, gamma, delta } = impactPresets[assumptions.impactLevel];
+  const {
+    beta, gamma, delta, lambda,
+  } = impactPresets[assumptions.impactLevel];
   const impactDefinition = assumptionDefinitions.find(
     ({ key }) => key === "impactLevel",
   );
@@ -252,6 +271,22 @@ export function runModel(inputAssumptions = {}) {
   const baselineCapabilityGap = gapFromBaseline(baselineCapability);
   const firmACapabilityGap = gapFromBaseline(firmACapability);
   const firmBCapabilityGap = gapFromBaseline(firmBCapability);
+  const reallocationShare = assumptions.computeReallocated / 100;
+  const policyAlignmentEffectiveness = assumptions.scenario === "baseline"
+    ? 0
+    : lambda;
+  const baselineRisk = years.map(() => 100);
+  const policyRisk = years.map((year) => (
+    100 * Math.exp(
+      -policyAlignmentEffectiveness
+      * reallocationShare
+      * (year - START_YEAR),
+    )
+  ));
+  const baselineSafetyBenefit = years.map(() => 0);
+  const policySafetyBenefit = policyRisk.map(
+    (risk, index) => 1 - risk / baselineRisk[index],
+  );
   const horizonSoftwareRatio = (software) => (
     software.at(-1) / baselineSoftware.at(-1)
   );
@@ -280,6 +315,7 @@ export function runModel(inputAssumptions = {}) {
       beta,
       gamma,
       delta,
+      lambda,
       label: calibrationLabel,
       policyRateMultiplier,
       calibrationMethod: "assumed-prior Monte Carlo",
@@ -326,6 +362,14 @@ export function runModel(inputAssumptions = {}) {
         firmA: firmACapabilityGap,
         firmB: firmBCapabilityGap,
       },
+      risk: {
+        baseline: baselineRisk,
+        policy: policyRisk,
+      },
+      safetyBenefit: {
+        baseline: baselineSafetyBenefit,
+        policy: policySafetyBenefit,
+      },
     },
     metrics: {
       evaluatedAtYear: START_YEAR + HORIZON_YEARS,
@@ -341,6 +385,9 @@ export function runModel(inputAssumptions = {}) {
         firmA: firmAMetrics.capabilityGap,
         firmB: firmBMetrics.capabilityGap,
       },
+      safetyBenefit: {
+        policy: policySafetyBenefit.at(-1),
+      },
     },
     units: {
       years: "calendar year",
@@ -349,6 +396,8 @@ export function runModel(inputAssumptions = {}) {
       softwareSlowdown: "fractional reduction from baseline software progress rate",
       capability: "training-compute-normalized index (2026 = 100)",
       capabilityGap: "fractional reduction from baseline capability",
+      risk: "normalized AI risk index (baseline = 100)",
+      safetyBenefit: "fractional reduction from baseline AI risk",
       metrics: "fraction of baseline at 2034",
     },
     caveats: [
@@ -358,6 +407,8 @@ export function runModel(inputAssumptions = {}) {
       "A is absorbed into the normalized baseline path; alpha is not needed because unchanged training compute cancels from the relative outputs.",
       "Each parameter uses 10,000 seeded draws from a triangular distribution whose bounds and mode are working assumptions, not empirical estimates.",
       "Low, medium, and high are rank-aligned marginal P10, P50, and P90 parameter bundles, not joint outcome percentiles.",
+      "The baseline AI risk path is held at a normalized index of 100 because the supplied specification does not define its shape.",
+      "Lambda uses a triangular 0.20 / 0.40 / 0.60 working prior; the supplied specification does not provide empirical bounds or a mode.",
     ],
   };
 }

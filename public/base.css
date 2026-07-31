@@ -1,53 +1,87 @@
 /* ==========================================================================
    Opportunity FLOPs — shared foundation
-   Direction: "Scientific Monograph". Ink and paper, numbered figure plates,
-   caveats hung in the margin, structure carried by rules and typography.
+   Direction: "Working Paper No. 01" — an operable offprint. A research
+   institute's working paper: running head, folio, section marks, numbered
+   plates, hanging footnotes, spot inks printed on warm stock. Except the
+   figures are live and the reader can operate them.
 
    Loaded by BOTH /index.html and /methodology.html, ahead of each page's own
-   stylesheet. Anything that must look identical across the two pages lives
-   here: fonts, tokens, the page shell, the masthead and the colophon.
-   Page-specific rules belong in styles.css (calculator) or methodology.css.
+   stylesheet. Everything that must look identical across the two pages lives
+   here: fonts, tokens, the page shell, the sheet grid, and every shared
+   primitive. Page-specific rules belong in styles.css (calculator) or
+   methodology.css (the paper).
+
+   Structure carried by rules and typography. There is no elevation in this
+   system and there never will be.
    ========================================================================== */
 
 /* --- Fonts ---------------------------------------------------------------
-   Barlow carries body, controls and labels. Newsreader carries display,
-   figure numbers and mathematics — a serif/sans pairing contrasts on
-   structure, where two sans faces would only muddy the hierarchy.
+   Newsreader (display / mathematics) + Fira Sans (body, controls, the whole
+   small-caps apparatus) + Fira Mono (readouts).
 
-   Newsreader ships no Greek. β, γ, δ and α therefore resolve through
-   --font-math's fallback, which is why that stack leads with a face that
-   actually has Greek rather than reusing --font-display.
+   Fira replaced Barlow because the apparatus this paper needs is not
+   stylistic — it is machinery, and Barlow does not have it. Fira Sans ships
+   real `smcp`/`c2sc` small caps, `onum` old-style figures for prose,
+   `lnum`+`tnum` tabular lining figures for readouts, and a full Greek
+   lowercase, in all four cuts. Every face here was verified to carry those
+   features before it was subset. See DESIGN.md § Typography for the route
+   comparison and why Switzer, Karrik and Public Sans were each rejected.
+
+   Self-hosted, subset to Latin + Latin-Ext-lite + Greek + the punctuation and
+   maths relations the copy actually sets. No CDN, no @import, no build step:
+   the woff2 files are committed, and the OFL text sits beside them.
+
+   Newsreader ships no Greek. Single-letter variables set through --font-math,
+   whose fallback deliberately leads with a Greek-capable serif rather than
+   reusing --font-display. Body-set Greek (β, γ, δ, λ in the parameter labels)
+   now resolves natively in Fira Sans and no longer falls back mid-line.
    ------------------------------------------------------------------------ */
 
 @font-face {
-  font-family: "Barlow";
-  src: url("/assets/fonts/Barlow-Regular.ttf") format("truetype");
+  font-family: "Fira Sans";
+  src: url("/assets/fonts/FiraSans-Regular.woff2") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Barlow";
-  src: url("/assets/fonts/Barlow-Medium.ttf") format("truetype");
+  font-family: "Fira Sans";
+  src: url("/assets/fonts/FiraSans-Italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Sans";
+  src: url("/assets/fonts/FiraSans-Medium.woff2") format("woff2");
   font-style: normal;
   font-weight: 500;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Barlow";
-  src: url("/assets/fonts/Barlow-SemiBold.ttf") format("truetype");
+  font-family: "Fira Sans";
+  src: url("/assets/fonts/FiraSans-Bold.woff2") format("woff2");
   font-style: normal;
-  font-weight: 600;
+  font-weight: 700;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Barlow";
-  src: url("/assets/fonts/Barlow-Bold.ttf") format("truetype");
+  font-family: "Fira Mono";
+  src: url("/assets/fonts/FiraMono-Regular.woff2") format("woff2");
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Mono";
+  src: url("/assets/fonts/FiraMono-Medium.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 500;
   font-display: swap;
 }
 
@@ -96,21 +130,22 @@
 }
 
 /* --- Tokens --------------------------------------------------------------
-   The four chart plates are frozen, and their strokes read straight from
+   The six chart plates are frozen, and their strokes read straight from
    --ink, --orange, --blue, --orange-soft, --panel and --rule-strong. Those
-   six keep their exact legacy values so the plots render byte-identical.
-   --ink (#101b2b) is already a deep cool printer's black, so the monograph
-   is built around it rather than against it.
+   seven keep their exact legacy values so the plots render unchanged.
 
-   What genuinely changes is the ground: a warm ivory page beneath cool-white
-   plate stock, replacing the old paper/panel pair that differed by ~2%
-   lightness and left everything looking washed out.
+   The register is risograph / two-colour offset: warm stock, a handful of
+   saturated spot inks, visible overprint where they overlap, halftone screens
+   instead of smooth fills. Every ink carries one meaning from the model
+   everywhere it appears — see the Semantic Ink Rule in DESIGN.md.
    ------------------------------------------------------------------------ */
 
 :root {
   color-scheme: light;
 
-  /* Frozen — referenced by the chart rules. Do not retune. */
+  /* ── FROZEN ────────────────────────────────────────────────────────────
+     Referenced directly by the chart rules in styles.css. Retuning any of
+     these silently alters all six plots. Add a token instead. */
   --ink: #101b2b;
   --panel: #fbfcfb;
   --rule: #c8d0d4;
@@ -118,19 +153,46 @@
   --orange: #c84e2f;
   --orange-soft: #f0d5ca;
   --blue: #245b96;
+  /* ── END FROZEN ─────────────────────────────────────────────────────── */
 
-  /* Ground and text */
+  /* Ground. --paper resolves to #f5f1e9; --plate is the cool-white stock the
+     figures print on, and nothing may tint, screen or grain it. */
   --paper: oklch(96% 0.012 88);
   --plate: var(--panel);
   --muted: #556070;
-  --orange-text: #9f381f;
-  --ready: #2e7253;
+
+  /* ── The ink system ────────────────────────────────────────────────────
+     Six inks, each with one fixed semantic job. Contrast ratios below are
+     measured against --paper (#f5f1e9); the `-text` variants exist because
+     the mark colour and the text colour of an ink cannot always be the same
+     value and still clear WCAG 1.4.3.
+
+       Ink        #101b2b  15.4:1  text, structural rules, baseline trajectory
+       Orange     #c84e2f   4.1:1  CAPABILITY COST — Firm A, figure numbers
+       Cobalt     #245b96   6.2:1  COORDINATION — Firm B, controls, focus
+       Verdigris  #2e7253   5.1:1  SAFETY BENEFIT — the alignment channel
+       Ochre      #a8791f   3.4:1  UNCERTAINTY — assumption bands, hatching
+       Fluoro     #ff48b0   2.7:1  ART ONLY — masthead plate, devices, colophon
+
+     Fluoro cannot clear 3:1 against either ground. That is not a defect to
+     work around: it is the Loud Ink Rule enforced by the token itself. An ink
+     that cannot legibly carry a value can never accidentally become one. */
+  --orange-text: #9f381f;   /* 6.1:1 — cost, as text */
+  --verdigris: #2e7253;     /* clears 4.5:1 as text unmodified */
+  --verdigris-text: #215940;
+  --ochre: #a8791f;         /* marks and hatching only */
+  --ochre-text: #7a5610;    /* 5.9:1 — uncertainty, as text */
+  --fluoro: #ff48b0;        /* drawn imagery only. Never a mark, never a control. */
+
+  /* Retained alias: --ready was the old name for verdigris and is still read
+     by page stylesheets. One value, one meaning. */
+  --ready: var(--verdigris);
 
   /* Type */
-  --font-body: "Barlow", "Trebuchet MS", sans-serif;
+  --font-body: "Fira Sans", "Trebuchet MS", sans-serif;
   --font-display: "Newsreader", "Iowan Old Style", Charter, Georgia, serif;
   --font-math: "Newsreader", "Times New Roman", Georgia, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-mono: "Fira Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 
   --t-display: clamp(2.6rem, 5.2vw, 4.75rem);
   --t-headline: clamp(1.9rem, 3.2vw, 2.9rem);
@@ -139,8 +201,14 @@
   --t-body: 1rem;
   --t-small: 0.875rem;
   --t-label: 0.7rem;
+  --t-micro: 0.62rem;
 
+  --track-caps: 0.09em;
+  --track-wide: 0.16em;
+
+  /* 62–72 characters. Never wider. */
   --measure: 68ch;
+  --measure-tight: 62ch;
 
   /* Space — multiples of the 24px body baseline */
   --s1: 8px;
@@ -160,6 +228,29 @@
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* ── Print artifacts ───────────────────────────────────────────────────
+     Paper grain: one fractal-noise tile, alpha baked into the SVG so it can
+     be used as a plain background-image with no opacity or blend juggling.
+     Applied once, to <body>, fixed to the viewport. It must never sit on a
+     plate — plates carry an opaque --plate background, which is what keeps
+     the White Plate Rule true structurally rather than by discipline. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.055'/%3E%3C/svg%3E");
+
+  /* Registration mark: a press target, rotationally symmetric so one drawing
+     serves all four corners. Hairline, small enough to read as structure. */
+  --reg-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2386919a' stroke-width='0.75'%3E%3Cpath d='M8 0v5M8 11v5M0 8h5M11 8h5'/%3E%3Ccircle cx='8' cy='8' r='3.25'/%3E%3C/svg%3E");
+
+  /* Halftone screens — see the .screen primitive below. A 45° staggered dot
+     grid on an 8px tile, coarse enough to read as a printed screen at 100%.
+     Masks, not images: one drawing tints to any ink. */
+  --screen-10: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Ccircle cx='2' cy='2' r='1.05'/%3E%3Ccircle cx='6' cy='6' r='1.05'/%3E%3C/svg%3E");
+  --screen-25: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Ccircle cx='2' cy='2' r='1.6'/%3E%3Ccircle cx='6' cy='6' r='1.6'/%3E%3C/svg%3E");
+  --screen-45: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Ccircle cx='2' cy='2' r='2.15'/%3E%3Ccircle cx='6' cy='6' r='2.15'/%3E%3C/svg%3E");
+  --screen-70: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Ccircle cx='2' cy='2' r='2.7'/%3E%3Ccircle cx='6' cy='6' r='2.7'/%3E%3C/svg%3E");
+
+  /* Diagonal hatch — uncertainty. Ochre's job, per the Semantic Ink Rule. */
+  --hatch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='7'%3E%3Cpath d='M-1 1L1 -1M0 7L7 0M6 8L8 6' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E");
+
   font-family: var(--font-body);
   font-synthesis: none;
   background: var(--paper);
@@ -177,13 +268,16 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image: var(--grain);
+  background-attachment: fixed;
   font-size: var(--t-body);
   line-height: 1.5;
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -191,83 +285,200 @@ a {
   color: inherit;
 }
 
-/* Mathematics and single-letter variables are set in the serif italic, the
-   way they would be in print. Greek falls through to --font-math's fallback. */
+/* --- Figure style --------------------------------------------------------
+   Old-style figures in prose, tabular lining figures in readouts. This is
+   the single most visible piece of typographic apparatus on the page and it
+   is why the body face was changed: Fira Sans has both, Barlow had neither.
+   ------------------------------------------------------------------------ */
+
+p,
+li,
+dd,
+blockquote,
+figcaption,
+.prose {
+  font-variant-numeric: oldstyle-nums proportional-nums;
+}
+
+/* Small caps sit at cap height with a large x-height; lining figures beside
+   them stand a head taller and break the line. Old-style figures match. */
+.label,
+.runninghead,
+.folio,
+.section-mark {
+  font-variant-numeric: oldstyle-nums;
+}
+
+/* Anything that is a value rather than a sentence. Values must align in a
+   column and must not vary in width as they change. */
+.numeric,
+.readout,
+output,
+td,
+th,
+.tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Mathematics and single-letter variables set in the serif italic, the way
+   they would be in print. Greek falls through to --font-math's fallback. */
 i,
 var {
   font-family: var(--font-math);
   font-style: italic;
 }
 
-/* --- Shell ---------------------------------------------------------------
-   `.sheet` is the monograph's two-column measure: a narrow margin for
-   hanging notes, and the main text column. It collapses to one column below
-   1020px, where marginalia become inline asides.
-   ------------------------------------------------------------------------ */
-
-main {
-  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
-  margin-inline: auto;
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-wrap: balance;
 }
 
-.sheet {
-  display: grid;
-  grid-template-columns: var(--margin-col) minmax(0, 1fr);
-  column-gap: var(--s6);
-}
+/* --- Shared typographic primitives --------------------------------------- */
 
-.sheet > * {
-  grid-column: 2;
-  min-width: 0;
-}
-
-/* Hung in the margin, aligned to the first line of the block it annotates. */
-.marginalia {
-  grid-column: 1;
-  margin: 0;
-  padding-top: 3px;
-  border-top: 1px solid var(--ink);
-  color: var(--muted);
-  font-size: var(--t-label);
-  line-height: 1.45;
-}
-
-.marginalia strong {
-  display: block;
-  margin-bottom: var(--s1);
-  color: var(--ink);
-  font-weight: 600;
-  font-variant-caps: all-small-caps;
-  letter-spacing: 0.08em;
-}
-
-/* --- Shared typography --------------------------------------------------- */
-
+/* Descriptive labels. Real small caps — Fira carries smcp and c2sc, so this
+   is drawn, not synthesised, and font-synthesis: none stays honest. */
 .label {
   color: var(--muted);
   font-family: var(--font-body);
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--track-caps);
 }
 
-.numeric {
-  font-variant-numeric: tabular-nums;
+.label-ink {
+  color: var(--ink);
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-display);
-  font-weight: 400;
-  text-wrap: balance;
+/* Values and readouts only. Monospace used as shorthand for "technical" is
+   the tell of a design that has not chosen a voice. */
+.readout {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
 }
 
-/* --- Masthead ------------------------------------------------------------
-   Shared chrome. Both pages carry this markup verbatim; edit it here rather
-   than in either page's stylesheet.
+.lede {
+  max-width: var(--measure-tight);
+  color: var(--muted);
+  font-size: var(--t-lead);
+  line-height: 1.6;
+}
+
+.measure {
+  max-width: var(--measure);
+}
+
+/* --- Rules ---------------------------------------------------------------
+   Three weights, three jobs. Hairline --rule divides within a block; 1px ink
+   bounds a structure; 2px ink is reserved for the masthead and the colophon.
+   Reach for a rule, a weight change, or a surface change — never a shadow.
    ------------------------------------------------------------------------ */
+
+.rule-hair {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 0;
+}
+
+.rule-structural {
+  border: 0;
+  border-top: 1px solid var(--ink);
+  margin: 0;
+}
+
+.rule-major {
+  border: 0;
+  border-top: 2px solid var(--ink);
+  margin: 0;
+}
+
+/* --- Print artifacts: screens and overprint ------------------------------
+
+   THE HALFTONE RULE. Tints are dot screens, never opacity fades and never
+   gradients. `.screen` masks a solid ink through a 45° dot grid, so one
+   drawing serves every ink and every density:
+
+       <div class="screen screen-25" style="--screen-ink: var(--blue)">
+
+   It works on an HTML box and on an SVG <g> alike, which is what lets drawn
+   imagery take a printed tint without a second mechanism.
+
+   THE OVERPRINT RULE. Where two inks overlap they multiply, producing a
+   genuine third colour the way real spot inks do. Measured results on this
+   palette: fluoro over cobalt gives #241a68, a deep violet; fluoro over
+   oxidized orange gives #c81620; the soft orange wash over cobalt gives
+   #224c77. Two saturated *solids* multiply to near-black (orange × cobalt is
+   #1c1c1c), so overprint is applied to screens and light tints — which is
+   also how the real process behaves, the inks being semi-transparent. Never
+   fake it with a gradient.
+
+   Neither may touch a figure plate. The frozen traces were chosen against
+   near-white, and the White Plate Rule outranks both.
+   ------------------------------------------------------------------------ */
+
+.screen {
+  --screen-ink: var(--ink);
+  background-color: var(--screen-ink);
+  -webkit-mask-image: var(--screen-25);
+  mask-image: var(--screen-25);
+  -webkit-mask-size: 8px 8px;
+  mask-size: 8px 8px;
+  mask-repeat: repeat;
+}
+
+.screen-10 { -webkit-mask-image: var(--screen-10); mask-image: var(--screen-10); }
+.screen-25 { -webkit-mask-image: var(--screen-25); mask-image: var(--screen-25); }
+.screen-45 { -webkit-mask-image: var(--screen-45); mask-image: var(--screen-45); }
+.screen-70 { -webkit-mask-image: var(--screen-70); mask-image: var(--screen-70); }
+
+/* Uncertainty hatching. Ochre's job — a band drawn in anything else is
+   claiming a precision the model does not have. */
+.hatch {
+  --hatch-ink: var(--ochre);
+  background-color: var(--hatch-ink);
+  -webkit-mask-image: var(--hatch);
+  mask-image: var(--hatch);
+  -webkit-mask-size: 7px 7px;
+  mask-size: 7px 7px;
+}
+
+.overprint {
+  mix-blend-mode: multiply;
+}
+
+/* Blending escapes its stacking context and will pick up whatever happens to
+   be behind it, including a plate. Wrap overprinted art in this. */
+.ink-field {
+  isolation: isolate;
+}
+
+/* --- Shell: running head -------------------------------------------------
+   Every page carries the paper's running head above a hairline rule, in
+   tracked small caps. It is the first thing that says "this is a document,
+   not a landing page".
+   ------------------------------------------------------------------------ */
+
+.runninghead {
+  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
+  margin: 0 auto;
+  padding: var(--s2) 0 5px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-wide);
+  line-height: 1.4;
+}
+
+/* --- Shell: masthead ----------------------------------------------------- */
 
 .topbar {
   width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
@@ -277,7 +488,7 @@ h3 {
   align-items: baseline;
   justify-content: space-between;
   gap: var(--s4);
-  padding-top: var(--s4);
+  padding-top: var(--s3);
   border-bottom: 2px solid var(--ink);
 }
 
@@ -311,7 +522,7 @@ h3 {
   padding-bottom: var(--s2);
 }
 
-/* Small-caps at 0.7rem gives a ~17px tap height on its own. The padding is
+/* Small caps at 0.7rem gives a ~17px tap height on its own. The padding is
    what makes these reachable on a touch screen; the negative inline margin
    keeps the optical alignment of the row unchanged. */
 .topbar nav a {
@@ -322,7 +533,7 @@ h3 {
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--track-caps);
   text-decoration: none;
 }
 
@@ -339,68 +550,256 @@ h3 {
   text-underline-offset: 5px;
 }
 
-/* --- Colophon ------------------------------------------------------------ */
+/* --- Shell: registration marks -------------------------------------------
+   Press targets at the four corners of the sheet, sitting in the trim margin
+   outside the type area. Positioned against <main>, not the viewport, so
+   they can never land on a plate. Removed below 1020px, where the gutter is
+   no longer a margin and there is nowhere honest to put them.
+   ------------------------------------------------------------------------ */
 
-footer {
+main {
+  position: relative;
   width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
   margin-inline: auto;
+}
+
+.sheet-marks {
+  position: absolute;
+  inset: -20px;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--reg-mark), var(--reg-mark), var(--reg-mark), var(--reg-mark);
+  background-position: left top, right top, left bottom, right bottom;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+
+/* --- Shell: the sheet grid -----------------------------------------------
+   One grid, used identically on both pages: a persistent 200px margin column
+   carrying section marks, figure numbers, footnotes and status, beside the
+   text column. Asymmetry is the point. It collapses below 1020px, where
+   marginalia become inline asides rather than disappearing.
+   ------------------------------------------------------------------------ */
+
+.sheet {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--s3) var(--s6);
-  align-items: baseline;
-  margin-top: var(--s7);
-  padding: var(--s4) 0 var(--s6);
-  border-top: 2px solid var(--ink);
-  color: var(--muted);
-  font-size: var(--t-small);
+  grid-template-columns: var(--margin-col) minmax(0, 1fr);
+  column-gap: var(--s6);
 }
 
-footer p {
+.sheet > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
+/* Spans both columns — for a figure or diagram that needs the full sheet. */
+.sheet > .bleed {
+  grid-column: 1 / -1;
+}
+
+/* Section mark. Set in the margin column, never inline in the heading:
+   `§ 1` beside the title is a printed convention, `§ 1 Overview` as a run-in
+   heading is a web one. */
+.section-mark {
+  grid-column: 1;
   margin: 0;
+  padding-top: 4px;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-caps);
+  text-align: right;
 }
 
-footer p:first-child {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
+.section-mark b {
+  display: block;
   color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
-/* The colophon is a single line now: wordmark left, contributors right. The
-   standing tagline came out upstream, so the second-paragraph rule and the
-   two-row span that positioned the links beside it went with it. */
-.footer-links {
-  justify-self: end;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s2) var(--s3);
-}
-
-.footer-links a {
-  display: inline-block;
-  padding: 14px 6px;
-  margin-inline: -6px;
+/* Hung in the margin, aligned to the first line of the block it annotates. */
+.marginalia {
+  grid-column: 1;
+  margin: 0;
+  padding-top: 3px;
+  border-top: 1px solid var(--ink);
   color: var(--muted);
   font-size: var(--t-label);
+  line-height: 1.45;
+  hanging-punctuation: first;
+}
+
+.marginalia strong {
+  display: block;
+  margin-bottom: var(--s1);
+  color: var(--ink);
+  font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
+}
+
+/* --- Footnote apparatus --------------------------------------------------
+   Superscript markers in prose, notes hung in the margin column at ≥1020px,
+   collapsing to inline asides below that. Never dropped.
+   ------------------------------------------------------------------------ */
+
+.fn-ref {
+  font-family: var(--font-body);
+  font-size: 0.62em;
+  font-variant-numeric: lining-nums;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: super;
+  color: var(--orange-text);
   text-decoration: none;
 }
 
-.footer-links a:hover,
-.footer-links a:focus-visible {
-  color: var(--orange-text);
+.fn-ref:hover {
   text-decoration: underline;
-  text-underline-offset: 5px;
+  text-underline-offset: 2px;
+}
+
+.note {
+  grid-column: 1;
+  display: grid;
+  grid-template-columns: 1.4em minmax(0, 1fr);
+  gap: 0 6px;
+  margin: 0;
+  padding-top: 3px;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--t-micro);
+  line-height: 1.5;
+  hanging-punctuation: first;
+}
+
+.note-no {
+  color: var(--orange-text);
+  font-size: var(--t-label);
+  font-variant-numeric: lining-nums;
+  font-weight: 700;
+}
+
+.note p {
+  margin: 0;
+}
+
+.note p + p {
+  margin-top: var(--s1);
+}
+
+/* --- Figure plates -------------------------------------------------------
+   A plate is cool-white stock inset into the ivory page, numbered, with the
+   live readout on a rule above the image and the caption below in the
+   printed convention: figure number, then title, then the plotted quantity.
+   A plate is never a card — the border is a printed boundary, and there is
+   no fill behind it, no shadow under it, and no grid of them.
+   ------------------------------------------------------------------------ */
+
+.plate {
+  margin: 0;
+  padding: var(--s3) var(--s3) var(--s2);
+  background: var(--plate);
+  border: 1px solid var(--rule);
+}
+
+.plate-readout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.plate figcaption {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--s3);
+  align-items: baseline;
+  padding-top: var(--s2);
+  border-top: 1px solid var(--ink);
+}
+
+/* Figure numbers are oxidized orange because oxidized orange means capability
+   cost, and the figures are the cost accounting. */
+.fig-no {
+  margin: 0;
+  color: var(--orange-text);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variant-caps: all-small-caps;
+  font-variant-numeric: lining-nums;
+  letter-spacing: var(--track-caps);
+  white-space: nowrap;
+}
+
+.plate figcaption h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 500;
+}
+
+.fig-sub {
+  grid-column: 2;
+  max-width: var(--measure-tight);
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: var(--t-small);
+  line-height: 1.45;
+}
+
+/* --- Controls ------------------------------------------------------------
+   Square-cornered, 34px minimum target, small-caps label, ink rule at rest,
+   inverting to paper-on-ink. No radius, no fill, no shadow.
+   ------------------------------------------------------------------------ */
+
+.button {
+  min-width: 54px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 140ms var(--ease-out), color 140ms var(--ease-out);
+}
+
+.button:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* --- Pull quote ---------------------------------------------------------- */
+
+.pull {
+  max-width: var(--measure-tight);
+  margin: var(--s5) 0;
+  padding-left: var(--s3);
+  border-left: 2px solid var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.3;
+  hanging-punctuation: first last;
 }
 
 /* --- Channel diagram -----------------------------------------------------
-   Reallocation runs down two parallel channels; only the capability one is
-   implemented. Drawn in CSS rather than shipped as an image so it scales with
-   the type stack, reflows at narrow widths, and stays selectable text. The
-   connectors carry empty alt text so screen readers get the list, not a run
-   of arrow glyphs.
-
-   Shared component — usable on either page.
+   Reallocation runs down two parallel channels. Drawn in CSS rather than
+   shipped as an image so it scales with the type stack, reflows at narrow
+   widths, and stays selectable text. Shared — usable on either page.
    ------------------------------------------------------------------------ */
 
 .channels {
@@ -483,15 +882,15 @@ footer p:first-child {
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--track-caps);
 }
 
-/* A channel resting on a working prior rather than a supplied specification is
-   marked in the accent reserved for caveats, and says so in words — colour
-   alone must not carry this. */
+/* A channel resting on a working prior rather than a supplied specification
+   is marked in ochre — the uncertainty ink — and says so in words, because
+   colour alone must not carry this. */
 .channel-status[data-state="pending"],
 .channel-status[data-state="prior"] {
-  color: var(--orange-text);
+  color: var(--ochre-text);
 }
 
 @media (max-width: 680px) {
@@ -499,6 +898,84 @@ footer p:first-child {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s5);
   }
+}
+
+/* --- Shell: folio --------------------------------------------------------
+   The foot of the sheet: section mark, short title, and the ordinal in the
+   printed convention. Sits above the colophon on both pages.
+   ------------------------------------------------------------------------ */
+
+.folio {
+  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
+  margin: var(--s7) auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  padding-top: 5px;
+  border-top: 1px solid var(--ink);
+  color: var(--muted);
+  font-size: var(--t-micro);
+  font-weight: 500;
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-wide);
+}
+
+.folio b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* --- Shell: colophon ----------------------------------------------------- */
+
+footer {
+  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s3) var(--s6);
+  align-items: baseline;
+  margin-top: var(--s4);
+  padding: var(--s4) 0 var(--s6);
+  border-top: 2px solid var(--ink);
+  color: var(--muted);
+  font-size: var(--t-small);
+}
+
+footer p {
+  margin: 0;
+}
+
+footer p:first-child {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.footer-links {
+  justify-self: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+}
+
+.footer-links a {
+  display: inline-block;
+  padding: 14px 6px;
+  margin-inline: -6px;
+  color: var(--muted);
+  font-size: var(--t-label);
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-caps);
+  text-decoration: none;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+  color: var(--orange-text);
+  text-decoration: underline;
+  text-underline-offset: 5px;
 }
 
 /* --- Focus --------------------------------------------------------------- */
@@ -523,7 +1000,7 @@ footer p:first-child {
   font-size: var(--t-label);
   font-weight: 600;
   font-variant-caps: all-small-caps;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--track-caps);
   text-decoration: none;
 }
 
@@ -532,11 +1009,28 @@ footer p:first-child {
   top: var(--s2);
 }
 
+/* Visually hidden but announced. For the live text equivalents that sit
+   beside decorative drawn imagery. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* --- Entrance ------------------------------------------------------------
-   One orchestrated page-load reveal, not scattered micro-interactions. Only
-   opacity and transform are animated. Each page stages its own sequence from
-   these keyframes; the reduced-motion block at the bottom of this file
-   neutralises all of it.
+   One orchestrated page-load reveal in reading order, not scattered
+   micro-interactions. Only opacity and transform are animated. Each page
+   stages its own sequence from these keyframes; the reduced-motion block at
+   the bottom of this file neutralises all of it.
+
+   THE CONTAINING BLOCK RULE. The apparatus fades but never translates. Any
+   transform value creates a containing block, identity matrices included,
+   which breaks the sticky control margin inside it.
    ------------------------------------------------------------------------ */
 
 @keyframes rise {
@@ -555,8 +1049,12 @@ footer p:first-child {
   to { opacity: 1; }
 }
 
-.topbar {
+.runninghead {
   animation: fade 520ms var(--ease-out) both;
+}
+
+.topbar {
+  animation: fade 520ms var(--ease-out) 60ms both;
 }
 
 /* --- Responsive ---------------------------------------------------------- */
@@ -574,7 +1072,8 @@ footer p:first-child {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .sheet > * {
+  .sheet > *,
+  .sheet > .bleed {
     grid-column: 1;
   }
 
@@ -588,6 +1087,33 @@ footer p:first-child {
     border-top: 0;
     border-left: 2px solid var(--ink);
   }
+
+  .note {
+    max-width: var(--measure);
+    margin-block: var(--s2) var(--s3);
+    padding-left: var(--s3);
+    padding-top: 0;
+    border-top: 0;
+    border-left: 1px solid var(--rule);
+  }
+
+  /* The section mark runs in above its heading rather than beside it. */
+  .section-mark {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s2);
+    padding-top: 0;
+    text-align: left;
+  }
+
+  .section-mark b {
+    font-size: 1.1rem;
+  }
+
+  /* No trim margin left to print them in. */
+  .sheet-marks {
+    display: none;
+  }
 }
 
 @media (max-width: 760px) {
@@ -598,6 +1124,11 @@ footer p:first-child {
   .topbar {
     flex-wrap: wrap;
     gap: var(--s2) var(--s4);
+  }
+
+  .runninghead {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
   }
 
   footer {

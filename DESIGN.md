@@ -1,6 +1,6 @@
 ---
 name: Opportunity FLOPs
-description: Scientific monograph for inspectable AI R&D policy scenarios.
+description: Working Paper No. 01 — an operable offprint for inspectable AI R&D policy scenarios.
 colors:
   paper: "oklch(96% 0.012 88)"
   plate: "#fbfcfb"
@@ -12,7 +12,11 @@ colors:
   accessible-orange-text: "#9f381f"
   orange-wash: "#f0d5ca"
   cobalt-trace: "#245b96"
-  ready-green: "#2e7253"
+  verdigris: "#2e7253"
+  verdigris-text: "#215940"
+  ochre: "#a8791f"
+  ochre-text: "#7a5610"
+  fluoro-pink: "#ff48b0"
 typography:
   display:
     fontFamily: "Newsreader, Iowan Old Style, Charter, Georgia, serif"
@@ -34,20 +38,28 @@ typography:
     fontFamily: "Newsreader, Times New Roman, Georgia, serif"
     fontStyle: "italic"
   body:
-    fontFamily: "Barlow, Trebuchet MS, sans-serif"
+    fontFamily: "Fira Sans, Trebuchet MS, sans-serif"
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.5
+    fontVariantNumeric: "oldstyle-nums proportional-nums"
   label:
-    fontFamily: "Barlow, Trebuchet MS, sans-serif"
+    fontFamily: "Fira Sans, Trebuchet MS, sans-serif"
     fontSize: "0.7rem"
     fontWeight: 600
     fontVariantCaps: "all-small-caps"
+    fontVariantNumeric: "oldstyle-nums"
     letterSpacing: "0.09em"
+  runninghead:
+    fontFamily: "Fira Sans, Trebuchet MS, sans-serif"
+    fontSize: "0.62rem"
+    fontWeight: 500
+    fontVariantCaps: "all-small-caps"
+    letterSpacing: "0.16em"
   readout:
-    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+    fontFamily: "Fira Mono, ui-monospace, SFMono-Regular, Consolas, monospace"
     fontSize: "0.7rem"
-    fontVariantNumeric: "tabular-nums"
+    fontVariantNumeric: "tabular-nums lining-nums"
     letterSpacing: "0.055em"
     textTransform: "uppercase"
 spacing:
@@ -61,7 +73,7 @@ spacing:
   s8: "96px"
   s9: "144px"
 components:
-  reset-button:
+  button:
     backgroundColor: "transparent"
     textColor: "{colors.midnight-ink}"
     typography: "{typography.label}"
@@ -73,59 +85,81 @@ components:
     borderLeft: "2px solid {colors.midnight-ink}"
     padding: "8px 12px 8px 14px"
   control-rack:
-    backgroundColor: "{colors.paper}"
+    backgroundColor: "transparent"
     borderRight: "1px solid {colors.midnight-ink}"
     padding: "32px 24px"
-  results-bay:
+  plate:
     backgroundColor: "{colors.plate}"
-    padding: "28px clamp(24px, 3.4vw, 54px) 36px"
+    border: "1px solid {colors.fine-rule}"
+    padding: "16px 16px 12px"
+  marginalia:
+    borderTop: "1px solid {colors.midnight-ink}"
+    textColor: "{colors.muted-slate}"
+    fontSize: "0.7rem"
 ---
 
 # Design System: Opportunity FLOPs
 
 ## Overview
 
-**Creative North Star: "The Scientific Monograph"**
+**Creative North Star: "Working Paper No. 01" — an operable offprint.**
 
-Opportunity FLOPs is a printed research paper you can operate. Ivory stock,
-printer's ink, numbered figure plates, and caveats hung in the margin. The
-composition should feel *read* as much as used — the calculator is the
-instrument, and `/methodology` is the paper it belongs to.
+Opportunity FLOPs is a research institute's working paper that the reader can
+operate. Running head, folio line, section marks in the margin, numbered
+figure plates, footnotes hung beside the text, old-style figures in prose —
+except the figures are live and the controls are real.
+
+The printing register is **risograph / two-colour offset**: warm stock, a
+small set of saturated spot inks, visible overprint where they overlap,
+halftone dot screens instead of smooth fills. That is a real process, which is
+why it reads as made by a person, and it is the exact inverse of the
+gradient-and-glow register the surrounding field defaults to.
 
 Hierarchy comes from typography and rules. There are no drop shadows and no
 cards: printed figures do not cast a shadow, and a page that leans on
 elevation to separate its parts has not earned the separation typographically.
 
-**Key Characteristics:**
-- Serif display and mathematics against a humanist sans body — contrast on
-  structure, not on two near-identical sans faces.
-- A warm ivory ground with cool-white plate stock inset into it. The two
-  surfaces must stay visibly distinct; the pre-redesign pair differed by about
-  two percent lightness and read as washed out.
+**Key characteristics:**
+- A serif display and mathematics face against a humanist sans that carries a
+  full typographic apparatus — real small caps, old-style figures, tabular
+  lining figures, Greek.
+- A warm ivory ground with cool-white plate stock inset into it, and a single
+  fixed paper-grain layer over the ivory only.
+- One asymmetric grid on both pages: a persistent 200px margin column beside
+  the text column.
 - Six numbered plates, captioned below in the printed convention.
 - Controls that travel with the reader, because the results column is roughly
   three times their height.
 
 ## Colors
 
-Cool instrument neutrals against a warm ground, with two functional trace
-colors and a darker orange reserved for text.
+### The ink system
 
-### Primary
-- **Oxidized Orange:** Policy-comparison strokes, figure numbers, active traces.
-- **Accessible Orange Text:** Warnings, result text, and disclaimers where the
-  brighter chart orange lacks text contrast.
+Six inks. Each carries exactly one meaning from the model, everywhere it
+appears. Contrast ratios are measured against `--paper` (`#f5f1e9`).
 
-### Secondary
-- **Cobalt Trace:** Interactive controls, range fills, focus rings, and the
-  second-firm trajectory.
+| Ink | Value | Contrast | Job |
+|---|---|---|---|
+| Ink | `#101b2b` | 15.4:1 | Text, structural rules, the baseline trajectory |
+| Oxidized Orange | `#c84e2f` | 4.1:1 | **Capability cost.** Firm A's trace, figure numbers |
+| Cobalt | `#245b96` | 6.2:1 | **Coordination.** Firm B's trace, controls, focus, range fills |
+| Verdigris | `#2e7253` | 5.1:1 | **Safety benefit.** The alignment channel |
+| Ochre | `#a8791f` | 3.4:1 | **Uncertainty.** Assumption bands, hatching, sensitivity ranges |
+| Fluoro Pink | `#ff48b0` | 2.7:1 | **Art only.** Masthead plate, section devices, colophon |
 
-### Neutral
-- **Paper:** Warm ivory ground for the page and the control margin.
-- **Plate:** Cool-white stock for the results bay and figure plates.
-- **Midnight Ink:** Body text, structural rules, and the baseline trajectory.
-- **Muted Slate:** Explanatory copy and secondary labels.
-- **Fine Rule / Strong Rule:** Plot grid, dividers, and internal boundaries.
+`--orange-text`, `--verdigris-text` and `--ochre-text` are the darker cuts used
+when an ink has to carry small text; the mark colour and the text colour of an
+ink cannot always be the same value and still clear WCAG 1.4.3.
+
+**Why Fluorescent Pink and not Fluorescent Orange.** Both were rendered on the
+ivory ground beside the frozen inks before choosing. Riso Fluorescent Orange
+`#ff6c2f` sits a short step from oxidized orange `#c84e2f`; side by side they
+read as two attempts at the same colour, and a reader could reasonably take a
+fluoro mark for a capability-cost mark. That collision breaks the Semantic Ink
+Rule. Fluorescent pink cannot be mistaken for any of the four data inks, it is
+the braver call in a room of grey policy decks, and — usefully — at 2.7:1 it is
+*incapable* of legibly carrying a value or bounding a control. The Loud Ink
+Rule is therefore enforced by the token itself rather than by discipline.
 
 ### Named Rules
 
@@ -135,36 +169,110 @@ They keep their exact legacy values so the six plots render unchanged.
 Retuning any of them silently alters the plots. If a surface needs a new
 value, add a token — do not edit these.
 
-**The White Plate Rule.** Figure plates stay near-white. The frozen traces were
-chosen against that ground; tinting it shifts their apparent contrast.
+**The White Plate Rule.** Figure plates stay near-white. No ink, screen,
+grain, overprint or wash may sit on top of a plate. The frozen traces were
+chosen against that ground; tinting it shifts their apparent contrast. This is
+structural, not a convention: the grain is a single fixed layer behind all
+content, and plates carry an opaque `--plate` background, so a plate cannot
+pick it up.
+
+**The Semantic Ink Rule.** Every ink carries one meaning from the model
+everywhere it appears. Cost is always orange. Coordination is always cobalt.
+Safety is always verdigris. Uncertainty is always ochre. A reader who learns
+the mapping on the calculator must find it holding on the methodology page.
+Colour is a legend, not a mood board. An ink used because a section looked
+empty is a defect.
+
+**The Loud Ink Rule.** Fluoro appears only in drawn imagery — the masthead
+plate, section devices, the colophon. It never touches a data mark, a control,
+or body text. High-energy ink in the art, sober ink in the figures.
+
+**The Overprint Rule.** Where two inks overlap they multiply
+(`mix-blend-mode: multiply` via `.overprint`), producing a genuine third
+colour the way real spot inks do. Measured on this palette: fluoro over cobalt
+gives `#241a68`, a deep violet; fluoro over oxidized orange gives `#c81620`;
+the soft orange wash over cobalt gives `#224c77`. Two saturated *solids*
+multiply to near-black — orange over cobalt is `#1c1c1c`, not the plum the
+direction assumed — so overprint is applied to screens and light tints, which
+is also how the real process behaves, the inks being semi-transparent. A third
+colour picked in a colour picker is not earned. Never fake overprint with a
+gradient.
+
+**The Halftone Rule.** Tints are dot screens, never opacity fades and never
+gradients. `.screen` with `.screen-10 / -25 / -45 / -70` masks a solid ink
+through a 45° staggered dot grid on an 8px tile, coarse enough to read as a
+printed screen at 100%. Because it is a mask and not an image, one drawing
+serves every ink, and it applies to an HTML box and an SVG `<g>` alike.
+`.hatch` is the same mechanism for ochre diagonal hatching.
 
 **The Trace/Text Separation Rule.** Oxidized orange draws comparison geometry;
-accessible orange carries text. Do not swap their jobs.
+`--orange-text` carries text. Do not swap their jobs. The same split applies to
+verdigris and ochre.
 
-**The Color Carries State Rule.** Accent color indicates scenario, status, or
-direct manipulation; it is never ambient decoration.
+**The Color Carries State Rule.** Accent colour indicates scenario, status, or
+direct manipulation; it is never ambient decoration. State is never signalled
+by colour alone — every coloured state also carries a rule, a fill, a weight
+change, or words.
 
 ## Typography
 
 **Display / Math:** Newsreader, self-hosted as a variable woff2 in roman and
 italic, weights 200–800.
-**Body / UI:** Barlow, self-hosted in 400, 500, 600, 700.
-**Readout:** UI monospace.
+**Body / UI:** Fira Sans, self-hosted subsets at 400, 400 italic, 500, 700.
+**Readout:** Fira Mono, self-hosted subsets at 400 and 500.
 
-**Character:** Newsreader carries the thesis, section headings, figure titles
-and all mathematics. Barlow carries body copy, controls and small-caps labels.
+All faces are OFL, self-hosted as `woff2` under `public/assets/fonts/` with
+their licence text committed alongside. No CDN, no `@import`, no build step.
+Subsetting to Latin + Latin-Ext-lite + Greek + the punctuation and maths
+relations the copy actually sets was done once by hand; the resulting files are
+committed.
 
-**Newsreader has no Greek.** β, γ, δ and α resolve through `--font-math`, whose
-fallback deliberately leads with a Greek-capable serif. Do not point
-`--font-math` at `--font-display`.
+### Why the body face changed
+
+Barlow was the weak link — a competent humanist sans with no point of view. But
+the reason it had to go is not stylistic, it is mechanical: the apparatus this
+paper needs is machinery, and Barlow does not have it. Three routes were
+evaluated by inspecting the actual font binaries and rendering a specimen at
+production sizes, not by reading descriptions.
+
+- **Route 1 — Institutional (Newsreader + Switzer + Commit/Martian Mono).**
+  Right structure. Switzer carries no `smcp`, so the entire small-caps label
+  system would be browser-synthesised or faked with `text-transform`.
+- **Route 2 — Characterful (Newsreader + Karrik + Departure Mono).** The
+  recommended route, conditional on Karrik holding up in small-caps labels at
+  0.7rem. It does not, and the failure is not marginal. Karrik ships **one
+  weight**, so every `<strong>`, active control and emphasised label loses its
+  weight step; it has **no `smcp`/`c2sc`**, so there are no drawn small caps;
+  **no `onum`**, so old-style figures in prose are impossible; and **no Greek
+  at all**, so β, γ, δ and λ fall back to a different face mid-line in the
+  parameter labels. Four independent failures against § 3.1 of the brief.
+- **Route 3 — Monoline archive (Newsreader + Public Sans + Departure Mono).**
+  Thematically apt — Public Sans is a real government face. It also has no
+  `smcp` and no Greek; rendered beside the others, its running head simply
+  fails to become small caps at all.
+
+**Chosen: Route 1 in structure — serif display, humanist sans body, mono
+readout — with the body and readout faces substituted for Fira Sans and Fira
+Mono, which actually carry the apparatus.** Verified present in every shipped
+cut: `smcp` + `c2sc` (drawn small caps), `onum` (old-style figures for prose),
+`lnum` + `tnum` (tabular lining figures for readouts), and full Greek
+lowercase. Fira Sans and Fira Mono are a designed superfamily, so the label
+column and the readout column are related rather than merely adjacent, and
+Fira was engineered for legibility at small sizes — which is what a 350px
+control margin full of 0.7rem labels actually needs. `font-synthesis: none`
+stays honest: nothing on this page is a synthesised bold, italic or small cap.
 
 ### Hierarchy
+
+- **Running head:** Fira Sans small caps at 0.62rem, tracked 0.16em, above a
+  hairline rule at the top of every page.
 - **Display:** Newsreader for the first-view thesis.
 - **Headline / Title:** Newsreader for section and figure headings.
 - **Math:** Newsreader italic for variables and equations.
-- **Body:** Barlow at a 24px baseline.
-- **Label:** Barlow small-caps with open tracking for descriptive labels.
-- **Readout:** Uppercase tabular monospace for values only.
+- **Body:** Fira Sans at a 24px baseline, old-style proportional figures.
+- **Label:** Fira Sans small caps, tracked 0.09em, old-style figures.
+- **Readout:** Uppercase Fira Mono, tabular lining figures, values only.
+- **Folio:** Fira Sans small caps at 0.62rem at the foot of the sheet.
 
 ### Named Rules
 
@@ -172,23 +280,84 @@ fallback deliberately leads with a Greek-capable serif. Do not point
 narrative, subtitles, or legends — monospace used as shorthand for "technical"
 is the tell of a design that has not chosen a voice.
 
+**The Figure Style Rule.** Old-style figures in prose, tabular lining figures
+in readouts, tables and any column of values. Small caps take old-style
+figures too: lining figures beside small caps stand a head taller and break the
+line. This is set once in `base.css` by selector, not sprinkled per component.
+
+**The Real Character Rule.** `–` en dashes in ranges, `—` em dashes unspaced,
+`×` for multiplication, `≈ ≤ ≥ ±`, proper `“ ” ‘ ’`, `§` for sections. No
+hyphen standing in for a dash, no `x` standing in for `×`. Fira ships no `′ ″`
+primes and no `▸`; the copy does not need primes, and UI marks are drawn rather
+than borrowed from a glyph the face does not have.
+
+**Newsreader has no Greek.** β, γ, δ and α inside `<i>` / `<var>` resolve
+through `--font-math`, whose fallback deliberately leads with a Greek-capable
+serif. Do not point `--font-math` at `--font-display`. Body-set Greek in the
+parameter labels now resolves natively in Fira Sans and no longer falls back
+mid-line.
+
+**Optical margin discipline.** The text measure is 62–72 characters
+(`--measure` 68ch, `--measure-tight` 62ch). Never wider.
+
 ## Layout
 
-A centered container capped at 1460px with 24px gutters. `base.css` provides a
-`.sheet` grid — a 200px margin column beside the text column — which collapses
-below 1020px, where hanging notes become inline asides rather than disappearing.
+One grid, used identically on both pages. A centered container capped at
+1460px with 24px gutters, and a `.sheet` grid inside it: a persistent **200px
+margin column** beside the text column, 48px apart. The margin column carries
+section marks, figure numbers, footnotes and status. It collapses below 1020px,
+where hanging notes become inline asides rather than disappearing. Asymmetry is
+the point; a centered single column is the default everyone else ships.
 
-The calculator is one apparatus: a 350px control margin beside a flexible
-results bay, narrowing to 300px at 1020px and stacking at 760px. Internal
-rhythm uses the 8/12/16/24/32/48/72/96/144 scale.
+The calculator is one apparatus: a 350px control margin beside a flexible plate
+bay, narrowing to 300px at 1020px and stacking at 760px. Internal rhythm uses
+the 8/12/16/24/32/48/72/96/144 scale. Nothing off-scale.
+
+### Page shell
+
+Every page carries, in order: running head over a hairline rule → masthead over
+a 2px ink rule → `<main>` → folio line → colophon over a 2px ink rule.
+Registration marks print at the four corners of `<main>`, in the trim margin
+outside the type area, and are removed below 1020px where there is no margin
+left to print them in.
+
+## Print artifacts
+
+- **Paper grain.** One `feTurbulence` tile, alpha baked into the SVG, applied
+  once to `<body>` and fixed to the viewport. Not repeated per section. It sits
+  behind all content, so opaque plate surfaces exclude it automatically.
+- **Registration marks.** A rotationally symmetric press target, hairline,
+  `aria-hidden`, 16px, positioned against `<main>` so it can never land on a
+  plate. If they read as decoration, they are too big.
+- **Rules do the structural work.** Hairline `--rule` for internal division,
+  1px `--ink` for structural boundary, 2px `--ink` for masthead and colophon.
+
+## Imagery
+
+Every image on the site is **drawn** — inline SVG built from the ink system and
+keyed to the ivory ground. Reference register: Otto Neurath's Isotype,
+mid-century scientific atlases, ordnance survey plates, printer's devices.
+
+- **The masthead plate** (calculator, first viewport): an Isotype-style array
+  of unit marks standing for frontier R&D compute. The share reallocated to
+  alignment flips from oxidized orange to verdigris, mark by mark, as the
+  reader drags the policy slider. The flip is also a fill-pattern change, so it
+  survives greyscale. Decorative parts are `aria-hidden`; the live count has an
+  `aria-live="polite"` text equivalent.
+- **Section devices** (methodology): one bespoke diagram per section carrying
+  the causal chain — compute → software progress → frontier capability → risk.
+  Hairline construction plus one spot ink each.
+- **The colophon device**: a printer's mark, in fluoro, small.
+
+**Never:** stock photography, 3D renders, glowing orbs, abstract "AI"
+node-graph illustrations, or generated imagery of any kind. These are the
+single fastest tell.
 
 ## Elevation & Depth
 
 **There is no elevation.** Depth comes from the ivory/white surface change and
-from rule weight — hairline `--rule` for internal divisions, 1px `--ink` for
-structural boundaries, 2px `--ink` for the masthead and colophon. The only
-remaining `box-shadow` declarations are zero-blur hairlines used to draw crisp
-rules, not to lift anything.
+from rule weight. The only remaining `box-shadow` declarations are zero-blur
+hairlines used to draw crisp rules, not to lift anything.
 
 ### Named Rules
 
@@ -199,13 +368,13 @@ margin, plates, or comparison cells into floating cards.
 
 Rectilinear throughout. Controls are square-cornered; plot lines terminate
 square; structure is expressed with 1px rules. Circular geometry is reserved
-for the sweep marker.
+for the sweep marker and for halftone dots.
 
 ## Components
 
 ### Buttons
 - **Shape:** Square-cornered, 34px minimum height, small-caps label.
-- **Reset / Copy link:** Ink rule at rest, inverting to ink-on-paper on hover.
+- **Reset / Copy link:** Ink rule at rest, inverting to paper-on-ink on hover.
 - **Focus:** 3px solid cobalt outline at 2px offset.
 
 ### Scenario Selectors
@@ -221,9 +390,17 @@ for the sweep marker.
   update from the same input event.
 
 ### Figure Plates
-- **Structure:** Live readout on a rule above the plot; caption below carrying
-  figure number, title, then the plotted quantity.
-- **Numbering:** Fig. 1–4 in oxidized orange small-caps.
+- **Structure:** Cool-white stock inset into the ivory page. Live readout on a
+  rule above the plot; caption below carrying figure number, title, then the
+  plotted quantity.
+- **Numbering:** `Fig. 1`–`Fig. 6` in oxidized-orange small caps — orange
+  because orange means capability cost, and the figures are the cost
+  accounting.
+
+### Footnote apparatus
+- **Marker:** `.fn-ref` superscript in prose, in `--orange-text`.
+- **Note:** `.note` hung in the margin column at ≥1020px, becoming an inline
+  aside below that. Never dropped.
 
 ### Control Margin
 - **Behavior:** The margin keeps full-height ivory; an inner wrapper sticks to
@@ -238,37 +415,57 @@ for the sweep marker.
 ### Trajectory Plots
 - **Style:** Fine gray grid, dashed midnight baseline, oxidized-orange Firm A
   trace, cobalt Firm B trace, soft orange comparison area.
-- **Motion:** Traces redraw over 720ms with a synchronized 760ms sweep on entry
-  and discrete scenario changes. Continuous slider input updates paths
-  immediately without replaying either. Disabled under reduced motion.
+- **Motion:** Traces draw left-to-right over 720ms behind a leading tick, like
+  a pen plotter, on entry and on discrete scenario changes. Continuous slider
+  input updates paths immediately without replaying the draw.
 
 ## Motion
 
-One orchestrated page-load reveal in reading order — title, lead, status rule,
-apparatus — using opacity and transform only, on `--ease-out`.
+One orchestrated page-load reveal in reading order — running head, title,
+abstract, status rule, then the apparatus — using opacity and transform only,
+on `--ease-out`.
+
+**The Signature Moment.** Hovering or keyboard-focusing any plate raises a
+vertical rule at that year across **all six** plates simultaneously, with each
+plate's value for that year on its own readout line in tabular monospace. Arrow
+keys move the year rule. This is what makes the page read as an instrument
+rather than a page with charts on it.
 
 **The Containing Block Rule.** The apparatus fades but never translates. Any
 transform value creates a containing block, identity matrices included, which
 breaks the sticky control margin inside it.
+
+All motion is gated behind `@media (prefers-reduced-motion: reduce)`, and the
+gate zeroes delays as well as durations — a stagger with `animation-fill-mode:
+both` and its delay intact leaves elements invisible for the length of the
+delay.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** keep assumptions, plates, statuses, and caveats in one continuous
   analytical field.
-- **Do** preserve the orange text/chart-stroke distinction and label Monte
-  Carlo output as non-empirical.
+- **Do** give every ink one meaning and hold it on both pages.
+- **Do** set tints as dot screens and overlaps as real multiply overprint.
+- **Do** preserve the mark/text ink distinction and label Monte Carlo output as
+  non-empirical.
 - **Do** reach for a rule, a weight change, or a surface change before reaching
   for a shadow.
 - **Do** respect reduced-motion preferences.
 
 ### Don't:
 - **Don't** retune the frozen chart tokens or tint the figure plates.
-- **Don't** add drop shadows or wrap sections in cards.
+- **Don't** put fluoro on a data mark, a control, or body text.
+- **Don't** add drop shadows, rounded corners, gradients, or wrap sections in
+  cards.
+- **Don't** ship stat-tile rows, KPI chips, or a 2/3/4-up grid of bordered
+  boxes.
 - **Don't** use monospace for narrative text.
 - **Don't** use accent color as decoration or rely on color alone for state.
 - **Don't** hide navigation or functionality at mobile widths.
 - **Don't** introduce playful mascot, flip-flop, or character illustration.
+- **Don't** use stock photography, renders, or generated imagery. Everything is
+  drawn.
 - **Don't** present sensitivity output as an empirical estimate or forecast.
 - **Don't** assert liveness the system does not have. The model is synchronous
   arithmetic; it is never "online".

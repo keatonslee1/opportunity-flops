@@ -149,6 +149,14 @@ const FALLBACK_IMPACT = {
 const EMPTY = "—";
 const STATE_KEY = "panelState";
 
+/**
+ * The panel is long-lived — it stays open for as long as someone is reading —
+ * so a copy of the model fetched on open can go stale in place. Re-check
+ * periodically, and when the panel regains focus after a gap.
+ */
+const REVALIDATE_MS = 30 * 60 * 1000;
+const FOCUS_REVALIDATE_MS = 5 * 60 * 1000;
+
 // ── State ──────────────────────────────────────────────────────────────
 
 const bridge = new ModelBridge();
@@ -160,6 +168,9 @@ const state = {
   assumptions: {},
   scenario: null,
   modelReady: false,
+  /** Source text currently loaded in the sandbox, for change detection. */
+  modelSource: null,
+  lastCheckedAt: 0,
 };
 
 /** Guards against a slow run overwriting a newer one. */
@@ -549,16 +560,12 @@ async function connectModel({ announce = true } = {}) {
     const exports = await bridge.load(source.source);
     applyDefinitions(exports, await restoreState());
     state.modelReady = true;
+    state.modelSource = source.source;
+    state.lastCheckedAt = Date.now();
 
     mountAssumptionControls();
     mountScenarioCards();
-
-    const host = new URL(state.origin).host;
-    if (source.from === "network") {
-      setSourceStatus("live", `Live — ${host}`);
-    } else {
-      setSourceStatus("cached", `Cached ${formatTime(source.fetchedAt)} — ${host}`);
-    }
+    showSourceState(source);
 
     await render();
   } catch (error) {
@@ -566,6 +573,53 @@ async function connectModel({ announce = true } = {}) {
     nodes.loadError.hidden = false;
     nodes.loadError.textContent = `The model at ${state.origin} could not be evaluated — ${error.message}`;
     paint({}, true);
+  }
+}
+
+function showSourceState(source, { updated = false } = {}) {
+  const host = new URL(state.origin).host;
+  if (source.from === "network") {
+    setSourceStatus("live", updated ? `Updated — ${host}` : `Live — ${host}`);
+  } else {
+    setSourceStatus("cached", `Cached ${formatTime(source.fetchedAt)} — ${host}`);
+  }
+}
+
+/**
+ * Re-fetches the model and swaps it in only when the source actually changed,
+ * so a routine check never disturbs the panel or resets someone's inputs.
+ */
+async function revalidate() {
+  if (!state.modelReady) return;
+  state.lastCheckedAt = Date.now();
+
+  let source;
+  try {
+    source = await loadModelSource(state.origin);
+  } catch {
+    // Offline mid-session is not worth interrupting a reader for; the panel
+    // keeps running the model it already has.
+    return;
+  }
+
+  if (source.from !== "network" || source.source === state.modelSource) return;
+
+  try {
+    const exports = await bridge.load(source.source);
+    // Current values are carried across, not the values from the last save.
+    applyDefinitions(exports, {
+      assumptions: state.assumptions,
+      scenario: state.scenario,
+    });
+    state.modelSource = source.source;
+
+    mountAssumptionControls();
+    mountScenarioCards();
+    showSourceState(source, { updated: true });
+
+    await render();
+  } catch (error) {
+    console.error("revalidate failed", error);
   }
 }
 
@@ -611,6 +665,11 @@ async function boot() {
   paint({}, true);
 
   await connectModel();
+
+  setInterval(revalidate, REVALIDATE_MS);
+  window.addEventListener("focus", () => {
+    if (Date.now() - state.lastCheckedAt > FOCUS_REVALIDATE_MS) revalidate();
+  });
 }
 
 boot();

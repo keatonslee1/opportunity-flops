@@ -50,7 +50,7 @@ devices out of them and never defines a parallel set.
 - [ ] **A — Phase 1** · calculator rebuilt: architecture, control margin, plates, signature moment, **masthead plate**, reveal, responsive
 - [ ] **B — Task 2** · methodology page set on A's primitives
 - [ ] **B — Task 2b** · section devices + colophon device
-- [ ] **B — Task 3** · `print.css`
+- [x] **B — Task 3** · `print.css`
 - [ ] **B — Task 4** · adversarial audit → `PUNCHLIST.md`
 - [ ] **A — Phase 2** · punchlist cleared, cross-page consistency, Studio Test, `DESIGN.md` reconciled
 
@@ -105,3 +105,49 @@ names by hand.
 
 B is now blocked on `PHASE 0 DONE` for Tasks 2 and 2b, and will start Task 3 (`print.css`)
 only after the gate too — it has to inherit the same rule vocabulary.
+
+## B — TASK 3 DONE · 2026-07-31 · plus a font finding you want now
+
+`public/print.css` created and linked from `methodology.html` with `media="print"`.
+Verified in-browser at 794px with the sheet forced to `media="all"`, not reasoned about:
+white ground, serif throughout, zero colour, zero overflow, the parameter-contract
+`<details>` prints open even when the reader left it closed, and every table fits the page.
+`npm test` 46/46, `npm run build` clean.
+
+**A2 on the punchlist is the thing to read before you finish Phase 0.** I decompressed every
+shipped `woff2`, walked the table directory and read `cmap` and `GSUB` directly, with
+controls to confirm the reader works. Results:
+
+- **Fira Sans has `smcp`, `c2sc`, `onum`, `lnum`, `tnum` and full Greek.** That closes both
+  font items I raised at Task 1 — the old Barlow had no `onum`, and Fira does. Good route.
+- **Newsreader has no Greek, no `onum`, and no math operators.** `--font-math` leads with
+  Newsreader, so every `β γ δ λ α ≤ →` in the paper falls back to a system serif *today*.
+- **`Ṡ` (U+1E60), `∈` (U+2208) and `∼` (U+223C) are in no shipped face at all.** `Ṡ` is the
+  derivative notation in equations (2.1) and (2.2). A different serif mid-equation in the
+  most prominent mathematics on the page is exactly the kind of tell the Studio Test is
+  looking for.
+- `Newsreader-latin-ext` declares `unicode-range: … U+1E00-1E9F …` but covers 7 of those 160
+  codepoints, so the browser selects it for `Ṡ`, downloads it, and falls through anyway.
+
+Punchlist A2 lists three remedies. I can restate `Ṡ` as `dS/dt` and `∼` in words, which
+removes two of the three orphans — but changing a paper's notation to route around a font
+gap is the wrong reason to change a paper's notation, so I have not done it unilaterally.
+Your call; say which and I will sweep the document to match.
+
+**One collision to flag.** Your new `base.css` rule
+
+```css
+.plate figcaption { display: grid; grid-template-columns: auto minmax(0, 1fr); }
+```
+
+is a two-child contract, and every inline element in a caption auto-places onto its own
+row. Table 3's caption rendered as three rows: "Table 3 | …", "λ | …", "§ 4 | .". I fixed the
+methodology side by wrapping each caption body in a single `<span class="caption-text">`.
+**The six calculator plates will break the same way** if any of their captions carries a
+link or a symbol — see punchlist A4 for the two ways out.
+
+Also on the list and cheap: `print.css` needs the calculator's final class names to finish
+the calculator half (A10), `index.html` needs the `print.css` link (A9), and
+`dl.model-readiness` is still live at `index.html:47` (A8).
+
+Still blocked on `PHASE 0 DONE` for Tasks 2 and 2b.

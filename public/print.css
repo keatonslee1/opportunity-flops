@@ -1,0 +1,535 @@
+/* ==========================================================================
+   Opportunity FLOPs — print
+   Linked with media="print" from methodology.html (and index.html, once A
+   adds the line — PUNCHLIST A8).
+
+   A working paper prints. On paper there is no ivory stock, no spot ink and
+   no instrument: what survives is the argument, the equations, the plates and
+   the apparatus. So this sheet does not try to reproduce the screen design in
+   CMYK. It sets the document as a plain offprint — black on white, serif
+   throughout, one column — and spends its effort on the two things that
+   actually go wrong in print: things breaking across a page boundary, and
+   scroll containers clipping their own contents.
+
+   Deliberately token-light. --ink, --measure and friends are Worker A's and
+   are still in flux; the handful of places that read them are collected in
+   the last block of this file so they are trivial to reconcile. Everything
+   above that block is literal and will not need revisiting.
+   ========================================================================== */
+
+@page {
+  /* No `size` — the reader's paper decides. Generous foot for the folio. */
+  margin: 18mm 16mm 20mm;
+}
+
+/* --- Ground --------------------------------------------------------------
+   One reset, applied wide, so nothing inherits a screen colour into print.
+   `print-color-adjust` is left at its default: we WANT the browser to drop
+   backgrounds rather than lay down ink the page does not need.
+   ------------------------------------------------------------------------ */
+
+/* `:root` rather than `html`: base.css grounds the page with a `:root` rule,
+   which out-specifies a bare `html` selector no matter which sheet loads last.
+   The ivory stock is the screen's paper — on real paper it would be a full
+   flood of ink to simulate the colour of the sheet you are already holding. */
+:root,
+html,
+body {
+  background: #fff !important;
+  color: #000;
+  font-size: 10.5pt;
+  line-height: 1.45;
+}
+
+body {
+  min-width: 0;
+}
+
+/* Black on white means *black*, and it has to be swept rather than patched.
+   The screen page carries cobalt links, an oxidized-orange λ in the notes and
+   a muted grey through every label; on a mono printer those come out as three
+   indistinguishable washes, and on a colour printer they come out as spot ink
+   nobody asked to pay for. Hierarchy on paper is carried by size, italic and
+   small caps instead, which is how it was carried before colour printing.
+
+   Backgrounds go the same way. Chrome's print preview defaults to dropping
+   them, but "defaults to" is not "will", and a tinted panel behind a plate
+   would violate the White Plate Rule on the one substrate that is actually
+   white. Being explicit makes it deterministic. */
+body,
+body *,
+body *::before,
+body *::after {
+  background: none !important;
+  box-shadow: none !important;
+  color: #000 !important;
+  filter: none !important;
+}
+
+main {
+  width: auto;
+  max-width: none;
+  margin: 0;
+}
+
+/* The two-column sheet collapses. A print page is 178mm of usable width; a
+   200px hanging margin inside that leaves the text column too narrow to set
+   an equation in. Notes come inline instead — see the footnote block below. */
+.sheet {
+  display: block;
+}
+
+/* The measure survives the move to paper — it is a rule about reading, not
+   about screens, and 178mm of usable width at 10.5pt runs to ~85 characters,
+   well past the brief's ceiling of 72. Prose keeps a book measure; plates,
+   tables and equations are allowed the full width. The standing slack down
+   the fore-edge is not waste, it is the same asymmetry the screen layout gets
+   from its margin column. */
+.paper p,
+.paper li,
+.paper dd,
+.abstract,
+.plate figcaption,
+.input-list {
+  max-width: 68ch;
+}
+
+.contents ol,
+.glossary {
+  max-width: none;
+}
+
+/* --- What does not print -------------------------------------------------
+   Navigation, the skip link, and the screen-only print artifacts. The
+   registration marks are the one that matters: they are a *simulation* of
+   print on screen, and reproducing them on an actual sheet is a costume.
+   ------------------------------------------------------------------------ */
+
+.skip-link,
+.topbar nav,
+.reg-marks,
+.grain,
+.paper-grain,
+footer .footer-links {
+  display: none;
+}
+
+/* Defensive: the calculator page's controls, whatever A ends up calling them.
+   An input rendered to paper is a dead artifact — see PUNCHLIST A11 for the
+   class names still needed to finish the calculator half of this sheet. */
+input,
+select,
+button,
+[role="tablist"],
+[role="tab"],
+.control-margin,
+.controls {
+  display: none;
+}
+
+/* --- Masthead and running head ------------------------------------------- */
+
+.topbar {
+  width: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 4pt;
+  border-bottom: 1pt solid #000;
+}
+
+.wordmark {
+  font-size: 12pt;
+}
+
+/* The running head is a print artifact that belongs in print. It prints once,
+   at the head of the document — CSS has no portable way to repeat it on every
+   sheet, and a wrong running head is worse than none. */
+.running-head {
+  margin: 0 0 6pt;
+  font-size: 7.5pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.running-head span + span::before {
+  content: " · ";
+}
+
+/* --- Front matter --------------------------------------------------------- */
+
+.frontmatter {
+  padding: 0 0 12pt;
+}
+
+.frontmatter h1 {
+  max-width: none;
+  margin: 12pt 0 0;
+  font-size: 24pt;
+  line-height: 1.05;
+}
+
+.byline,
+.imprint {
+  margin: 4pt 0 0;
+  font-size: 10pt;
+  font-style: italic;
+}
+
+.abstract {
+  margin-top: 10pt;
+}
+
+/* The contents page is screen navigation. On paper the § marks and the folio
+   line already carry the structure, and a list of unclickable page-less
+   entries is just noise. */
+.contents {
+  display: none;
+}
+
+/* --- Sections ------------------------------------------------------------- */
+
+.part {
+  padding: 14pt 0 0;
+  border-top: 0.5pt solid #000;
+  /* Not `break-before: page`: a paper that starts every section on a fresh
+     sheet wastes half the paper on a ten-section document. */
+  break-inside: auto;
+}
+
+.part-rule {
+  margin-top: 18pt;
+  padding-top: 4pt;
+  border-top: 1pt solid #000;
+}
+
+/* The § mark and its status stamp run in above the heading. */
+.section-mark {
+  display: block;
+  margin-bottom: 2pt;
+  padding: 0;
+  font-size: 9pt;
+}
+
+.section-no {
+  font-size: 11pt;
+}
+
+.status {
+  padding: 0 3pt;
+  border: 0.5pt solid #000;
+  color: #000;
+  font-size: 7.5pt;
+}
+
+/* A heading is never the last thing on a sheet. */
+h1,
+h2,
+h3,
+h4 {
+  break-after: avoid;
+  break-inside: avoid;
+  color: #000;
+}
+
+.part h2 {
+  font-size: 15pt;
+}
+
+.part h3 {
+  margin-bottom: 0;
+  font-size: 11.5pt;
+}
+
+p {
+  orphans: 3;
+  widows: 3;
+}
+
+/* --- Equations -----------------------------------------------------------
+   Task 3's hard requirement: an equation never splits across a page. The
+   number goes flush right in the printed convention.
+   ------------------------------------------------------------------------ */
+
+.equation {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12pt;
+  max-width: none;
+  margin: 10pt 0;
+  break-inside: avoid;
+  break-before: avoid;
+}
+
+.eq-body {
+  flex: 0 1 auto;
+  font-size: 11pt;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.eq-no {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: #000;
+  font-size: 9pt;
+}
+
+/* --- Plates, tables ------------------------------------------------------
+   The scroll containers are the real bug in print. `overflow-x: auto` clips
+   at the container's width on paper exactly as it does on screen, except
+   there is nothing to scroll with — the last columns of every table would
+   simply be gone. Every one of them has to go back to visible, and the
+   screen min-widths have to come off with them.
+   ------------------------------------------------------------------------ */
+
+.table-scroll,
+.parameter-contract-table {
+  max-width: none;
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+.plate {
+  margin: 10pt 0 0;
+  break-inside: avoid;
+}
+
+.plate figcaption {
+  margin-top: 3pt;
+  padding-top: 3pt;
+  border-top: 0.5pt solid #000;
+  break-before: avoid;
+  color: #000;
+  font-size: 8.5pt;
+}
+
+.caption-index {
+  color: #000;
+}
+
+table {
+  width: 100%;
+  min-width: 0 !important;
+  max-width: none !important;
+  border-collapse: collapse;
+  font-size: 8.5pt;
+}
+
+/* A table longer than a sheet repeats its head rather than orphaning its
+   body — the parameter contract is 27 rows and will always straddle. */
+thead {
+  display: table-header-group;
+}
+
+tr {
+  break-inside: avoid;
+}
+
+th,
+td {
+  padding: 3pt 6pt;
+  border-top: 0.5pt solid #000;
+  color: #000;
+  vertical-align: top;
+}
+
+thead th {
+  border-top: 0.75pt solid #000;
+  border-bottom: 0.75pt solid #000;
+  color: #000;
+  font-size: 7.5pt;
+  letter-spacing: 0.06em;
+}
+
+/* Ruled, never boxed — the brief's rule, restated in print terms. */
+.summary-table,
+.preset-matrix,
+.notation-table,
+.where-table,
+.protocol-table,
+.parameter-contract table {
+  border-left: 0;
+  border-right: 0;
+}
+
+.where-table,
+.protocol-table {
+  width: auto;
+  margin: 8pt 0 0;
+  break-inside: avoid;
+}
+
+.where-table caption,
+.protocol-table caption {
+  padding-bottom: 2pt;
+  color: #000;
+  font-size: 8pt;
+  font-style: italic;
+  text-align: left;
+}
+
+/* A disclosure widget is a screen affordance. On paper the contract is simply
+   part of the document, so it prints open whatever state the reader left it
+   in. The pseudo-element is the modern hook; the sibling rule is the fallback
+   for engines that have not shipped it. Without both, a reader who never
+   opened the contract prints a paper with § 10 missing. */
+.parameter-contract {
+  border: 0;
+}
+
+.parameter-contract summary {
+  display: none;
+}
+
+details::details-content {
+  content-visibility: visible !important;
+  block-size: auto !important;
+}
+
+details:not([open]) > *:not(summary) {
+  display: block !important;
+}
+
+/* --- Footnote apparatus --------------------------------------------------
+   The margin column is gone (see .sheet above), so the notes set inline,
+   indented, at the foot of the block that cites them. They keep their number
+   and their rule, so the reciprocal reference still works on paper the way it
+   works in a printed journal.
+   ------------------------------------------------------------------------ */
+
+.marginalia,
+.footnote {
+  max-width: none;
+  margin: 6pt 0 6pt 18pt;
+  padding: 3pt 0 0 0;
+  border: 0;
+  border-top: 0.5pt solid #000;
+  break-inside: avoid;
+  color: #000;
+  font-size: 8.5pt;
+  line-height: 1.35;
+}
+
+.fn-no {
+  font-size: 8pt;
+  font-weight: 700;
+}
+
+.fn-back {
+  text-decoration: none;
+}
+
+.fn-ref a {
+  text-decoration: none;
+}
+
+/* --- The folio -----------------------------------------------------------
+   The one piece of screen chrome that earns its place on paper. It sets at
+   the foot of each section, ruled off, in the printed convention.
+   ------------------------------------------------------------------------ */
+
+.folio {
+  display: flex;
+  gap: 12pt;
+  margin: 12pt 0 0;
+  padding-top: 3pt;
+  border-top: 0.5pt solid #000;
+  break-before: avoid;
+  font-size: 7.5pt;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.folio-no {
+  margin-left: auto;
+}
+
+/* --- Links ---------------------------------------------------------------
+   External URLs expand so a printed copy remains checkable. Fragment links
+   and same-site routes do not: "( /methodology )" beside a cross-reference in
+   a document that already carries § numbers is noise, and expanding the nine
+   footnote back-references would put a URL beside every note number.
+   ------------------------------------------------------------------------ */
+
+a {
+  color: #000;
+  text-decoration: none;
+}
+
+a[href^="http"]::after,
+a[href^="www."]::after {
+  content: " ⟨" attr(href) "⟩";
+  font-size: 8pt;
+  word-break: break-all;
+}
+
+/* --- Colophon ------------------------------------------------------------- */
+
+footer {
+  width: auto;
+  display: block;
+  margin-top: 18pt;
+  padding: 6pt 0 0;
+  border-top: 1pt solid #000;
+  break-inside: avoid;
+  color: #000;
+  font-size: 8.5pt;
+}
+
+/* --- Serif throughout ----------------------------------------------------
+   Task 3 asks for serif everywhere, which on paper is right: the sans/serif
+   split on screen separates instrument from argument, and in print there is
+   no instrument left to separate.
+
+   This is the block that reads Worker A's tokens, kept last and kept small so
+   reconciling it after Phase 0 is a two-line job. The fallbacks are real
+   faces, not a bare `serif`, because a printer that has not loaded the
+   webfont should still set the document in something with old-style figures.
+
+   Swept rather than enumerated, for the same reason the colour reset is: the
+   screen sheets set the sans on long compound selectors like
+   `.summary-table thead th`, which out-specify any tidy list of element
+   selectors written here. A sweep also survives Worker A renaming the
+   calculator's classes in Phase 1, which a list would not.
+   ------------------------------------------------------------------------ */
+
+body,
+body * {
+  font-family: var(--font-display, "Iowan Old Style", Charter, Georgia, serif) !important;
+}
+
+/* Prose takes old-style figures, readouts take lining tabular — the same rule
+   as on screen, and the reason the numeric columns still line up on paper. */
+.paper p,
+.paper li,
+.abstract,
+.plate figcaption,
+.marginalia,
+.footnote {
+  font-variant-numeric: oldstyle-nums proportional-nums;
+}
+
+.preset-matrix,
+.notation-table,
+.protocol-table,
+.parameter-contract table,
+.eq-no,
+.folio-no,
+.numeric {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* Mathematics keeps its own stack: it is the one place where the glyph
+   coverage matters more than the family. See PUNCHLIST A11 — several
+   operators and the whole Greek range resolve through the fallback here. */
+.eq-body,
+.eq-body *,
+i,
+var,
+.sym,
+.sym *,
+.glossary dt,
+.where-table .sym {
+  font-family: var(--font-math, "Iowan Old Style", Charter, Georgia, serif) !important;
+}

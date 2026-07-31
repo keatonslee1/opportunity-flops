@@ -11,10 +11,6 @@
    either. The plots must render identically before and after the redesign.
    ========================================================================== */
 
-:root {
-  --shadow: 0 16px 42px rgba(25, 39, 50, 0.09);
-}
-
 main {
   width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
   margin-inline: auto;
@@ -46,16 +42,20 @@ main {
 
 /* --- Abstract ------------------------------------------------------------ */
 
+/*
+ * The abstract runs the full measure rather than sitting beside a floating
+ * status list. The old two-column split left roughly a third of the first
+ * viewport empty to the right of the headline, and pinned the status list to
+ * the bottom of that void. Setting the status as a run-in metadata strip
+ * beneath the text — the way a paper carries its masthead line — removes the
+ * hole and gives the three values a rule to sit on.
+ */
 .intro {
-  display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(360px, 0.85fr);
-  gap: clamp(44px, 8vw, 120px);
-  align-items: end;
-  padding: clamp(56px, 8vw, 112px) 0 44px;
+  padding: clamp(56px, 7vw, 104px) 0 clamp(40px, 5vw, 64px);
 }
 
 .intro h1 {
-  max-width: 970px;
+  max-width: 15em;
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--t-display);
@@ -66,51 +66,62 @@ main {
 }
 
 .intro > div > p {
-  max-width: 66ch;
-  margin: 28px 0 0;
+  max-width: 62ch;
+  margin: var(--s4) 0 0;
   color: var(--muted);
   font-size: var(--t-lead);
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .model-readiness {
-  margin: 0;
-  border-top: 1px solid var(--ink);
-}
-
-.model-readiness div {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 20px;
-  align-items: baseline;
-  padding: 14px 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: var(--s6) 0 0;
+  border-top: 1px solid var(--ink);
   border-bottom: 1px solid var(--rule);
 }
 
+.model-readiness div {
+  min-width: 0;
+  padding: var(--s2) var(--s4) var(--s3) 0;
+}
+
+.model-readiness div + div {
+  padding-left: var(--s4);
+  border-left: 1px solid var(--rule);
+}
+
 .model-readiness dt {
+  margin-bottom: 7px;
   color: var(--muted);
 }
 
 .model-readiness dd {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
 /* --- The apparatus ------------------------------------------------------- */
 
+/*
+ * The apparatus is one object, not a grid of floating cards: an ivory margin
+ * of controls cut from the page itself, and the plates inset on white stock
+ * beside it. Depth comes from the ink rule between them. There is no drop
+ * shadow anywhere on this page — printed figures do not cast one, and the old
+ * diffuse shadow was the last thing making this read as a web dashboard.
+ */
 .calculator {
   display: grid;
   grid-template-columns: 350px minmax(0, 1fr);
   background: var(--plate);
-  border: 1px solid var(--rule-strong);
-  box-shadow: var(--shadow);
+  border: 1px solid var(--ink);
 }
 
 .control-rack {
-  padding: 28px 26px;
-  background: #e9edef;
-  border-right: 1px solid var(--rule-strong);
+  padding: var(--s5) var(--s4);
+  background: var(--paper);
+  border-right: 1px solid var(--ink);
 }
 
 .rack-heading,
@@ -133,18 +144,22 @@ main {
 
 .reset-button {
   min-width: 54px;
-  min-height: 36px;
-  padding: 0 11px;
-  border: 1px solid var(--rule-strong);
-  border-radius: 3px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--ink);
   color: var(--ink);
   background: transparent;
-  font-size: 0.75rem;
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
   cursor: pointer;
+  transition: background 140ms var(--ease-out), color 140ms var(--ease-out);
 }
 
 .reset-button:hover {
-  background: var(--panel);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 /*
@@ -201,24 +216,28 @@ main {
 }
 
 .scenario-control label span {
-  min-height: 53px;
+  min-height: 52px;
   display: grid;
-  grid-template-columns: 88px 1fr;
+  grid-template-columns: 92px 1fr;
   align-items: center;
-  padding: 8px 12px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  transition: background 160ms ease, border-color 160ms ease;
+  padding: 8px 12px 8px 14px;
+  border-left: 2px solid transparent;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out);
 }
 
 .scenario-control label:hover span {
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--plate);
 }
 
+/* Selection is carried by an ink rule and a filled ground rather than a
+   floating shadow, so the state survives greyscale and print. */
 .scenario-control input:checked + span {
-  background: var(--panel);
-  border-color: var(--rule-strong);
-  box-shadow: 0 5px 16px rgba(25, 39, 50, 0.07);
+  background: var(--plate);
+  border-left-color: var(--ink);
+}
+
+.scenario-control input:checked + span strong {
+  font-weight: 700;
 }
 
 .scenario-control strong {
@@ -293,27 +312,30 @@ main {
 }
 
 .choice-option span {
-  min-height: 62px;
+  min-height: 60px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 3px;
   padding: 8px 5px;
   border: 1px solid var(--rule);
-  border-radius: 3px;
-  background: rgba(255, 255, 255, 0.38);
+  background: var(--plate);
   text-align: center;
-  transition: background 160ms ease, border-color 160ms ease;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out);
 }
 
 .choice-option:hover span {
-  background: rgba(255, 255, 255, 0.72);
+  border-color: var(--rule-strong);
 }
 
 .choice-option input:checked + span {
-  border-color: var(--blue);
-  background: var(--panel);
-  box-shadow: 0 4px 12px rgba(25, 39, 50, 0.06);
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.choice-option input:checked + span small {
+  color: var(--rule);
 }
 
 .choice-option strong {
@@ -699,15 +721,6 @@ main {
 @media (max-width: 1020px) {
   main {
     width: min(100% - 32px, 900px);
-  }
-
-  .intro {
-    grid-template-columns: 1fr;
-    gap: 42px;
-  }
-
-  .model-readiness {
-    max-width: 620px;
   }
 
   .calculator {

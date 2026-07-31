@@ -4,98 +4,503 @@
    page and nothing else: the masthead and colophon come from base.css and
    must stay identical to the calculator page.
 
-   These rules were transplanted verbatim from styles.css when the page was
-   split out, so the page renders as it did before. They are the starting
-   point for the monograph treatment, not the finished state.
+   This route is the paper the calculator is the instrument for, so it is set
+   as one: a title page, numbered parts, display equations numbered in the
+   right margin, caveats hung in the left margin, and numbered plates. There
+   are no cards and no fills. Every division on the page is a rule or a change
+   of type.
+
+   Structure comes from base.css's `.sheet`: a fixed margin column for hanging
+   notes and part numbers, then the text column. Each <section class="part">
+   is its own sheet so the margin column stays in register down the whole
+   document. A `.marginalia` or `.section-mark` is placed immediately BEFORE
+   the block it annotates, which is what puts it on that block's first line.
    ========================================================================== */
 
-.methodology {
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  gap: clamp(60px, 10vw, 160px);
-  padding: clamp(80px, 10vw, 150px) 0;
+/* --- Page ---------------------------------------------------------------
+   styles.css sizes <main> on the calculator page; that file is not loaded
+   here, so this route has to size its own.
+   ------------------------------------------------------------------------ */
+
+main {
+  width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
+  margin-inline: auto;
 }
 
-.methodology h2 {
+/* Newsreader ships no Greek, and this page is now full of β, γ, δ and λ. The
+   shared stack in base.css resolves them through Times New Roman, whose small
+   x-height and light stroke make a lone β in a Newsreader equation read as a
+   footnote marker rather than a variable. Georgia is the closer match on both
+   counts, so it leads the fallback here — Newsreader still sets every Latin
+   glyph, so nothing else on the page changes. Scoped to this route rather
+   than edited into base.css, which the calculator page also loads. */
+main {
+  --font-math: "Newsreader", Georgia, "Times New Roman", serif;
+}
+
+/* The measure is the point of the whole layout. Prose never runs wider than
+   --measure even though the sheet's text column is far wider — the extra
+   width belongs to plates and equations, not to running text. */
+.paper p,
+.paper li,
+.paper dd {
+  max-width: var(--measure);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+/* --- Title page ---------------------------------------------------------- */
+
+.frontmatter {
+  padding: clamp(var(--s6), 9vw, var(--s9)) 0 var(--s7);
+}
+
+.running-head {
+  margin: 0 0 var(--s5);
+}
+
+.frontmatter h1 {
+  max-width: 14ch;
   margin: 0;
-  max-width: 440px;
-  font-size: clamp(2rem, 3.5vw, 3.4rem);
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  font-size: var(--t-display);
+  font-weight: 300;
+  line-height: 0.98;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
 }
 
-.methodology > div p {
-  max-width: 610px;
-  margin: 24px 0 0;
+.byline {
+  margin: var(--s4) 0 0;
   color: var(--muted);
-  line-height: 1.65;
+  font-family: var(--font-display);
+  font-size: var(--t-lead);
+  font-style: italic;
+  line-height: 1.45;
 }
 
-.methodology ol {
+/* The research question is the abstract. The title rule sits on this heading
+   rather than under the byline so it spans the whole text column: it divides
+   the page, and prose measure has no business setting the width of a
+   structural rule. */
+.question-heading {
+  margin: var(--s7) 0 var(--s3);
+  padding-top: var(--s3);
+  border-top: 2px solid var(--ink);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+}
+
+.lede {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.1vw, 1.7rem);
+  line-height: 1.34;
+  text-wrap: pretty;
+}
+
+/* --- Contents ------------------------------------------------------------ */
+
+.contents {
+  margin-top: var(--s7);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--ink);
+}
+
+.contents h2 {
+  margin: 0 0 var(--s3);
+}
+
+.contents ol {
   margin: 0;
   padding: 0;
+  max-width: var(--measure);
   list-style: none;
-  border-top: 1px solid var(--rule-strong);
+  counter-reset: none;
 }
 
-.model-specification {
-  min-width: 0;
-}
-
-.methodology li {
-  display: grid;
-  grid-template-columns: minmax(110px, 0.3fr) 1fr;
-  gap: 24px;
-  padding: 24px 0;
+.contents li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
   border-bottom: 1px solid var(--rule);
 }
 
-.methodology li strong {
-  font-size: 0.92rem;
+/* The leader is the classic table-of-contents dotted rule, drawn as a
+   flexible spacer so it fills whatever gap the title leaves. */
+.contents li a {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7em;
+  padding: var(--s2) 0;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  text-decoration: none;
 }
 
-.methodology li span {
+.contents li a::after {
+  content: "";
+  flex: 1 1 auto;
+  align-self: end;
+  height: 1px;
+  margin-bottom: 0.3em;
+  border-bottom: 1px dotted var(--rule-strong);
+}
+
+.contents li a:hover,
+.contents li a:focus-visible {
+  color: var(--orange-text);
+}
+
+.contents .section-no,
+.contents .numeric {
+  flex: 0 0 3.6ch;
   color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-small);
+  letter-spacing: 0.06em;
+}
+
+/* --- Status marks --------------------------------------------------------
+   Implementation status is never implied by placement or omission — every
+   part carries it in words. An outlined small-caps stamp reads as an
+   editorial mark rather than a UI chip, which keeps the fill count at zero.
+   ------------------------------------------------------------------------ */
+
+.status {
+  flex: 0 0 auto;
+  display: inline-block;
+  padding: 2px 7px 1px;
+  border: 1px solid currentColor;
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.status.is-live {
+  color: var(--ready);
+}
+
+.status.is-pending {
+  color: var(--orange-text);
+}
+
+/* --- Parts --------------------------------------------------------------- */
+
+.part {
+  padding: var(--s7) 0 var(--s6);
+  border-top: 1px solid var(--rule);
+}
+
+/* The part number and its status stamp hang in the margin column, level with
+   the heading they belong to. */
+.section-mark {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2);
+  padding-top: 0.55em;
+}
+
+.section-no {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.part h2 {
+  margin: 0;
+  font-size: var(--t-headline);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+}
+
+.part p {
+  margin: var(--s4) 0 0;
+  line-height: 1.62;
+  text-wrap: pretty;
+}
+
+.part h2 + p {
+  margin-top: var(--s4);
+}
+
+/* Parts IV and V exist on paper only. The whole part is set a shade back from
+   the implemented ones, and opens with a notice in the orange used for
+   caveats everywhere else in the system. */
+.is-unbuilt h2 {
+  color: var(--muted);
+}
+
+.unbuilt-notice {
+  max-width: var(--measure);
+  margin: var(--s4) 0 0;
+  padding-left: var(--s3);
+  border-left: 2px solid var(--orange-text);
+  color: var(--orange-text);
+  font-size: var(--t-small);
+  line-height: 1.55;
+}
+
+/* --- Equations -----------------------------------------------------------
+   Display equations are centred in the text column with the number set flush
+   right, balanced by an equal gutter on the left so the body stays on the
+   column's true centre. Both gutters collapse on narrow screens, where the
+   equation left-aligns and the number follows it.
+   ------------------------------------------------------------------------ */
+
+.equation {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4rem;
+  align-items: baseline;
+  gap: var(--s2);
+  /* The body column is exactly the measure, so a centred equation shares its
+     centre with every paragraph around it; the number hangs in the 4rem
+     gutter to its right. Uncapped, equations centre on the full plate column
+     and drift right of the text they belong to. */
+  max-width: calc(var(--measure) + 4rem);
+  margin: var(--s5) 0;
+}
+
+.eq-body {
+  grid-column: 1;
+  font-family: var(--font-math);
+  font-size: clamp(1.02rem, 1.5vw, 1.24rem);
+  line-height: 1.85;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.eq-body i,
+.eq-body var {
+  font-size: 1.06em;
+}
+
+.eq-no {
+  grid-column: 2;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-small);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* --- Where-clauses -------------------------------------------------------
+   The `where …` glossaries under each equation set. A hanging indent, not a
+   table: the symbol sits in its own column and the gloss runs on.
+   ------------------------------------------------------------------------ */
+
+.glossary {
+  max-width: var(--measure);
+  margin: var(--s4) 0 0;
+  padding-top: var(--s3);
+  border-top: 1px solid var(--rule);
+}
+
+.glossary div {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: var(--s2) var(--s3);
+  padding: var(--s2) 0;
+}
+
+.glossary div + div {
+  border-top: 1px solid var(--rule);
+}
+
+.glossary dt {
+  font-family: var(--font-math);
+  font-size: 1.02rem;
+  font-style: italic;
+}
+
+.glossary dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--t-small);
+  line-height: 1.55;
+}
+
+/* --- The two user inputs -------------------------------------------------- */
+
+.input-list {
+  max-width: var(--measure);
+  margin: var(--s4) 0 0;
+  padding: 0 0 0 var(--s5);
+  border-top: 1px solid var(--rule);
+}
+
+.input-list li {
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.input-list li::marker {
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.input-list strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 500;
+}
+
+.input-list span {
+  display: block;
+  margin-top: var(--s1);
+  color: var(--muted);
+  font-size: var(--t-small);
+  line-height: 1.55;
+}
+
+/* --- Divider between the specification and the implementation record ------ */
+
+.part-rule {
+  margin-top: var(--s7);
+  padding-top: var(--s2);
+  border-top: 2px solid var(--ink);
+}
+
+.part-rule p {
+  margin: 0;
+}
+
+/* --- Plates --------------------------------------------------------------
+   Every table is a numbered plate with its caption below it, monograph style.
+   The scroll container is the fix for the real defect here: both bundle
+   tables used to clip their last column at 390px because only the parameter
+   contract had one.
+   ------------------------------------------------------------------------ */
+
+.plate {
+  margin: var(--s5) 0 0;
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.plate figcaption {
+  max-width: var(--measure);
+  margin-top: var(--s2);
+  padding-top: var(--s2);
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: var(--t-small);
   line-height: 1.5;
 }
 
-.methodology li i {
+.caption-index {
+  margin-right: 0.55em;
   color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
 }
 
+/* --- Tables --------------------------------------------------------------- */
+
+.summary-table,
 .preset-matrix {
-  margin-top: 42px;
-}
-
-.preset-matrix h3 {
-  margin: 0 0 14px;
-  font-size: 1rem;
-}
-
-.preset-matrix table {
   width: 100%;
   border-collapse: collapse;
   color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Plates are capped near the measure. A two-row table stretched across the
+   full plate column reads as a layout accident, not as a table. */
+.summary-table {
+  min-width: 520px;
+  max-width: calc(var(--measure) + 4rem);
+  font-size: var(--t-small);
+  text-align: left;
+}
+
+.summary-table th,
+.summary-table td {
+  padding: var(--s2) var(--s3);
+  border-top: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.summary-table thead th {
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+}
+
+.summary-table tbody th {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.summary-table tbody tr:last-child th,
+.summary-table tbody tr:last-child td {
+  border-bottom: 1px solid var(--rule);
+}
+
+.summary-table th:first-child,
+.summary-table td:first-child {
+  padding-left: 0;
+}
+
+.summary-table th:last-child,
+.summary-table td:last-child {
+  padding-right: 0;
+}
+
+/* Numbers are set in the mono face so columns align optically as well as
+   metrically; the row stubs stay in Barlow so they read as words. */
+.preset-matrix {
+  min-width: 420px;
+  max-width: 620px;
   font-family: var(--font-mono);
   font-size: var(--t-label);
-  font-variant-numeric: tabular-nums;
   letter-spacing: 0.055em;
   text-align: right;
   text-transform: uppercase;
 }
 
-.preset-matrix caption {
-  padding: 0 0 10px;
-  color: var(--muted);
-  text-align: left;
-  text-transform: none;
-  letter-spacing: normal;
-}
-
 .preset-matrix th,
 .preset-matrix td {
-  padding: 11px 12px;
+  padding: 11px var(--s2);
   border-top: 1px solid var(--rule);
+  white-space: nowrap;
 }
 
 .preset-matrix th:first-child {
@@ -109,26 +514,40 @@
 }
 
 .preset-matrix thead th {
+  border-top: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
   color: var(--muted);
   font-weight: 500;
+}
+
+.preset-matrix thead th i,
+.preset-matrix thead th {
+  font-size: var(--t-label);
 }
 
 .preset-matrix tbody th {
   font-family: var(--font-body);
   font-size: 0.8rem;
+  font-weight: 600;
   letter-spacing: normal;
   text-transform: none;
 }
 
-.preset-matrix .distribution-inputs {
-  margin-top: 32px;
+.preset-matrix tbody tr:last-child th,
+.preset-matrix tbody tr:last-child td {
+  border-bottom: 1px solid var(--rule);
 }
+
+/* --- Calibration protocol ------------------------------------------------
+   Was a rigid four-column grid that cramped well before 760px. It now packs
+   as many columns as fit and rules every cell from above, so wrapping never
+   leaves an orphaned vertical rule.
+   ------------------------------------------------------------------------ */
 
 .calibration-protocol {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 24px 0 0;
-  border-top: 1px solid var(--rule-strong);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin: var(--s5) 0 0;
   border-bottom: 1px solid var(--rule);
   font-family: var(--font-mono);
   font-size: var(--t-label);
@@ -138,15 +557,12 @@
 
 .calibration-protocol div {
   min-width: 0;
-  padding: 12px;
+  padding: var(--s2) var(--s2) var(--s3);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .calibration-protocol div:first-child {
   padding-left: 0;
-}
-
-.calibration-protocol div + div {
-  border-left: 1px solid var(--rule);
 }
 
 .calibration-protocol dt {
@@ -165,18 +581,10 @@
   text-transform: none;
 }
 
-.preset-matrix p {
-  margin: 16px 0 0;
-  color: var(--muted);
-  font-family: var(--font-body);
-  font-size: 0.84rem;
-  letter-spacing: normal;
-  line-height: 1.55;
-  text-transform: none;
-}
+/* --- Parameter contract --------------------------------------------------- */
 
 .parameter-contract {
-  margin-top: 32px;
+  margin-top: var(--s5);
   border-top: 1px solid var(--rule-strong);
   border-bottom: 1px solid var(--rule-strong);
 }
@@ -186,10 +594,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: var(--s4);
   color: var(--ink);
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
   cursor: pointer;
   list-style: none;
 }
@@ -210,10 +618,19 @@
   content: "−";
 }
 
+.parameter-contract summary:hover {
+  color: var(--orange-text);
+}
+
+.parameter-contract .plate {
+  margin-top: 0;
+}
+
 .parameter-contract-table {
   max-width: 100%;
-  padding-bottom: 16px;
+  padding-bottom: var(--s3);
   overflow-x: auto;
+  overscroll-behavior-x: contain;
 }
 
 .parameter-contract table {
@@ -227,7 +644,7 @@
 
 .parameter-contract th,
 .parameter-contract td {
-  padding: 9px 12px;
+  padding: 9px var(--s2);
   border-top: 1px solid var(--rule);
   text-align: left;
   vertical-align: top;
@@ -264,23 +681,72 @@
   color: var(--muted);
 }
 
+/* Symbols belonging to the unimplemented parts are marked in the caveat
+   colour, so the status is legible from the shape of the column and from the
+   words in it — not from colour alone. */
+.parameter-contract tbody .is-pending-row td:nth-child(4) {
+  color: var(--orange-text);
+}
+
+.closing {
+  margin-top: var(--s6);
+  font-family: var(--font-display);
+  font-size: var(--t-lead);
+  font-style: italic;
+}
+
+.closing a {
+  text-underline-offset: 4px;
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 1020px) {
+  /* Off the margin column, the part number and its status stamp become a
+     single line above the heading rather than a stacked block. */
+  .section-mark {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--s3);
+    padding-top: 0;
+    margin-bottom: var(--s3);
+  }
+
+  .section-no {
+    font-size: 1.2rem;
+  }
+
+  .frontmatter h1 {
+    max-width: 18ch;
+  }
+}
+
 @media (max-width: 760px) {
-  .methodology {
-    grid-template-columns: 1fr;
-    gap: 48px;
+  .equation {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--s3);
+    margin: var(--s4) 0;
   }
 
-  .calibration-protocol {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .eq-body {
+    text-align: left;
   }
 
-  .calibration-protocol div:nth-child(3) {
-    padding-left: 0;
-    border-top: 1px solid var(--rule);
-    border-left: 0;
+  .glossary div {
+    grid-template-columns: 4rem minmax(0, 1fr);
   }
 
-  .calibration-protocol div:nth-child(4) {
-    border-top: 1px solid var(--rule);
+  .contents li {
+    flex-wrap: wrap;
+    padding-bottom: var(--s2);
+  }
+
+  .contents li a {
+    flex: 1 1 100%;
+    padding-bottom: var(--s1);
+  }
+
+  .part {
+    padding-top: var(--s6);
   }
 }

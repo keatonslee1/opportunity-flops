@@ -1076,6 +1076,42 @@
   margin-top: var(--s6);
 }
 
+/* § 7 sets its argument beside its diagram rather than above it. The prose
+   and the picture are the same statement made twice; stacked, the reader
+   finishes the paragraph and then has to be told again. Side by side they
+   read as one thing, and the section stops running to two screens.
+
+   Done by giving the sheet a third column for this section only, rather than
+   nesting a grid inside column two — the diagram then keeps its own column
+   edge, so its rules still register with the sheet above it.
+
+   The breakpoint is the same 1020px at which base.css collapses the margin
+   column: below that there is not enough width for two columns of anything,
+   and they stack in source order — prose first, which is the right order to
+   read them in anyway. */
+@media (min-width: 1020px) {
+  .channels-section {
+    grid-template-columns: var(--margin-col) minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: start;
+    column-gap: var(--s6);
+  }
+
+  .channels-section > .channels-head {
+    grid-column: 2;
+  }
+
+  .channels-section > .channels {
+    grid-column: 3;
+    margin-top: 0;
+  }
+
+  /* Uncapped in the narrower column: --measure would leave the prose column
+     half empty beside a diagram that fills its own. */
+  .channels-section .channels-head > p {
+    max-width: none;
+  }
+}
+
 /* --- Entrance ------------------------------------------------------------
    The first viewport arrives in reading order: title, abstract, status,
    Plate I, then the apparatus. The apparatus fades without translating — a

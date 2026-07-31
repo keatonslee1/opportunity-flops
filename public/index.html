@@ -20,7 +20,7 @@
       THESIS: A research institute's working paper you can operate. The apparatus of print — running head, folio, § marks in the margin, numbered plates, hung footnotes, old-style figures in prose — carries a policy model that would otherwise be a dashboard.
       OWN-WORLD: Warm ivory stock under a paper-grain screen, cool-white plates inset into it, press registration marks in the trim margin. Six spot inks, each with one fixed meaning: orange is capability cost, cobalt is coordination, verdigris is safety benefit, ochre is uncertainty. Tints are halftone dot screens and overlaps multiply like real spot inks. Fluoro pink appears only in drawn art, never on a mark or a control.
       STORY: Read the thesis as a picture — a hundred unit marks of frontier R&D compute, the reallocated share flipping to verdigris under your hand — then work the same policy through six figures in the carousel beside the rack, and follow the caption to the paper at /methodology.
-      FIRST VIEWPORT: Running head over the masthead, an abstract at a 66-character measure with its status hung in the margin, then Plate I: the live compute bank, which is the whole argument in one image.
+      FIRST VIEWPORT: Running head over the masthead, an abstract at a 66-character measure with its status hung in the margin, then straight into the apparatus.
       FORM: Working paper. The six plots are frozen; the page is designed around them, one at a time in a named carousel so the assumption you are changing and the figure you are reading stay on screen together.
       FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
     -->
@@ -85,43 +85,6 @@
           </p>
         </aside>
 
-        <!--
-          Plate I — the thesis as a picture, and the one image on the page that
-          moves. A hundred unit marks stand for frontier R&D compute; the share
-          the reader commits flips to alignment, mark by mark, as the policy
-          slider moves. The flip is a fill change as well as an ink change, so
-          it survives greyscale. Marks are drawn by app.js.
-        -->
-        <figure class="compute-plate bleed" aria-labelledby="compute-plate-title">
-          <div class="compute-plate-head">
-            <p class="plate-no">Plate <span class="plate-device" aria-hidden="true">I</span></p>
-            <p class="readout" id="compute-plate-readout" aria-live="polite">
-              Frontier R&amp;D compute · 100 units
-            </p>
-          </div>
-
-          <div class="compute-bank ink-field">
-            <div class="compute-screen" aria-hidden="true"></div>
-            <svg
-              class="compute-marks"
-              id="compute-marks"
-              viewBox="0 0 750 50"
-              preserveAspectRatio="xMidYMid meet"
-              aria-hidden="true"
-            ></svg>
-          </div>
-
-          <figcaption>
-            <h2 id="compute-plate-title">The reallocation, at unit scale</h2>
-            <p class="compute-key">
-              <span class="key-mark key-capability" aria-hidden="true"></span>
-              Capability R&amp;D compute
-              <span class="key-mark key-alignment" aria-hidden="true"></span>
-              Alignment R&amp;D compute
-              <span class="key-note">One mark = one per cent of frontier R&amp;D compute</span>
-            </p>
-          </figcaption>
-        </figure>
       </section>
 
       <section class="calculator sheet" id="calculator" aria-label="Compute tradeoff calculator">
@@ -466,7 +429,6 @@
                 <li>Slower software progress</li>
                 <li>Lower AI capability</li>
               </ol>
-              <p class="channel-status">Implemented · Fig. 1–4</p>
             </div>
             <div class="channel">
               <h3>Safety channel</h3>
@@ -475,14 +437,13 @@
                 <li>More alignment progress</li>
                 <li>Lower AI risk</li>
               </ol>
-              <p class="channel-status" data-state="prior">Implemented · Fig. 5–6 · working prior</p>
             </div>
           </div>
         </figure>
       </section>
 
       <p class="folio folio-sheet" aria-hidden="true">
-        <span class="folio-mark">Plate I</span>
+        <span class="folio-mark">Working Paper 01</span>
         <span class="folio-title">The compute tradeoff calculator</span>
         <span class="folio-no numeric">1&#8202;/&#8202;2</span>
       </p>

@@ -90,7 +90,7 @@ The visual hierarchy comes from typography, dividers, tonal surfaces, and synchr
 - Continuous rack-and-results workspace rather than a card grid.
 - Cool-white panels with clipped equipment-case geometry and fine rules.
 - Cobalt controls and traces, oxidized-orange comparison strokes, and a darker orange reserved for readable text.
-- Synchronized chart redraw and sweep motion with a reduced-motion fallback.
+- Synchronized chart redraw and sweep motion for authored entrances and discrete scenario changes, with immediate slider feedback and a reduced-motion fallback.
 
 ## Colors
 
@@ -181,14 +181,14 @@ Form language is rectilinear and equipment-like. The calculator uses a single 22
 
 ### Trajectory Plots
 - **Style:** Fine gray grid, dashed midnight baseline, oxidized-orange Firm A trace, cobalt Firm B trace, and a soft orange comparison area.
-- **Motion:** All traces redraw over 720ms while a synchronized sweep crosses over 760ms using the same easing curve. Motion is effectively disabled when reduced motion is requested.
+- **Motion:** Traces redraw over 720ms while a synchronized sweep crosses over 760ms on initial load and discrete scenario changes. Continuous slider input updates the paths immediately without replaying either animation. Motion is effectively disabled when reduced motion is requested.
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** keep assumptions, plots, statuses, and caveats in one continuous analytical workspace.
 - **Do** preserve the orange text/chart-stroke distinction and label illustrative geometry explicitly.
-- **Do** pair every chart update with synchronized trace and sweep behavior, while respecting reduced-motion preferences.
+- **Do** reserve synchronized trace and sweep animation for initial entry and discrete scenario changes; keep continuous slider feedback immediate and respect reduced-motion preferences.
 - **Do** use rules, typography, and tonal changes before adding elevation.
 
 ### Don't:

@@ -510,9 +510,13 @@
 
 /* --- Results bay --------------------------------------------------------- */
 
+/* The left inset is deliberately larger than the other three. The rack's ink
+   rule is a hard edge, and the figure needs to stand clear of it rather than
+   start immediately against it — at the old symmetric padding the y-axis
+   labels sat close enough to the rule to read as part of the controls. */
 .results-bay {
   min-width: 0;
-  padding: 28px clamp(24px, 3.4vw, 54px) 36px;
+  padding: 28px clamp(24px, 3.4vw, 54px) 36px clamp(32px, 4.4vw, 72px);
 }
 
 .results-header {
@@ -596,8 +600,171 @@
   padding-top: var(--s4);
 }
 
-.plate + .plate {
-  margin-top: var(--s5);
+/* --- Figure carousel -----------------------------------------------------
+   One plate is visible at a time; the other five sit beside it in a flex
+   track that translates. Nothing is display:none, so every plate keeps its
+   layout box and app.js can go on drawing all six into fixed-viewBox SVGs
+   without measuring anything.
+
+   Flex stretch also does useful work here: the track takes the height of the
+   tallest plate, so switching figures never jumps the page.
+   ------------------------------------------------------------------------ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.carousel-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-top: var(--s4);
+}
+
+.carousel-position {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+}
+
+.carousel-nav {
+  display: flex;
+  gap: var(--s2);
+}
+
+.carousel-step {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--rule-strong);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.carousel-step:hover {
+  border-color: var(--ink);
+  color: var(--orange-text);
+}
+
+/* The ends are stops, not dead controls — the track does not wrap, so the
+   button says so rather than silently doing nothing. */
+.carousel-step[disabled] {
+  border-color: var(--rule);
+  color: var(--rule-strong);
+  cursor: default;
+}
+
+.carousel-viewport {
+  overflow: hidden;
+  margin-top: var(--s2);
+}
+
+.carousel-track {
+  display: flex;
+  align-items: stretch;
+  transition: transform 460ms var(--ease-out);
+}
+
+.carousel-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+/* Off-screen plates are hidden from assistive technology by aria-hidden alone,
+   which app.js sets as the track moves — without it a screen reader walks all
+   six captions as one run of text.
+ *
+ * Deliberately no `visibility: hidden` to go with it. aria-hidden flips at the
+ * START of the slide, so hiding the outgoing plate visually as well made it
+ * disappear on the spot and left an empty panel sliding across. The viewport's
+ * overflow already clips everything that is off-screen; the only thing needed
+ * here is the accessibility half. */
+
+/* --- Figure selector ------------------------------------------------------
+   Six named quantities, so the selector is named. A dot row tells you how far
+   along you are but never what you are about to look at, and arriving at
+   "AI risk" should not require pressing next four times.
+   ------------------------------------------------------------------------ */
+
+/* One row, always. Wrapping six labels onto three ragged rows broke the ink
+   rule they hang from and left the selected marker floating above nothing, so
+   the row scrolls instead — the focused tab is scrolled into view for
+   keyboard users by the browser, and it is a tablist, so it costs no extra
+   tab stop. */
+.carousel-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  margin-top: var(--s4);
+  border-top: 1px solid var(--ink);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.carousel-tab {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  min-height: 44px;
+  white-space: nowrap;
+  padding: var(--s2) var(--s3);
+  margin-top: -1px;
+  background: none;
+  border: 0;
+  border-top: 2px solid transparent;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+  cursor: pointer;
+  transition: color 160ms var(--ease-out);
+}
+
+.carousel-tab:first-child {
+  padding-left: 0;
+}
+
+.carousel-tab .tab-no {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-variant-caps: normal;
+  letter-spacing: 0.05em;
+}
+
+.carousel-tab[aria-selected="true"] {
+  border-top-color: var(--orange);
+  color: var(--ink);
+}
+
+.carousel-tab[aria-selected="true"] .tab-no {
+  color: var(--orange-text);
+}
+
+.carousel-tab:hover {
+  color: var(--orange-text);
 }
 
 .plate-readout {
@@ -896,6 +1063,13 @@
 
   .results-bay {
     padding-inline: 22px;
+  }
+
+  /* Tighten the selector before letting it scroll — at this width all six
+     labels still fit across the narrower results column, and a row that fits
+     beats a row that scrolls. */
+  .carousel-tab {
+    padding-inline: var(--s2);
   }
 }
 

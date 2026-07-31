@@ -18,7 +18,7 @@
       THESIS: A flight-test telemetry workspace makes policy tradeoffs inspectable and refuses the generic card-dashboard scaffold.
       OWN-WORLD: Cool-white instrument panels, midnight ink, oxidized orange and cobalt traces, tabular data, clipped corners, and fine plot rules.
       STORY: Configure a reallocation policy, watch two trajectories diverge, then inspect the assumptions behind the comparison.
-      FIRST VIEWPORT: A compact mission header and question lead directly into a left control rack beside two synchronized trajectory charts.
+      FIRST VIEWPORT: A compact mission header and question lead directly into a left control rack beside four synchronized model-output charts.
       FORM: Flight-test telemetry notebook, sixth grounded direction, seed 41000c17.
       FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
     -->
@@ -136,15 +136,15 @@
           <article class="chart-block" aria-labelledby="software-chart-title">
             <div class="chart-heading">
               <div>
-                <h3 id="software-chart-title">Software progress</h3>
+                <h3 id="software-chart-title">Software efficiency level</h3>
                 <p>Software-efficiency level index · 2026 = 100</p>
               </div>
               <output id="software-gap">Running model</output>
             </div>
             <div class="chart-frame">
               <svg class="trajectory-chart" id="software-chart" viewBox="0 0 800 300" role="img" aria-labelledby="software-svg-title software-svg-desc">
-                <title id="software-svg-title">Modeled software progress trajectories</title>
-                <desc id="software-svg-desc">Modeled baseline, Firm A, and Firm B software progress indices from 2026 through 2034.</desc>
+                <title id="software-svg-title">Modeled software efficiency-level trajectories</title>
+                <desc id="software-svg-desc">Modeled baseline, Firm A, and Firm B software efficiency-level indices from 2026 through 2034.</desc>
                 <path class="plot-grid" id="software-grid" aria-hidden="true"></path>
                 <g class="axis-labels" id="software-axes" aria-hidden="true"></g>
                 <path class="gap-area" id="software-area"></path>
@@ -152,6 +152,31 @@
                 <path class="trace trace-a" id="software-a"></path>
                 <path class="trace trace-b" id="software-b"></path>
                 <g class="sweep" id="software-sweep" aria-hidden="true">
+                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                </g>
+              </svg>
+            </div>
+          </article>
+
+          <article class="chart-block" aria-labelledby="slowdown-chart-title">
+            <div class="chart-heading">
+              <div>
+                <h3 id="slowdown-chart-title">Software progress slowdown</h3>
+                <p><i>SS</i>(<i>t</i>) = 1 − <i>Ṡ</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>Ṡ</i><sub>B</sub>(<i>t</i>) · percent</p>
+              </div>
+              <output id="slowdown-gap">Running model</output>
+            </div>
+            <div class="chart-frame">
+              <svg class="trajectory-chart" id="slowdown-chart" viewBox="0 0 800 300" role="img" aria-labelledby="slowdown-svg-title slowdown-svg-desc">
+                <title id="slowdown-svg-title">Modeled software progress slowdown</title>
+                <desc id="slowdown-svg-desc">Modeled percentage slowdown in baseline, Firm A, and Firm B software progress rates from 2026 through 2034. Zero means no slowdown relative to baseline.</desc>
+                <path class="plot-grid" id="slowdown-grid" aria-hidden="true"></path>
+                <g class="axis-labels" id="slowdown-axes" aria-hidden="true"></g>
+                <path class="gap-area" id="slowdown-area"></path>
+                <path class="trace trace-baseline" id="slowdown-baseline"></path>
+                <path class="trace trace-a" id="slowdown-a"></path>
+                <path class="trace trace-b" id="slowdown-b"></path>
+                <g class="sweep" id="slowdown-sweep" aria-hidden="true">
                   <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
                 </g>
               </svg>
@@ -177,6 +202,31 @@
                 <path class="trace trace-a" id="capability-a"></path>
                 <path class="trace trace-b" id="capability-b"></path>
                 <g class="sweep" id="capability-sweep" aria-hidden="true">
+                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                </g>
+              </svg>
+            </div>
+          </article>
+
+          <article class="chart-block" aria-labelledby="capability-gap-chart-title">
+            <div class="chart-heading">
+              <div>
+                <h3 id="capability-gap-chart-title">AI capability gap</h3>
+                <p><i>CG</i>(<i>t</i>) = 1 − <i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>) / <i>M</i><sub>B</sub>(<i>t</i>) · percent</p>
+              </div>
+              <output id="capability-gap-series-output">Running model</output>
+            </div>
+            <div class="chart-frame">
+              <svg class="trajectory-chart" id="capability-gap-chart" viewBox="0 0 800 300" role="img" aria-labelledby="capability-gap-svg-title capability-gap-svg-desc">
+                <title id="capability-gap-svg-title">Modeled AI capability gap</title>
+                <desc id="capability-gap-svg-desc">Modeled percentage gaps in baseline, Firm A, and Firm B capability from 2026 through 2034. Zero means no gap relative to baseline.</desc>
+                <path class="plot-grid" id="capability-gap-grid" aria-hidden="true"></path>
+                <g class="axis-labels" id="capability-gap-axes" aria-hidden="true"></g>
+                <path class="gap-area" id="capability-gap-area"></path>
+                <path class="trace trace-baseline" id="capability-gap-baseline"></path>
+                <path class="trace trace-a" id="capability-gap-a"></path>
+                <path class="trace trace-b" id="capability-gap-b"></path>
+                <g class="sweep" id="capability-gap-sweep" aria-hidden="true">
                   <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
                 </g>
               </svg>
@@ -270,9 +320,9 @@
                   <tr data-parameter="M_P"><th><i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy capability level</td><td>Model-generated</td><td>Firm policy series</td></tr>
                   <tr><th><i>M</i><sub>0</sub></th><td>Initial capability level</td><td>Fixed normalization</td><td>Index 100</td></tr>
                   <tr><th><i>t</i></th><td>Time since policy start</td><td>Model index</td><td>2026–2034, quarterly</td></tr>
-                  <tr><th>SS</th><td>Software progress-rate slowdown</td><td>Model output</td><td>Shown above software chart</td></tr>
+                  <tr><th>SS</th><td>Software progress-rate slowdown</td><td>Model output</td><td>Shown in software slowdown chart</td></tr>
                   <tr><th>SG</th><td>Software level gap</td><td>Model output</td><td>Returned in model contract</td></tr>
-                  <tr><th>CG</th><td>Capability gap</td><td>Model output</td><td>Shown above capability chart</td></tr>
+                  <tr><th>CG</th><td>Capability gap</td><td>Model output</td><td>Shown in AI capability gap chart</td></tr>
                 </tbody>
               </table>
             </div>

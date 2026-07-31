@@ -11,7 +11,9 @@ npm run dev
 
 The site has no runtime dependencies. Katherine's reduced-form model lives in
 `public/model.js` and exposes a single `runModel(assumptions)` function. Its
-assumption definitions drive the controls, and its output series drive both charts.
+assumption definitions drive the controls, and its output series drive four charts:
+software efficiency level, software progress slowdown, frontier capability, and
+AI capability gap.
 
 The equations and full parameter contract are implemented. The policy-impact
 control uses a deterministic assumed-prior Monte Carlo calibration: 10,000

@@ -168,7 +168,7 @@ Form language is rectilinear and equipment-like. The calculator uses a single 22
 
 ### Range Controls
 - **Style:** Three-pixel cobalt progress track with a narrow rectangular thumb edged by the panel tone.
-- **Behavior:** Value output is uppercase monospace; fill and both charts update from the same input event.
+- **Behavior:** Value output is uppercase monospace; fill and all four charts update from the same input event.
 
 ### Cards / Containers
 - **Corner Style:** Near-square internal corners and one clipped outer workspace corner.

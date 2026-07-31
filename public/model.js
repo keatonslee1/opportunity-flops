@@ -234,9 +234,24 @@ export function runModel(inputAssumptions = {}) {
     firmBSoftware,
     firmBRateMultiplier,
   );
+  const slowdownForRate = (softwareRate) => softwareRate.map(
+    (rate, index) => 1 - rate / baselineSoftwareRate[index],
+  );
+  const baselineSoftwareSlowdown = slowdownForRate(baselineSoftwareRate);
+  const firmASoftwareSlowdown = slowdownForRate(firmASoftwareRate);
+  const firmBSoftwareSlowdown = slowdownForRate(firmBSoftwareRate);
   const toCapability = (softwareIndex) => (
     100 * (softwareIndex / 100) ** delta
   );
+  const baselineCapability = baselineSoftware.map(toCapability);
+  const firmACapability = firmASoftware.map(toCapability);
+  const firmBCapability = firmBSoftware.map(toCapability);
+  const gapFromBaseline = (capability) => capability.map(
+    (value, index) => 1 - value / baselineCapability[index],
+  );
+  const baselineCapabilityGap = gapFromBaseline(baselineCapability);
+  const firmACapabilityGap = gapFromBaseline(firmACapability);
+  const firmBCapabilityGap = gapFromBaseline(firmBCapability);
   const horizonSoftwareRatio = (software) => (
     software.at(-1) / baselineSoftware.at(-1)
   );
@@ -296,10 +311,20 @@ export function runModel(inputAssumptions = {}) {
         firmA: firmASoftwareRate,
         firmB: firmBSoftwareRate,
       },
+      softwareSlowdown: {
+        baseline: baselineSoftwareSlowdown,
+        firmA: firmASoftwareSlowdown,
+        firmB: firmBSoftwareSlowdown,
+      },
       capability: {
-        baseline: baselineSoftware.map(toCapability),
-        firmA: firmASoftware.map(toCapability),
-        firmB: firmBSoftware.map(toCapability),
+        baseline: baselineCapability,
+        firmA: firmACapability,
+        firmB: firmBCapability,
+      },
+      capabilityGap: {
+        baseline: baselineCapabilityGap,
+        firmA: firmACapabilityGap,
+        firmB: firmBCapabilityGap,
       },
     },
     metrics: {
@@ -321,7 +346,9 @@ export function runModel(inputAssumptions = {}) {
       years: "calendar year",
       software: "index (2026 = 100)",
       softwareRate: "software index points per year",
+      softwareSlowdown: "fractional reduction from baseline software progress rate",
       capability: "training-compute-normalized index (2026 = 100)",
+      capabilityGap: "fractional reduction from baseline capability",
       metrics: "fraction of baseline at 2034",
     },
     caveats: [

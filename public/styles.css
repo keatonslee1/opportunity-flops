@@ -147,6 +147,27 @@ footer {
   color: #747168;
 }
 
+footer p {
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 8px;
+}
+
+.footer-links a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+  color: #181815;
+}
+
 @media (max-width: 760px) {
   .shell {
     width: min(100% - 24px, 620px);

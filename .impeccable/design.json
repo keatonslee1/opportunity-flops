@@ -29,8 +29,8 @@
       { "name": "selection-lift", "value": "0 5px 16px rgba(25, 39, 50, 0.07)", "purpose": "Marks the active scenario row." }
     ],
     "motion": [
-      { "name": "trace-draw", "value": "720ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Redraws all trajectory traces after an input change." },
-      { "name": "plot-sweep", "value": "760ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Synchronizes the scanning marker with trace redraw." },
+      { "name": "trace-draw", "value": "720ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Redraws trajectory traces on initial entry and discrete scenario changes." },
+      { "name": "plot-sweep", "value": "760ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Synchronizes the scanning marker with authored trace redraws, never continuous slider input." },
       { "name": "control-state", "value": "160ms ease", "purpose": "Scenario hover and selection feedback." },
       { "name": "reduced-motion", "value": "0.01ms linear", "purpose": "Effectively disables transitions and animations for reduced-motion users." }
     ],
@@ -85,7 +85,7 @@
       "Continuous rack-and-results workspace rather than a card grid.",
       "Cool-white panels with clipped equipment-case geometry and fine rules.",
       "Cobalt controls and traces, oxidized-orange comparison strokes, and a darker orange reserved for readable text.",
-      "Synchronized chart redraw and sweep motion with a reduced-motion fallback."
+      "Synchronized chart redraw and sweep motion for authored entrances and discrete scenario changes, with immediate slider feedback and a reduced-motion fallback."
     ],
     "rules": [
       { "name": "The Trace/Text Separation Rule", "body": "Oxidized orange draws comparison geometry; accessible orange carries text. Do not swap their jobs.", "section": "colors" },
@@ -96,7 +96,7 @@
     "dos": [
       "Do keep assumptions, plots, statuses, and caveats in one continuous analytical workspace.",
       "Do preserve the orange text/chart-stroke distinction and label illustrative geometry explicitly.",
-      "Do pair every chart update with synchronized trace and sweep behavior, while respecting reduced-motion preferences.",
+      "Do reserve synchronized trace and sweep animation for initial entry and discrete scenario changes; keep continuous slider feedback immediate and respect reduced-motion preferences.",
       "Do use rules, typography, and tonal changes before adding elevation."
     ],
     "donts": [

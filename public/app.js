@@ -74,7 +74,7 @@ function createControls() {
       assumptions[definition.key] = Number(input.value);
       value.textContent = formatValue(definition, input.value);
       updateRangeFill(input);
-      renderResult();
+      renderResult(false);
     });
 
     row.append(title, value, input);
@@ -135,17 +135,35 @@ function illustrativeSeries(kind) {
   return { baseline, firmA, firmB };
 }
 
+function stopChartAnimation(chart) {
+  for (const path of [chart.baseline, chart.firmA, chart.firmB]) {
+    path.classList.remove("is-drawing");
+    path.style.removeProperty("--trace-length");
+    path.style.removeProperty("stroke-dasharray");
+  }
+
+  chart.sweep.classList.remove("is-scanning");
+}
+
 function animateChart(chart) {
+  stopChartAnimation(chart);
+
   for (const path of [chart.baseline, chart.firmA, chart.firmB]) {
     const length = Math.ceil(path.getTotalLength());
     path.style.setProperty("--trace-length", length);
     path.style.strokeDasharray = length;
-    path.classList.remove("is-drawing");
+    path.addEventListener("animationend", () => {
+      path.classList.remove("is-drawing");
+      path.style.removeProperty("--trace-length");
+      path.style.removeProperty("stroke-dasharray");
+    }, { once: true });
     void path.getBoundingClientRect();
     path.classList.add("is-drawing");
   }
 
-  chart.sweep.classList.remove("is-scanning");
+  chart.sweep.addEventListener("animationend", () => {
+    chart.sweep.classList.remove("is-scanning");
+  }, { once: true });
   void chart.sweep.getBoundingClientRect();
   chart.sweep.classList.add("is-scanning");
 }
@@ -153,6 +171,10 @@ function animateChart(chart) {
 function renderChart(kind, shouldAnimate = true) {
   const chart = charts[kind];
   const series = illustrativeSeries(kind);
+
+  if (!shouldAnimate) {
+    stopChartAnimation(chart);
+  }
 
   chart.baseline.setAttribute("d", pathFromSeries(series.baseline));
   chart.firmA.setAttribute("d", pathFromSeries(series.firmA));

@@ -96,8 +96,12 @@
 }
 
 /* The imprint line is apparatus, not prose: it sets in the body face at label
-   size so it reads as a stamp on the title page rather than as a sentence. */
-.imprint {
+   size so it reads as a stamp on the title page rather than as a sentence —
+   and it is uncapped for the same reason the folio is. Held to the prose
+   measure it broke "Priors / unvalidated" across two lines, which reads as an
+   accident rather than as a stamp. */
+.paper .imprint {
+  max-width: none;
   margin: var(--s2) 0 0;
   color: var(--muted);
   font-family: var(--font-body);
@@ -971,7 +975,10 @@
      calculator's section marks collapse through the same rule. */
   .section-mark {
     flex-direction: row;
-    align-items: baseline;
+    /* Not baseline: an inline SVG's baseline is its bottom edge, so the
+       device floats above the § mark and the stamp instead of sitting with
+       them. Centre is what reads as one row. */
+    align-items: center;
     gap: var(--s3);
     margin-bottom: var(--s3);
   }
@@ -1094,9 +1101,15 @@
 }
 
 .device {
+  /* Its own row in the margin column, level with the first paragraph — not
+     inside .section-mark. Riding with the § mark made the margin item taller
+     than the heading, which stretched the grid row and opened a gap between
+     every heading and its opening sentence. */
+  grid-column: 1;
+  justify-self: end;
   width: 120px;
   height: 64px;
-  margin-top: var(--s2);
+  margin-top: 0.5em;
   overflow: visible;
 }
 
@@ -1158,8 +1171,10 @@
      than being dropped. It is carrying a link in the causal chain, so losing
      it would lose content, not ornament. */
   .device {
+    justify-self: start;
     width: 96px;
     height: 51px;
     margin-top: 0;
+    margin-bottom: var(--s3);
   }
 }

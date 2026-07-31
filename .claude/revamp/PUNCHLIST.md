@@ -280,3 +280,95 @@ Work B owes itself. Cleared before Task 4 is reported.
   against a real print preview at Letter as well as A4 before Task 4 is reported.
 - **B8** — Table renumbering: the notation table is new, so old Tables 2/3/4 are now 3/4/5.
   Sweep for stale references once the page is set.
+
+---
+
+# TASK 4 — ADVERSARIAL AUDIT
+
+Run against `acbb67c` (B) and `8851050` (A Phase 1), at 1440 / 1020 / 760 / 360, in the
+browser. Everything below was seen, not inferred. Findings I could verify as **not** defects
+are recorded too, because a punchlist that only lists hits is not an audit.
+
+## 4.1 — Banlist grep, raw output
+
+```
+$ grep -rnE "border-radius|box-shadow|linear-gradient|radial-gradient|conic-gradient|\
+backdrop-filter|transition: ?all|Inter|Roboto|Open Sans|Lato|Poppins|Montserrat|system-ui" \
+  public/*.css public/*.html
+
+public/print.css:64:   box-shadow: none !important;
+public/styles.css:566: box-shadow: 0 0 0 1px var(--blue);
+public/styles.css:578: border-radius: 0;
+public/styles.css:580: box-shadow: 0 0 0 1px var(--blue);
+public/styles.css:880: box-shadow: inset 0 3px 0 0 var(--blue);
+```
+
+**Verdict: zero violations.** Every hit checked against the rule rather than the pattern.
+`print.css:64` removes shadows. `styles.css:566/580/880` are all **zero-blur** — a hairline
+around the range thumb and a 3px inset rule marking the active scenario — which §2 permits
+explicitly, and all three carry a comment saying so. `styles.css:578` is `border-radius:
+**0**`, stripping a UA default off the Firefox range thumb; the banlist covers non-zero
+values.
+
+Also swept and clean: **no emoji** anywhere in `public/*.{html,css}`; **no `<img>`, no raster
+background-image, no external URL** — every image on the site is drawn vector.
+
+## 4.4 — Accessibility
+
+**Focus rings — not a defect, and worth recording why.** My first pass measured every one of
+the 25 focusables at `outline-width: 2.4px, outline-offset: 1.6px` against a spec of 3px/2px,
+which looks like a systematic miss. It is not: I injected a control element with a literal
+`outline: 3px` and it also reported 2.4px. The browser was at 80% zoom and
+`getComputedStyle` returns used values. **All 25 rings are correct 3px cobalt at 2px offset.**
+
+- 25 focusables on the calculator, all reachable, no traps, ring colour `rgb(36,91,150)` on
+  every one.
+- The six plates are `tabindex="0"` with the ring applied — the signature moment is
+  keyboard-reachable, not mouse-only.
+- Nothing found signalled by colour alone: the active scenario carries a 3px inset rule *and*
+  a colour change; status stamps carry words.
+
+## 4.5 — Responsive
+
+| Width | Calculator | Paper |
+|---|---|---|
+| 1440 | clean | clean |
+| 1020 | clean | clean |
+| 760 | clean | clean |
+| **360** | no horizontal scroll, nav wraps to 3 items, margin note inline | no horizontal scroll, **9/9** notes inline, **10/10** devices visible |
+
+Nothing clipped, nothing hidden, no page-level sideways scroll on either page at any of the
+four. Wide tables scroll inside their own containers rather than pushing the page.
+
+## For A — new, from the audit
+
+### A16 — Fluoro on a plate ordinal (Loud Ink Rule)
+
+`index.html` / `styles.css`, `span.plate-device` — the plate ordinal beside `PLATE` renders
+as an 18×15px solid fluoro swatch with the numeral reversed out of it. Queried the DOM: it is
+a **CSS `background-color`, not drawn vector** (`isDrawn: false`, not inside any `<svg>`).
+
+Brief §3.4: *"Fluoro appears **only in drawn imagery** — the masthead plate, section devices,
+the colophon. It never touches a data mark, a control, or body text."* A plate ordinal is
+typographic apparatus. This is the one loud element in an otherwise sober first viewport, and
+it is spending that energy on the least important thing on screen — while `.fig-no` sets
+figure numbers in oxidized orange two lines below, so the page now numbers its plates in two
+different inks.
+
+Fix: set the ordinal in `--ink` or in `.fig-no`'s orange like every other figure number, and
+keep fluoro for the masthead plate and the colophon.
+
+### A17 — Orange means two different things across the two pages
+
+The masthead plate keys its 80 solid marks to **"CAPABILITY R&D"** in oxidized orange. But
+the ink table gives orange one job — **capability *cost*** — and that is how it is used in
+Fig. 1–4, in `.fig-no`, and throughout the paper. Compute-spent-on-capability and
+cost-of-not-spending-it are not the same quantity; one is an input, the other is the model's
+output. A reader who learns the mapping on the masthead reads every trace below it wrong.
+
+This is the exact failure the Semantic Ink Rule exists to prevent, and it is on the first
+thing anyone sees. Cheapest fix: key the masthead's two states to **verdigris = alignment**
+and **ink = capability R&D**, leaving orange free to mean cost everywhere it appears. That
+also strengthens the plate's thesis — the marks that flip are the story, and they flip *into*
+the ink that means safety.
+

@@ -2,4 +2,7 @@
 .env*
 .npm-cache
 .vercel
+.venv/
+.uv-cache/
+work/
 node_modules

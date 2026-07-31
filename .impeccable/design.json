@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-31T15:31:59Z",
+  "title": "Design System: Opportunity FLOPs",
+  "extensions": {
+    "colorMeta": {
+      "cool-paper": { "role": "neutral", "displayName": "Cool Paper", "canonical": "#f4f6f5", "tonalRamp": ["oklch(15% 0.004 160)", "oklch(26% 0.004 160)", "oklch(38% 0.004 160)", "oklch(50% 0.004 160)", "oklch(62% 0.004 160)", "oklch(74% 0.004 160)", "oklch(86% 0.004 160)", "oklch(95% 0.004 160)"] },
+      "instrument-panel": { "role": "neutral", "displayName": "Instrument Panel", "canonical": "#fbfcfb", "tonalRamp": ["oklch(15% 0.003 160)", "oklch(26% 0.003 160)", "oklch(38% 0.003 160)", "oklch(50% 0.003 160)", "oklch(62% 0.003 160)", "oklch(74% 0.003 160)", "oklch(86% 0.003 160)", "oklch(95% 0.003 160)"] },
+      "midnight-ink": { "role": "neutral", "displayName": "Midnight Ink", "canonical": "#101b2b", "tonalRamp": ["oklch(15% 0.035 255)", "oklch(26% 0.035 255)", "oklch(38% 0.035 255)", "oklch(50% 0.035 255)", "oklch(62% 0.035 255)", "oklch(74% 0.035 255)", "oklch(86% 0.035 255)", "oklch(95% 0.035 255)"] },
+      "muted-slate": { "role": "neutral", "displayName": "Muted Slate", "canonical": "#556070", "tonalRamp": ["oklch(15% 0.025 250)", "oklch(26% 0.025 250)", "oklch(38% 0.025 250)", "oklch(50% 0.025 250)", "oklch(62% 0.025 250)", "oklch(74% 0.025 250)", "oklch(86% 0.025 250)", "oklch(95% 0.025 250)"] },
+      "fine-rule": { "role": "neutral", "displayName": "Fine Rule", "canonical": "#c8d0d4", "tonalRamp": ["oklch(15% 0.012 220)", "oklch(26% 0.012 220)", "oklch(38% 0.012 220)", "oklch(50% 0.012 220)", "oklch(62% 0.012 220)", "oklch(74% 0.012 220)", "oklch(86% 0.012 220)", "oklch(95% 0.012 220)"] },
+      "strong-rule": { "role": "neutral", "displayName": "Strong Rule", "canonical": "#86919a", "tonalRamp": ["oklch(15% 0.015 230)", "oklch(26% 0.015 230)", "oklch(38% 0.015 230)", "oklch(50% 0.015 230)", "oklch(62% 0.015 230)", "oklch(74% 0.015 230)", "oklch(86% 0.015 230)", "oklch(95% 0.015 230)"] },
+      "oxidized-orange": { "role": "primary", "displayName": "Oxidized Orange", "canonical": "#c84e2f", "tonalRamp": ["oklch(15% 0.15 36)", "oklch(26% 0.15 36)", "oklch(38% 0.15 36)", "oklch(50% 0.15 36)", "oklch(62% 0.15 36)", "oklch(74% 0.15 36)", "oklch(86% 0.15 36)", "oklch(95% 0.15 36)"] },
+      "accessible-orange-text": { "role": "primary", "displayName": "Accessible Orange Text", "canonical": "#9f381f", "tonalRamp": ["oklch(15% 0.13 36)", "oklch(26% 0.13 36)", "oklch(38% 0.13 36)", "oklch(50% 0.13 36)", "oklch(62% 0.13 36)", "oklch(74% 0.13 36)", "oklch(86% 0.13 36)", "oklch(95% 0.13 36)"] },
+      "orange-wash": { "role": "primary", "displayName": "Orange Wash", "canonical": "#f0d5ca", "tonalRamp": ["oklch(15% 0.045 40)", "oklch(26% 0.045 40)", "oklch(38% 0.045 40)", "oklch(50% 0.045 40)", "oklch(62% 0.045 40)", "oklch(74% 0.045 40)", "oklch(86% 0.045 40)", "oklch(95% 0.045 40)"] },
+      "cobalt-trace": { "role": "secondary", "displayName": "Cobalt Trace", "canonical": "#245b96", "tonalRamp": ["oklch(15% 0.105 255)", "oklch(26% 0.105 255)", "oklch(38% 0.105 255)", "oklch(50% 0.105 255)", "oklch(62% 0.105 255)", "oklch(74% 0.105 255)", "oklch(86% 0.105 255)", "oklch(95% 0.105 255)"] },
+      "cobalt-wash": { "role": "secondary", "displayName": "Cobalt Wash", "canonical": "#d7e3ef", "tonalRamp": ["oklch(15% 0.035 250)", "oklch(26% 0.035 250)", "oklch(38% 0.035 250)", "oklch(50% 0.035 250)", "oklch(62% 0.035 250)", "oklch(74% 0.035 250)", "oklch(86% 0.035 250)", "oklch(95% 0.035 250)"] },
+      "ready-green": { "role": "tertiary", "displayName": "Ready Green", "canonical": "#2e7253", "tonalRamp": ["oklch(15% 0.085 155)", "oklch(26% 0.085 155)", "oklch(38% 0.085 155)", "oklch(50% 0.085 155)", "oklch(62% 0.085 155)", "oklch(74% 0.085 155)", "oklch(86% 0.085 155)", "oklch(95% 0.085 155)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Flight Thesis", "purpose": "First-view thesis only." },
+      "headline": { "displayName": "Section Headline", "purpose": "Major explanatory sections." },
+      "title": { "displayName": "Rack Title", "purpose": "Instrument and methodology headings." },
+      "body": { "displayName": "Analytical Body", "purpose": "Explanations, assumptions, and methods." },
+      "label": { "displayName": "Telemetry Label", "purpose": "Values, legends, status, and plot metadata." }
+    },
+    "shadows": [
+      { "name": "workspace-lift", "value": "0 16px 42px rgba(25, 39, 50, 0.09)", "purpose": "Lifts the unified calculator above the page field." },
+      { "name": "selection-lift", "value": "0 5px 16px rgba(25, 39, 50, 0.07)", "purpose": "Marks the active scenario row." }
+    ],
+    "motion": [
+      { "name": "trace-draw", "value": "720ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Redraws all trajectory traces after an input change." },
+      { "name": "plot-sweep", "value": "760ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Synchronizes the scanning marker with trace redraw." },
+      { "name": "control-state", "value": "160ms ease", "purpose": "Scenario hover and selection feedback." },
+      { "name": "reduced-motion", "value": "0.01ms linear", "purpose": "Effectively disables transitions and animations for reduced-motion users." }
+    ],
+    "breakpoints": [
+      { "name": "compact-desktop", "value": "1020px" },
+      { "name": "stacked-mobile", "value": "760px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Reset Button",
+      "kind": "button",
+      "refersTo": "reset-button",
+      "description": "Quiet utility action for restoring calculator defaults.",
+      "html": "<button class=\"ds-reset-button\" type=\"button\">Reset</button>",
+      "css": ".ds-reset-button { min-width: 54px; min-height: 36px; padding: 0 11px; border: 1px solid #86919a; border-radius: 3px; color: #101b2b; background: transparent; font: 500 0.75rem Barlow, sans-serif; cursor: pointer; } .ds-reset-button:hover { background: #fbfcfb; } .ds-reset-button:focus-visible { outline: 3px solid rgba(36,91,150,.32); outline-offset: 2px; }"
+    },
+    {
+      "name": "Selected Scenario",
+      "kind": "input",
+      "refersTo": "scenario-selected",
+      "description": "Two-line scenario row with a visible selected state.",
+      "html": "<label class=\"ds-scenario\"><input type=\"radio\" checked><span><strong>Both firms</strong><small>Common commitment</small></span></label>",
+      "css": ".ds-scenario { display: block; color: #101b2b; cursor: pointer; font-family: Barlow, sans-serif; } .ds-scenario input { position: absolute; opacity: 0; pointer-events: none; } .ds-scenario span { min-height: 53px; display: grid; grid-template-columns: 88px 1fr; align-items: center; padding: 8px 12px; border: 1px solid #86919a; border-radius: 4px; background: #fbfcfb; box-shadow: 0 5px 16px rgba(25,39,50,.07); } .ds-scenario strong { font-size: .83rem; } .ds-scenario small { color: #556070; font-size: .74rem; } .ds-scenario:hover span { background: rgba(255,255,255,.72); } .ds-scenario input:focus-visible + span { outline: 3px solid rgba(36,91,150,.32); outline-offset: 2px; }"
+    },
+    {
+      "name": "Cobalt Range Control",
+      "kind": "input",
+      "description": "Direct-manipulation assumption control with a telemetry value.",
+      "html": "<label class=\"ds-range\"><span>Compute reallocated</span><output>20%</output><input type=\"range\" min=\"0\" max=\"50\" value=\"20\"></label>",
+      "css": ".ds-range { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; color: #101b2b; font: 600 .85rem Barlow, sans-serif; } .ds-range output { color: #245b96; font: 700 .7rem ui-monospace, monospace; letter-spacing: .055em; } .ds-range input { grid-column: 1 / -1; width: 100%; accent-color: #245b96; cursor: pointer; } .ds-range input:focus-visible { outline: 3px solid rgba(36,91,150,.32); outline-offset: 2px; }"
+    },
+    {
+      "name": "Workspace Shell",
+      "kind": "card",
+      "description": "Unified control-rack and results apparatus with a clipped case corner.",
+      "html": "<section class=\"ds-workspace\"><aside>Policy assumptions</aside><main>Baseline versus policy</main></section>",
+      "css": ".ds-workspace { min-height: 180px; display: grid; grid-template-columns: 35% 1fr; border: 1px solid #86919a; background: #fbfcfb; box-shadow: 0 16px 42px rgba(25,39,50,.09); clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%); color: #101b2b; font: 600 1rem Barlow, sans-serif; } .ds-workspace aside { padding: 28px 26px; background: #e9edef; border-right: 1px solid #86919a; } .ds-workspace main { padding: 28px; } @media (max-width: 520px) { .ds-workspace { grid-template-columns: 1fr; clip-path: none; } .ds-workspace aside { border-right: 0; border-bottom: 1px solid #86919a; } }"
+    },
+    {
+      "name": "Trajectory Legend",
+      "kind": "custom",
+      "description": "Monospace legend that preserves trace identity and illustrative status.",
+      "html": "<div class=\"ds-legend\"><span><i class=\"ds-baseline\"></i>Baseline</span><span><i class=\"ds-firm-a\"></i>Firm A</span><span><i class=\"ds-firm-b\"></i>Firm B</span><em>Illustrative preview</em></div>",
+      "css": ".ds-legend { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; color: #344451; font: 400 .7rem ui-monospace, monospace; letter-spacing: .055em; text-transform: uppercase; } .ds-legend span { display: inline-flex; align-items: center; gap: 7px; } .ds-legend i { width: 24px; border-top: 2px solid; } .ds-legend .ds-baseline { border-color: #101b2b; border-top-style: dashed; } .ds-legend .ds-firm-a { border-color: #c84e2f; } .ds-legend .ds-firm-b { border-color: #245b96; } .ds-legend em { margin-left: auto; color: #9f381f; font-style: normal; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Flight-Test Telemetry Rack",
+    "overview": "Opportunity FLOPs is an analytically serious instrument workspace: cool-white equipment surfaces, midnight ink, fine plot rules, and calibrated accent traces keep assumptions and outputs in one continuous field. The composition should feel operated rather than browsed—dense enough for research, but quiet enough that state changes and caveats remain legible.\n\nThe visual hierarchy comes from typography, dividers, tonal surfaces, and synchronized plot motion. Decoration is subordinate to evidence; every bright color or animated sweep should carry status, comparison, or interaction meaning.",
+    "keyCharacteristics": [
+      "Continuous rack-and-results workspace rather than a card grid.",
+      "Cool-white panels with clipped equipment-case geometry and fine rules.",
+      "Cobalt controls and traces, oxidized-orange comparison strokes, and a darker orange reserved for readable text.",
+      "Synchronized chart redraw and sweep motion with a reduced-motion fallback."
+    ],
+    "rules": [
+      { "name": "The Trace/Text Separation Rule", "body": "Oxidized orange draws comparison geometry; accessible orange carries text. Do not swap their jobs.", "section": "colors" },
+      { "name": "The Color Carries State Rule", "body": "Accent color indicates scenario, status, or direct manipulation; it is not ambient decoration.", "section": "colors" },
+      { "name": "The Readout Rule", "body": "Use monospace only for values, legends, status, and axis metadata; narrative remains in Barlow.", "section": "typography" },
+      { "name": "The One Instrument Rule", "body": "Elevate the calculator as one apparatus; do not turn its internal rack, charts, or comparison cells into floating cards.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep assumptions, plots, statuses, and caveats in one continuous analytical workspace.",
+      "Do preserve the orange text/chart-stroke distinction and label illustrative geometry explicitly.",
+      "Do pair every chart update with synchronized trace and sweep behavior, while respecting reduced-motion preferences.",
+      "Do use rules, typography, and tonal changes before adding elevation."
+    ],
+    "donts": [
+      "Don't split the calculator into a grid of individually elevated cards.",
+      "Don't use accent color as decoration or rely on color alone to communicate state.",
+      "Don't introduce playful mascot, flip-flop, or character illustration into the instrument world.",
+      "Don't present illustrative chart geometry as validated output or empirical results."
+    ]
+  }
+}

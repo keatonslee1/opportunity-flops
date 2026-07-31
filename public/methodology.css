@@ -952,7 +952,8 @@
    notes hang and generous at the fore-edge. Left register with the masthead
    and the running head is preserved. */
 @media (min-width: 1240px) {
-  .paper .sheet {
+  .paper .sheet,
+  .paper .colophon-device {
     max-width: calc(var(--margin-col) + var(--s6) + 56rem);
   }
 }
@@ -1060,5 +1061,105 @@
   .caveat-notice,
   .is-limitations .standfirst {
     padding-left: var(--s3);
+  }
+}
+
+/* --- Section devices -----------------------------------------------------
+   One drawn plate per section, hung in the margin column under the § mark and
+   its status stamp. Each carries a link in the causal chain the model
+   describes — compute, software progress, capability, risk, safety benefit —
+   and each is built from hairline construction plus at most one spot ink.
+
+   They are diagrams, not icons. Every one draws a quantity the section
+   actually defines: § 1 is the unit compute bar with the reallocated share
+   screened, § 4 is the normalized-constant baseline with the policy path
+   decaying away from it, § 7 is the triangular prior read at three marginal
+   percentiles. Nothing here is a glyph standing in for an idea.
+
+   THE SEMANTIC INK RULE decides the ink, section by section, and two of the
+   ten take none. § 1 and § 5 are verdigris because they draw the alignment
+   share and the safety benefit. § 2 and § 3 are orange because they draw the
+   capability cost channel. § 4, § 7 and § 9 are ochre and screened through
+   --hatch because each rests on an assumed prior. § 6 is cobalt because it
+   draws the controls. § 8 and § 10 are ink alone — normalization and the
+   parameter contract are structure, not model quantities, and an ink applied
+   to them because the neighbouring devices have one would be decoration.
+   ------------------------------------------------------------------------ */
+
+.ink-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.device {
+  width: 120px;
+  height: 64px;
+  margin-top: var(--s2);
+  overflow: visible;
+}
+
+/* --- The colophon device -------------------------------------------------
+   A printer's mark at the foot of the paper. Orb-and-cross, the oldest device
+   in the trade, redrawn on the same grid as everything above it.
+
+   THE LOUD INK RULE. This is the only fluoro in the file — one drawn mark, no
+   data, no control, no text. It is deliberately the last thing on the page:
+   high-energy ink in the art, sober ink in the figures.
+
+   It sits inside <article class="paper">, not in <footer>. The footer is
+   shared chrome that has to stay identical to the calculator; the paper's own
+   colophon is the paper's business.
+   ------------------------------------------------------------------------ */
+
+.colophon-device {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s3);
+  margin-top: var(--s7);
+  padding-top: var(--s6);
+  border-top: 1px solid var(--rule);
+}
+
+.colophon-device svg {
+  width: 44px;
+  height: 52px;
+}
+
+.paper .colophon-line {
+  max-width: none;
+}
+
+/* Separator on the preceding unit, not the following one: as ::before it
+   breaks to the head of the next line and reads as a stray mark. */
+.colophon-line span:not(:last-child)::after {
+  content: "·";
+  margin: 0 0.55em;
+  color: var(--rule-strong);
+}
+
+.colophon-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-micro);
+  font-variant-caps: all-small-caps;
+  letter-spacing: var(--track-wide);
+  text-align: center;
+}
+
+@media (max-width: 1020px) {
+  /* The margin column is gone; the device runs in beside the § mark rather
+     than being dropped. It is carrying a link in the causal chain, so losing
+     it would lose content, not ornament. */
+  .device {
+    width: 96px;
+    height: 51px;
+    margin-top: 0;
   }
 }

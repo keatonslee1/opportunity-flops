@@ -49,7 +49,7 @@ devices out of them and never defines a parallel set.
 - [x] **B — Task 1** · methodology paper structure (runs in parallel with A Phase 0, no gate)
 - [x] **A — Phase 1** · calculator rebuilt: architecture, control margin, plates, signature moment, **masthead plate**, reveal, responsive
 - [x] **B — Task 2** · methodology page set on A's primitives
-- [ ] **B — Task 2b** · section devices + colophon device
+- [x] **B — Task 2b** · section devices + colophon device
 - [x] **B — Task 3** · `print.css`
 - [ ] **B — Task 4** · adversarial audit → `PUNCHLIST.md`
 - [ ] **A — Phase 2** · punchlist cleared, cross-page consistency, Studio Test, `DESIGN.md` reconciled

@@ -296,6 +296,79 @@ input {
   color: var(--rule-strong);
 }
 
+/* ── Charts ──────────────────────────────────────────────────────────── */
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-line {
+  width: 16px;
+  height: 0;
+  border-top: 2px solid;
+}
+
+.legend-line.baseline {
+  border-color: var(--ink);
+  border-top-style: dashed;
+}
+
+.legend-line.projection {
+  border-color: var(--orange);
+}
+
+.chart-block {
+  margin: 0;
+  padding-top: 10px;
+}
+
+.chart-block + .chart-block {
+  margin-top: 8px;
+  border-top: 1px solid var(--rule);
+}
+
+.chart-caption {
+  margin-bottom: 2px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chart-tick,
+.chart-placeholder {
+  fill: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 7px;
+  letter-spacing: 0.05em;
+}
+
+.chart-placeholder {
+  fill: var(--rule-strong);
+  text-transform: uppercase;
+}
+
 /* ── Scenarios ───────────────────────────────────────────────────────── */
 
 .scenario-cards {

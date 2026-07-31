@@ -87,11 +87,11 @@
           <div class="equation"><span class="eq-body"><i>C</i><sub>C,B</sub>(<i>t</i>) = <i>C</i><sub>R</sub>(<i>t</i>)</span><span class="eq-no">(1.3)</span></div>
           <div class="equation"><span class="eq-body"><i>C</i><sub>A,B</sub>(<i>t</i>) = 0</span><span class="eq-no">(1.4)</span></div>
           <aside class="marginalia" aria-label="Note on equation 1.2">
-            <strong>Unused term</strong>
-            Equation (1.2) is specified but has no consumer. Alignment compute only enters the model through Parts <span class="numeric">IV</span> and <span class="numeric">V</span>, so nothing downstream of the calculator reads it.
+            <strong>Never referenced</strong>
+            (1.2) defines alignment compute, and no later equation uses it — not even the risk function it appears to feed. (4.1) is written in terms of the share <i>x</i>, so <i>C</i><sub>A,P</sub> never needs a value, much as α never needs one in Part <span class="numeric">III</span>.
           </aside>
           <p>
-            The calculator implements (1.1), (1.3) and (1.4). It carries no quantity derived from (1.2).
+            None of the four is evaluated as a quantity of compute. <i>C</i><sub>R</sub>(<i>t</i>) never receives a numeric path — Part <span class="numeric">VIII</span> normalizes it away — so (1.1) reaches the model only as the factor (1 − <i>x</i>)<sup>β</sup> in (2.2), and (1.2) reaches it not at all.
           </p>
         </section>
 
@@ -316,7 +316,7 @@
                     <tr><th scope="row"><i>C</i><sub>R</sub></th><td>Total frontier R&amp;D compute</td><td>Exogenous path</td><td>Fixed and normalized</td></tr>
                     <tr><th scope="row"><i>C</i><sub>C,B</sub></th><td>Baseline capability-R&amp;D compute</td><td>Model-derived</td><td><i>C</i><sub>R</sub>, unchanged</td></tr>
                     <tr><th scope="row"><i>C</i><sub>C,P</sub></th><td>Policy capability-R&amp;D compute</td><td>Model-derived</td><td>(1 − <i>x</i>)<i>C</i><sub>R</sub></td></tr>
-                    <tr><th scope="row"><i>C</i><sub>A,P</sub></th><td>Policy alignment compute</td><td>Model-derived</td><td><i>x C</i><sub>R</sub>; enters risk through λ</td></tr>
+                    <tr><th scope="row"><i>C</i><sub>A,P</sub></th><td>Policy alignment compute</td><td>Model-derived</td><td>Not evaluated — (4.1) takes <i>x</i></td></tr>
                     <tr><th scope="row"><i>A</i></th><td>Research productivity</td><td>Set by <i>z</i> / calibrated</td><td>Absorbed into baseline normalization</td></tr>
                     <tr><th scope="row">β</th><td>R&amp;D-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
                     <tr><th scope="row">γ</th><td>Software-feedback elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>

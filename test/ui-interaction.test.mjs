@@ -12,8 +12,46 @@ test("continuous slider input updates charts without replaying trace animation",
   assert.match(sliderHandler[0], /renderResult\(false\)/);
 });
 
-test("both charts position Y-axis labels to the left of the plot axis", () => {
-  const yAxisLabels = pageSource.match(/<text x="50"[^>]*text-anchor="end"[^>]*>/g) ?? [];
+test("the UI renders model-owned series instead of local preview geometry", () => {
+  assert.doesNotMatch(appSource, /illustrativeSeries/);
+  assert.match(appSource, /const series = result\.series\[kind\]/);
+  assert.match(appSource, /runModel\(\{ \.\.\.assumptions, scenario \}\)/);
+});
 
-  assert.equal(yAxisLabels.length, 8);
+test("both charts expose dynamic grids, axes, and accessible descriptions", () => {
+  for (const kind of ["software", "capability"]) {
+    assert.match(pageSource, new RegExp(`id="${kind}-grid"`));
+    assert.match(pageSource, new RegExp(`id="${kind}-axes"`));
+    assert.match(pageSource, new RegExp(`id="${kind}-svg-desc"`));
+  }
+
+  assert.match(appSource, /"text-anchor": "end"/);
+  assert.match(appSource, /chart\.description\.textContent/);
+});
+
+test("categorical sensitivity changes replay the discrete chart transition", () => {
+  const choiceHandler = appSource.match(/input\.addEventListener\("change", \(\) => \{[\s\S]*?assumptions\[definition\.key\][\s\S]*?\n\s*}\);/);
+
+  assert.ok(choiceHandler, "expected a categorical choice handler");
+  assert.match(choiceHandler[0], /renderResult\(\)/);
+});
+
+test("software output distinguishes the rate metric from the plotted level series", () => {
+  assert.match(pageSource, /Software-efficiency level index/);
+  assert.match(pageSource, /Software progress-rate slowdown/);
+  assert.match(appSource, /rate slowdown/);
+  assert.match(appSource, /progress rate ends/);
+  assert.match(appSource, /progress rates end/);
+});
+
+test("the full source table and placeholder calibration status remain explicit", () => {
+  for (const symbol of ["S_B", "S_P", "M_B", "M_P"]) {
+    assert.match(pageSource, new RegExp(`data-parameter="${symbol}"`));
+  }
+
+  assert.match(pageSource, /Working placeholder sets/);
+  assert.match(pageSource, /Source status/);
+  assert.match(pageSource, /Set by <i>z<\/i> \/ calibrated/);
+  assert.match(pageSource, /Model-generated/);
+  assert.match(pageSource, /not a forecast/i);
 });

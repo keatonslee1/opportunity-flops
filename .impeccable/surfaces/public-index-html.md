@@ -21,10 +21,11 @@ The surface is a flight-test telemetry notebook: a cool-white control rack and s
 ## Constraints
 
 - Keep the existing `runModel(assumptions)` handoff boundary intact.
-- Label all interim chart geometry as illustrative, never as a model result.
+- Present chart geometry as modeled sensitivity output, never as an empirical estimate or absolute forecast.
+- Keep the active β, γ, and δ assumptions visible and identify the normalized baseline.
 - Support keyboard input, reduced motion, and mobile widths without horizontal page overflow.
 - Do not reintroduce the discarded flip-flop or mascot concept.
 
 ## Unresolved
 
-Validated output language, chart series, uncertainty treatment, and the final set of model controls remain dependent on the modeling work.
+Empirical parameter calibration, time-varying R&D compute, uncertainty intervals, a user-selectable horizon, and capability-threshold delay remain future model extensions.

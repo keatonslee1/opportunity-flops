@@ -13,9 +13,22 @@ const contentTypes = {
 createServer((request, response) => {
   const pathname = new URL(request.url, `http://${request.headers.host}`).pathname;
   const requested = pathname === "/" ? "/index.html" : pathname;
-  const filePath = normalize(join(root, requested));
+  let filePath = normalize(join(root, requested));
 
-  if (!filePath.startsWith(root) || !existsSync(filePath)) {
+  if (!filePath.startsWith(root)) {
+    response.writeHead(404);
+    response.end("Not found");
+    return;
+  }
+
+  // Vercel serves this project with `cleanUrls: true`, so /methodology resolves
+  // to methodology.html once deployed. Mirror that here, or extensionless links
+  // work in production and 404 under `npm run dev`.
+  if (!existsSync(filePath) && !extname(filePath) && existsSync(`${filePath}.html`)) {
+    filePath = `${filePath}.html`;
+  }
+
+  if (!existsSync(filePath)) {
     response.writeHead(404);
     response.end("Not found");
     return;

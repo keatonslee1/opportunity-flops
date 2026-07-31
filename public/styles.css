@@ -67,12 +67,9 @@
   text-wrap: balance;
 }
 
+/* Type comes from base.css's shared .abstract primitive — this only places it. */
 .abstract {
-  max-width: var(--measure);
   margin: var(--s4) 0 0;
-  color: var(--muted);
-  font-size: var(--t-lead);
-  line-height: 1.6;
 }
 
 .frontmatter .marginalia p {

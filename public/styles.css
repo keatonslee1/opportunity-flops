@@ -1090,18 +1090,42 @@
    and they stack in source order — prose first, which is the right order to
    read them in anyway. */
 @media (min-width: 1020px) {
+  /* Two content columns across the full sheet, so the pair centres on the
+     page. Held inside the sheet's text column it sat 124px right of centre —
+     the margin column was pushing it over, and with nothing hanging in the
+     margin here but the § mark, that space was doing no work.
+
+     The mark is taken out of flow rather than dropped: it still hangs at the
+     sheet's left edge, in register with every other section's margin column,
+     so the page keeps one vertical line down its left side. Offset by the
+     section's own top padding so it sits level with the heading. */
   .channels-section {
-    grid-template-columns: var(--margin-col) minmax(0, 1fr) minmax(0, 1.15fr);
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
     align-items: start;
-    column-gap: var(--s6);
+    column-gap: var(--s7);
+  }
+
+  /* Not hung in the margin: this section has no margin column left to hang
+     it in, and absolutely positioning it at the sheet edge dropped it on top
+     of the heading's first letter. It runs in above the heading instead —
+     the same treatment base.css gives every section mark below 1020px. */
+  .channels-section > .section-mark {
+    grid-column: 1;
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--s2);
+    margin-bottom: var(--s2);
+    padding-top: 0;
+    text-align: left;
   }
 
   .channels-section > .channels-head {
-    grid-column: 2;
+    grid-column: 1;
   }
 
   .channels-section > .channels {
-    grid-column: 3;
+    grid-column: 2;
     margin-top: 0;
   }
 

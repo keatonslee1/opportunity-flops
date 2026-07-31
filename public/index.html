@@ -147,7 +147,39 @@
 
           <p class="model-error" id="model-error" role="alert" hidden></p>
 
-          <figure class="plate" aria-labelledby="software-chart-title">
+          <!--
+            Six plates stacked ran the results column to roughly four screens,
+            so the assumption you were changing and the figure you were reading
+            were never on screen together. They are now one carousel: the rack
+            stays put on the left, and the figure changes beside it.
+
+            All six stay in the DOM and all six are drawn on every render —
+            app.js still calls renderChart six times. The carousel only moves
+            the track and marks which slide is current, so nothing about the
+            model wiring or the chart tests depends on which figure is showing.
+          -->
+          <div
+            class="carousel"
+            id="results-carousel"
+            role="group"
+            aria-roledescription="carousel"
+            aria-label="Model output figures"
+          >
+            <div class="carousel-bar">
+              <p class="carousel-position"><span id="carousel-position">Figure 1 of 6</span></p>
+              <div class="carousel-nav">
+                <button class="carousel-step" id="carousel-prev" type="button" aria-controls="carousel-track">
+                  <span aria-hidden="true">←</span><span class="sr-only">Previous figure</span>
+                </button>
+                <button class="carousel-step" id="carousel-next" type="button" aria-controls="carousel-track">
+                  <span aria-hidden="true">→</span><span class="sr-only">Next figure</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="carousel-viewport">
+              <div class="carousel-track" id="carousel-track">
+          <figure class="plate carousel-slide" aria-roledescription="slide" aria-labelledby="software-chart-title">
             <div class="plate-readout">
               <output id="software-gap" aria-live="off">Running model</output>
             </div>
@@ -173,7 +205,7 @@
             </figcaption>
           </figure>
 
-          <figure class="plate" aria-labelledby="slowdown-chart-title">
+          <figure class="plate carousel-slide" aria-roledescription="slide" aria-labelledby="slowdown-chart-title">
             <div class="plate-readout">
               <output id="slowdown-gap" aria-live="off">Running model</output>
             </div>
@@ -199,7 +231,7 @@
             </figcaption>
           </figure>
 
-          <figure class="plate" aria-labelledby="capability-chart-title">
+          <figure class="plate carousel-slide" aria-roledescription="slide" aria-labelledby="capability-chart-title">
             <div class="plate-readout">
               <output id="capability-gap" aria-live="off">Running model</output>
             </div>
@@ -225,7 +257,7 @@
             </figcaption>
           </figure>
 
-          <figure class="plate" aria-labelledby="capability-gap-chart-title">
+          <figure class="plate carousel-slide" aria-roledescription="slide" aria-labelledby="capability-gap-chart-title">
             <div class="plate-readout">
               <output id="capability-gap-series-output" aria-live="off">Running model</output>
             </div>
@@ -251,7 +283,7 @@
             </figcaption>
           </figure>
 
-          <figure class="plate" aria-labelledby="risk-chart-title">
+          <figure class="plate carousel-slide" aria-roledescription="slide" aria-labelledby="risk-chart-title">
             <div class="plate-readout">
               <div class="chart-series-legend" aria-label="AI risk chart legend">
                 <span><i class="legend-line baseline"></i>Baseline</span>
@@ -281,7 +313,7 @@
             </figcaption>
           </figure>
 
-          <figure class="plate" aria-labelledby="safety-benefit-chart-title">
+          <figure class="plate carousel-slide" aria-roledescription="slide" aria-labelledby="safety-benefit-chart-title">
             <div class="plate-readout">
               <div class="chart-series-legend" aria-label="Safety benefit chart legend">
                 <span><i class="legend-line baseline"></i>Baseline (0%)</span>
@@ -310,6 +342,36 @@
               <p class="fig-sub"><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>) / <i>R</i><sub>B</sub>(<i>t</i>) · percent</p>
             </figcaption>
           </figure>
+              </div>
+            </div>
+
+            <!--
+              The figure names carry the selector, not six anonymous dots. With
+              six distinct quantities a dot tells you how far along you are but
+              never what you are about to look at, and "AI risk" is not a place
+              you should have to arrive at by pressing next four times.
+            -->
+            <div class="carousel-tabs" id="carousel-tabs" role="tablist" aria-label="Choose a figure">
+              <button class="carousel-tab" type="button" role="tab" data-slide="0" id="tab-software" aria-controls="carousel-track" aria-selected="true">
+                <span class="tab-no">1</span>Software level
+              </button>
+              <button class="carousel-tab" type="button" role="tab" data-slide="1" id="tab-slowdown" aria-controls="carousel-track" aria-selected="false" tabindex="-1">
+                <span class="tab-no">2</span>Slowdown
+              </button>
+              <button class="carousel-tab" type="button" role="tab" data-slide="2" id="tab-capability" aria-controls="carousel-track" aria-selected="false" tabindex="-1">
+                <span class="tab-no">3</span>Capability
+              </button>
+              <button class="carousel-tab" type="button" role="tab" data-slide="3" id="tab-capability-gap" aria-controls="carousel-track" aria-selected="false" tabindex="-1">
+                <span class="tab-no">4</span>Capability gap
+              </button>
+              <button class="carousel-tab" type="button" role="tab" data-slide="4" id="tab-risk" aria-controls="carousel-track" aria-selected="false" tabindex="-1">
+                <span class="tab-no">5</span>AI risk
+              </button>
+              <button class="carousel-tab" type="button" role="tab" data-slide="5" id="tab-safety-benefit" aria-controls="carousel-track" aria-selected="false" tabindex="-1">
+                <span class="tab-no">6</span>Safety benefit
+              </button>
+            </div>
+          </div>
 
           <div class="comparison-strip" aria-label="Scenario comparison status">
             <div data-scenario="baseline">

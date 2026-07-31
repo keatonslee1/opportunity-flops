@@ -16,8 +16,8 @@
    ========================================================================== */
 
 /* --- Fonts ---------------------------------------------------------------
-   Newsreader (display / mathematics) + Fira Sans (body, controls, the whole
-   small-caps apparatus) + Fira Mono (readouts).
+   Newsreader (display) + Fira Sans (body, controls, the whole small-caps
+   apparatus) + Fira Mono (readouts) + STIX Two (mathematics).
 
    Fira replaced Barlow because the apparatus this paper needs is not
    stylistic — it is machinery, and Barlow does not have it. Fira Sans ships
@@ -31,10 +31,10 @@
    maths relations the copy actually sets. No CDN, no @import, no build step:
    the woff2 files are committed, and the OFL text sits beside them.
 
-   Newsreader ships no Greek. Single-letter variables set through --font-math,
-   whose fallback deliberately leads with a Greek-capable serif rather than
-   reusing --font-display. Body-set Greek (β, γ, δ, λ in the parameter labels)
-   now resolves natively in Fira Sans and no longer falls back mid-line.
+   Newsreader ships no Greek and no maths operators, which is why --font-math
+   points at STIX Two rather than at --font-display — see the note above the
+   STIX faces below. Body-set Greek (β, γ, δ, λ in the parameter labels)
+   resolves natively in Fira Sans and does not fall back mid-line.
    ------------------------------------------------------------------------ */
 
 @font-face {
@@ -85,6 +85,47 @@
   font-display: swap;
 }
 
+/* Mathematics sets in STIX Two, not in Newsreader.
+
+   Newsreader ships no Greek at all and no maths operators, so every β, γ, δ,
+   λ and ∈ in the paper was resolving through --font-math's *fallback* — a
+   second serif, mid-equation, in the most prominent typography on the page,
+   and a different second serif on every reader's machine. Ṡ, ∈ and ∼ reached
+   no shipped face whatsoever. That is a rendering fallback working correctly,
+   not a typographic result.
+
+   Setting mathematics in a face built for it is also just what scientific
+   publishing does; display and mathematics being different faces is normal,
+   not a compromise. STIX splits its own coverage — Text carries the alphabet,
+   Greek and accented Latin, Math carries the operators — so both are here.
+   The operator face is subset to U+2190–22FF alone and declares that range, so
+   a page with no operators on it never fetches it. */
+
+@font-face {
+  font-family: "STIX Two Text";
+  src: url("/assets/fonts/STIXTwoText-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "STIX Two Text";
+  src: url("/assets/fonts/STIXTwoText-Italic.woff2") format("woff2");
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "STIX Two Math";
+  src: url("/assets/fonts/STIXTwoMath-ops.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+2190-21FF, U+2200-22FF;
+}
+
 @font-face {
   font-family: "Newsreader";
   src: url("/assets/fonts/Newsreader-latin.woff2") format("woff2");
@@ -103,8 +144,7 @@
   font-weight: 200 800;
   font-display: swap;
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
-    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
-    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    U+0304, U+0308, U+0329, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113;
 }
 
 @font-face {
@@ -125,8 +165,7 @@
   font-weight: 200 800;
   font-display: swap;
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
-    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
-    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    U+0304, U+0308, U+0329, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113;
 }
 
 /* --- Tokens --------------------------------------------------------------
@@ -184,14 +223,17 @@
   --ochre-text: #7a5610;    /* 5.9:1 — uncertainty, as text */
   --fluoro: #ff48b0;        /* drawn imagery only. Never a mark, never a control. */
 
-  /* Retained alias: --ready was the old name for verdigris and is still read
-     by page stylesheets. One value, one meaning. */
-  --ready: var(--verdigris);
+  /* --ready was the old name for this ink and is deliberately NOT aliased.
+     It was being read by the methodology page's status stamps, which made
+     verdigris mean "safety benefit" in the figures and "implemented" in the
+     margins — two meanings for one ink, which is exactly what the Semantic Ink
+     Rule exists to prevent. Build status is --ink, and the one caveat stamp is
+     --ochre-text, because that one really is marking uncertainty. */
 
   /* Type */
   --font-body: "Fira Sans", "Trebuchet MS", sans-serif;
   --font-display: "Newsreader", "Iowan Old Style", Charter, Georgia, serif;
-  --font-math: "Newsreader", "Times New Roman", Georgia, serif;
+  --font-math: "STIX Two Text", "STIX Two Math", "Times New Roman", Georgia, serif;
   --font-mono: "Fira Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 
   --t-display: clamp(2.6rem, 5.2vw, 4.75rem);
@@ -206,9 +248,17 @@
   --track-caps: 0.09em;
   --track-wide: 0.16em;
 
-  /* 62–72 characters. Never wider. */
-  --measure: 68ch;
-  --measure-tight: 62ch;
+  /* 62–72 characters. Never wider — brief §3.1 makes the cap hard.
+
+     These are NOT 68 and 62. A `ch` is the advance width of "0", and in every
+     face here the digits are appreciably wider than the average lowercase
+     letter, so `68ch` of Fira Sans prose renders about 83 characters — over
+     the cap on both pages, measured on the built page rather than assumed.
+     The ratio is roughly 1.23 characters per ch for Fira Sans and differs per
+     face, which is why the display-serif surfaces carry their own caps rather
+     than sharing one token that cannot fit them all. */
+  --measure: 56ch;        /* ≈69 characters of Fira Sans prose */
+  --measure-tight: 50ch;  /* ≈61 characters, for the display serif */
 
   /* Space — multiples of the 24px body baseline */
   --s1: 8px;
@@ -1162,9 +1212,13 @@ footer p:first-child {
     border-left: 1px solid var(--rule);
   }
 
-  /* The section mark runs in above its heading rather than beside it. */
+  /* The section mark runs in above its heading rather than beside it. It has
+     to un-stack as well as re-align: at full width it is a column with the
+     status stamp under the mark, and leaving flex-direction alone here left
+     the mark, the stamp and the heading as three cramped lines at 360px. */
   .section-mark {
     display: flex;
+    flex-direction: row;
     align-items: baseline;
     gap: var(--s2);
     padding-top: 0;

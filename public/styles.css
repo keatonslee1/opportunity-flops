@@ -727,6 +727,7 @@
 }
 
 .cursor-hint {
+  max-width: var(--measure);
   margin: 0 0 var(--s3);
   padding-top: var(--s2);
   border-top: 1px solid var(--rule);

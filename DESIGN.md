@@ -35,7 +35,7 @@ typography:
     fontWeight: 500
     lineHeight: 1.15
   math:
-    fontFamily: "Newsreader, Times New Roman, Georgia, serif"
+    fontFamily: "STIX Two Text, STIX Two Math, Times New Roman, Georgia, serif"
     fontStyle: "italic"
   body:
     fontFamily: "Fira Sans, Trebuchet MS, sans-serif"
@@ -96,6 +96,11 @@ components:
     borderTop: "1px solid {colors.midnight-ink}"
     textColor: "{colors.muted-slate}"
     fontSize: "0.7rem"
+  abstract:
+    fontFamily: "{typography.display.fontFamily}"
+    fontSize: "clamp(1.14rem, 1.7vw, 1.4rem)"
+    lineHeight: 1.42
+    maxWidth: "50ch"
 ---
 
 # Design System: Opportunity FLOPs
@@ -216,10 +221,12 @@ change, or words.
 
 ## Typography
 
-**Display / Math:** Newsreader, self-hosted as a variable woff2 in roman and
-italic, weights 200–800.
+**Display:** Newsreader, self-hosted as a variable woff2 in roman and italic,
+weights 200–800.
 **Body / UI:** Fira Sans, self-hosted subsets at 400, 400 italic, 500, 700.
 **Readout:** Fira Mono, self-hosted subsets at 400 and 500.
+**Mathematics:** STIX Two Text (roman and italic) with STIX Two Math for the
+operators, both self-hosted subsets.
 
 All faces are OFL, self-hosted as `woff2` under `public/assets/fonts/` with
 their licence text committed alongside. No CDN, no `@import`, no build step.
@@ -291,14 +298,33 @@ hyphen standing in for a dash, no `x` standing in for `×`. Fira ships no `′ �
 primes and no `▸`; the copy does not need primes, and UI marks are drawn rather
 than borrowed from a glyph the face does not have.
 
-**Newsreader has no Greek.** β, γ, δ and α inside `<i>` / `<var>` resolve
-through `--font-math`, whose fallback deliberately leads with a Greek-capable
-serif. Do not point `--font-math` at `--font-display`. Body-set Greek in the
-parameter labels now resolves natively in Fira Sans and no longer falls back
-mid-line.
+**Mathematics does not set in the display face.** Newsreader ships no Greek and
+no mathematical operators, so pointing `--font-math` at it meant every β, γ, δ,
+λ and ∈ resolved through the *fallback* — a second serif mid-equation, and a
+different one on every reader's machine. `Ṡ`, `∈` and `∼` reached no shipped
+face at all. `--font-math` is therefore STIX Two, which is built for this:
+STIX Two Text carries the alphabet, Greek and accented Latin; STIX Two Math
+carries the operators and is subset to `U+2190–22FF` with a matching
+`unicode-range`, so a page with no operators never fetches it. Display and
+mathematics being different faces is the scientific-publishing norm, not a
+compromise. Body-set Greek in the parameter labels resolves natively in Fira
+Sans. Verified by resolving each glyph against a deliberately different
+fallback: nothing mathematical falls through to a system font.
 
-**Optical margin discipline.** The text measure is 62–72 characters
-(`--measure` 68ch, `--measure-tight` 62ch). Never wider.
+**Do not restore `--ready`.** It was an alias for verdigris, and status stamps
+read it — which made verdigris mean "safety benefit" in the figures and
+"implemented" in the margins. Build status is `--ink`; a caveat stamp is
+`--ochre-text`, because that one is genuinely marking uncertainty.
+
+**Optical margin discipline.** The text measure is 62–72 characters. Never
+wider — `--measure` is **56ch** and `--measure-tight` **50ch**, not 68 and 62.
+A `ch` is the advance width of `0`, and the digits in every face here are
+appreciably wider than the average lowercase letter, so `68ch` of Fira Sans
+prose renders about 83 characters. The ratio is roughly 1.23 characters per
+`ch` for Fira Sans and differs per face, which is why the display-serif
+surfaces carry their own caps rather than sharing one token. Measured on the
+built page against a reference string set in each element's own computed font,
+not assumed from the token.
 
 ## Layout
 
@@ -324,11 +350,18 @@ left to print them in.
 ## Print artifacts
 
 - **Paper grain.** One `feTurbulence` tile, alpha baked into the SVG, applied
-  once to `<body>` and fixed to the viewport. Not repeated per section. It sits
-  behind all content, so opaque plate surfaces exclude it automatically.
+  once to the **root** and fixed to the viewport. Not repeated per section. It
+  sits behind all content, so opaque plate surfaces exclude it automatically.
+  It is on the root and not on `<body>` for a reason: a stacking context paints
+  its own background, then its negative-`z-index` descendants, then the
+  backgrounds of its in-flow block descendants — so a grain on `<body>` painted
+  straight over the registration marks and they vanished on both pages.
 - **Registration marks.** A rotationally symmetric press target, hairline,
-  `aria-hidden`, 16px, positioned against `<main>` so it can never land on a
-  plate. If they read as decoration, they are too big.
+  `aria-hidden`, 12px at a 6px inset, `z-index: -1` so it sits behind all
+  content and can never land on a plate. Removed below 1020px, where there is
+  no trim margin to print them in. If they read as decoration, they are too
+  big — at 16px the top-left mark touched the first letter of the running head,
+  which is a mark in the type area rather than in the margin.
 - **Rules do the structural work.** Hairline `--rule` for internal division,
   1px `--ink` for structural boundary, 2px `--ink` for masthead and colophon.
 

@@ -16,7 +16,7 @@ Policy and technical-governance researchers arrive to configure a compute-reallo
 
 ## Direction
 
-The surface is a flight-test telemetry notebook: a cool-white control rack and synchronized plots make the calculator itself the first-view thesis. Its memorable moment is a sweep line and trace redraw on entry and discrete scenario changes; continuous slider movement updates both trajectories immediately without replaying the sequence.
+The surface is a flight-test telemetry notebook: a cool-white control rack and four synchronized plots make the calculator itself the first-view thesis. Its memorable moment is a sweep line and trace redraw on entry and discrete scenario changes; continuous slider movement updates all four plots immediately without replaying the sequence.
 
 ## Constraints
 

@@ -31,6 +31,13 @@ let scenario = initialState.scenario;
 
 const charts = {
   software: {
+    seriesKey: "software",
+    domainKind: "level",
+    areaMode: "min",
+    metricKey: "softwareLevelGap",
+    descriptionKind: "softwareLevel",
+    zeroLabel: "level gap",
+    resultLabel: "lower",
     svg: document.querySelector("#software-chart"),
     axes: document.querySelector("#software-axes"),
     grid: document.querySelector("#software-grid"),
@@ -42,7 +49,33 @@ const charts = {
     sweep: document.querySelector("#software-sweep"),
     output: document.querySelector("#software-gap"),
   },
+  softwareSlowdown: {
+    seriesKey: "softwareSlowdown",
+    domainKind: "fraction",
+    areaMode: "max",
+    metricKey: "softwareSlowdown",
+    descriptionKind: "softwareSlowdown",
+    zeroLabel: "rate slowdown",
+    resultLabel: "rate slowdown",
+    svg: document.querySelector("#slowdown-chart"),
+    axes: document.querySelector("#slowdown-axes"),
+    grid: document.querySelector("#slowdown-grid"),
+    description: document.querySelector("#slowdown-svg-desc"),
+    baseline: document.querySelector("#slowdown-baseline"),
+    firmA: document.querySelector("#slowdown-a"),
+    firmB: document.querySelector("#slowdown-b"),
+    area: document.querySelector("#slowdown-area"),
+    sweep: document.querySelector("#slowdown-sweep"),
+    output: document.querySelector("#slowdown-gap"),
+  },
   capability: {
+    seriesKey: "capability",
+    domainKind: "level",
+    areaMode: "min",
+    metricKey: "capabilityGap",
+    descriptionKind: "capability",
+    zeroLabel: "capability gap",
+    resultLabel: "lower",
     svg: document.querySelector("#capability-chart"),
     axes: document.querySelector("#capability-axes"),
     grid: document.querySelector("#capability-grid"),
@@ -53,6 +86,25 @@ const charts = {
     area: document.querySelector("#capability-area"),
     sweep: document.querySelector("#capability-sweep"),
     output: document.querySelector("#capability-gap"),
+  },
+  capabilityGap: {
+    seriesKey: "capabilityGap",
+    domainKind: "fraction",
+    areaMode: "max",
+    metricKey: "capabilityGap",
+    descriptionKind: "capabilityGap",
+    zeroLabel: "capability gap",
+    resultLabel: "capability gap",
+    svg: document.querySelector("#capability-gap-chart"),
+    axes: document.querySelector("#capability-gap-axes"),
+    grid: document.querySelector("#capability-gap-grid"),
+    description: document.querySelector("#capability-gap-svg-desc"),
+    baseline: document.querySelector("#capability-gap-baseline"),
+    firmA: document.querySelector("#capability-gap-a"),
+    firmB: document.querySelector("#capability-gap-b"),
+    area: document.querySelector("#capability-gap-area"),
+    sweep: document.querySelector("#capability-gap-sweep"),
+    output: document.querySelector("#capability-gap-series-output"),
   },
 };
 
@@ -171,8 +223,18 @@ function yPosition(value, domain) {
   return plot.bottom - ((clamped - domain.min) / (domain.max - domain.min)) * (plot.bottom - plot.top);
 }
 
-function chartDomain(series) {
+function chartDomain(series, chart) {
   const maximum = Math.max(...series.baseline, ...series.firmA, ...series.firmB);
+
+  if (chart.domainKind === "fraction") {
+    const fallbackMaximum = 0.03;
+    const niceMaximum = Math.max(
+      fallbackMaximum,
+      Math.ceil((maximum * 100) / 3) * 3 / 100,
+    );
+    return { min: 0, max: niceMaximum };
+  }
+
   const niceMaximum = Math.max(110, Math.ceil((maximum + 4) / 10) * 10);
   return { min: 100, max: niceMaximum };
 }
@@ -219,7 +281,9 @@ function renderAxes(chart, years, domain) {
       y: (y + 5).toFixed(1),
       "text-anchor": "end",
     });
-    label.textContent = Math.round(value);
+    label.textContent = chart.domainKind === "fraction"
+      ? `${(value * 100).toFixed(0)}%`
+      : Math.round(value);
     chart.axes.append(label);
   }
 
@@ -273,10 +337,50 @@ function animateChart(chart) {
   chart.sweep.classList.add("is-scanning");
 }
 
+function chartDescription(chart, result, metric) {
+  const startYear = Math.round(result.series.years[0]);
+  const endYear = Math.round(result.series.years.at(-1));
+  const endValue = formatPercent(metric.firmA);
+
+  if (chart.descriptionKind === "softwareLevel") {
+    const scenarioDescription = scenario === "baseline"
+      ? "Both firms follow the baseline level path."
+      : scenario === "unilateral"
+        ? `Firm A follows the policy level path while Firm B remains on the baseline, ending ${endValue} lower.`
+        : `Both firms follow the same policy level path, ending ${endValue} lower.`;
+    return `Modeled software-efficiency level indices from ${startYear} through ${endYear}. ${scenarioDescription}`;
+  }
+
+  if (chart.descriptionKind === "softwareSlowdown") {
+    const scenarioDescription = scenario === "baseline"
+      ? "Both firms remain at zero slowdown relative to baseline."
+      : scenario === "unilateral"
+        ? `Firm A reaches ${endValue} rate slowdown in ${endYear}; Firm B remains at zero.`
+        : `Both firms follow the same slowdown path, reaching ${endValue} in ${endYear}.`;
+    return `Modeled software progress slowdown percentages from ${startYear} through ${endYear}. ${scenarioDescription}`;
+  }
+
+  if (chart.descriptionKind === "capabilityGap") {
+    const scenarioDescription = scenario === "baseline"
+      ? "Both firms remain at zero capability gap relative to baseline."
+      : scenario === "unilateral"
+        ? `Firm A reaches a ${endValue} capability gap in ${endYear}; Firm B remains at zero.`
+        : `Both firms follow the same gap path, reaching ${endValue} in ${endYear}.`;
+    return `Modeled AI capability gap percentages from ${startYear} through ${endYear}. ${scenarioDescription}`;
+  }
+
+  const scenarioDescription = scenario === "baseline"
+    ? "Both firms follow the baseline."
+    : scenario === "unilateral"
+      ? `Firm A follows the policy path while Firm B remains on the baseline, ending ${endValue} lower.`
+      : `Both firms follow the same policy path, ending ${endValue} lower.`;
+  return `Modeled frontier capability indices from ${startYear} through ${endYear}. ${scenarioDescription}`;
+}
+
 function renderChart(kind, result, shouldAnimate = true) {
   const chart = charts[kind];
-  const series = result.series[kind];
-  const domain = chartDomain(series);
+  const series = result.series[chart.seriesKey];
+  const domain = chartDomain(series, chart);
 
   if (!shouldAnimate) stopChartAnimation(chart);
 
@@ -285,37 +389,28 @@ function renderChart(kind, result, shouldAnimate = true) {
   chart.firmA.setAttribute("d", pathFromSeries(series.firmA, domain));
   chart.firmB.setAttribute("d", pathFromSeries(series.firmB, domain));
 
-  const comparisonSeries = series.firmA.map((value, index) => Math.min(value, series.firmB[index]));
-  chart.area.setAttribute("d", areaBetween(series.baseline, comparisonSeries, domain));
+  const comparisonSeries = series.firmA.map((value, index) => (
+    chart.areaMode === "max"
+      ? Math.max(value, series.firmB[index])
+      : Math.min(value, series.firmB[index])
+  ));
+  const areaUpper = chart.areaMode === "max" ? comparisonSeries : series.baseline;
+  const areaLower = chart.areaMode === "max" ? series.baseline : comparisonSeries;
+  chart.area.setAttribute("d", areaBetween(areaUpper, areaLower, domain));
 
   chart.firmA.style.opacity = scenario === "baseline" ? "0" : "1";
   chart.firmB.style.opacity = scenario === "coordinated" ? "1" : "0";
   chart.firmB.classList.toggle("is-overlapping", scenario === "coordinated");
   chart.area.style.opacity = scenario === "baseline" ? "0" : "0.42";
 
-  const isSoftware = kind === "software";
-  const metric = isSoftware ? result.metrics.softwareSlowdown : result.metrics.capabilityGap;
+  const metric = result.metrics[chart.metricKey];
   chart.output.textContent = scenario === "baseline"
-    ? isSoftware ? "0.0% rate slowdown" : "0.0% capability gap"
+    ? `0.0% ${chart.zeroLabel}`
     : scenario === "unilateral"
-      ? isSoftware
-        ? `Firm A · ${formatPercent(metric.firmA)} rate slowdown`
-        : `Firm A · ${formatPercent(metric.firmA)} lower`
-      : isSoftware
-        ? `Both firms · ${formatPercent(metric.firmA)} rate slowdown`
-        : `Both firms · ${formatPercent(metric.firmA)} lower`;
+      ? `Firm A · ${formatPercent(metric.firmA)} ${chart.resultLabel}`
+      : `Both firms · ${formatPercent(metric.firmA)} ${chart.resultLabel}`;
 
-  const subject = isSoftware ? "software-efficiency levels" : "frontier capability";
-  const scenarioDescription = scenario === "baseline"
-    ? "Both firms follow the baseline."
-    : scenario === "unilateral"
-      ? isSoftware
-        ? `Firm A follows the policy level path while Firm B remains on the baseline; Firm A's progress rate ends ${formatPercent(metric.firmA)} below baseline.`
-        : `Firm A follows the policy path while Firm B remains on the baseline, ending ${formatPercent(metric.firmA)} lower.`
-      : isSoftware
-        ? `Both firms follow the same policy level path; their progress rates end ${formatPercent(metric.firmA)} below baseline.`
-        : `Both firms follow the same policy path, ending ${formatPercent(metric.firmA)} lower.`;
-  chart.description.textContent = `Modeled ${subject} indices from ${Math.round(result.series.years[0])} through ${Math.round(result.series.years.at(-1))}. ${scenarioDescription}`;
+  chart.description.textContent = chartDescription(chart, result, metric);
 
   if (shouldAnimate && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     animateChart(chart);
@@ -358,7 +453,9 @@ function renderResult(shouldAnimate = true) {
     headline.textContent = scenario === "baseline" ? "No divergence" : `${formatPercent(capabilityGap)} lower`;
     updateCalibrationReadout(result.calibration);
     renderChart("software", result, shouldAnimate);
+    renderChart("softwareSlowdown", result, shouldAnimate);
     renderChart("capability", result, shouldAnimate);
+    renderChart("capabilityGap", result, shouldAnimate);
     updateComparisonStrip(result);
   } catch (error) {
     modelError.textContent = `The model could not run: ${error.message}. Reset the assumptions and try again.`;

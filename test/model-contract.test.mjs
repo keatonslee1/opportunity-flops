@@ -462,7 +462,9 @@ test("model exposes rate series, metric timing, units, and calibration caveats",
     years: "calendar year",
     software: "index (2026 = 100)",
     softwareRate: "software index points per year",
+    softwareSlowdown: "fractional reduction from baseline software progress rate",
     capability: "training-compute-normalized index (2026 = 100)",
+    capabilityGap: "fractional reduction from baseline capability",
     metrics: "fraction of baseline at 2034",
   });
   assert.equal(result.caveats.length, 6);
@@ -472,6 +474,75 @@ test("model exposes rate series, metric timing, units, and calibration caveats",
   assert.match(result.caveats[3], /A is absorbed.*alpha.*cancels/i);
   assert.match(result.caveats[4], /10,000.*triangular.*working assumptions/i);
   assert.match(result.caveats[5], /rank-aligned.*P10.*P50.*P90.*not joint outcome/i);
+});
+
+test("model exposes software progress slowdown at every charted time", () => {
+  const result = runModel({
+    computeReallocated: 20,
+    impactLevel: "medium",
+    scenario: "unilateral",
+  });
+
+  for (const firm of ["baseline", "firmA", "firmB"]) {
+    assert.equal(
+      result.series.softwareSlowdown[firm].length,
+      result.series.years.length,
+    );
+  }
+
+  for (let index = 0; index < result.series.years.length; index += 1) {
+    assert.equal(result.series.softwareSlowdown.baseline[index], 0);
+    assert.equal(result.series.softwareSlowdown.firmB[index], 0);
+    assertClose(
+      result.series.softwareSlowdown.firmA[index],
+      1 - (
+        result.series.softwareRate.firmA[index]
+        / result.series.softwareRate.baseline[index]
+      ),
+    );
+  }
+
+  assertClose(
+    result.metrics.softwareSlowdown.firmA,
+    result.series.softwareSlowdown.firmA.at(-1),
+  );
+});
+
+test("model exposes AI capability gap at every charted time", () => {
+  const result = runModel({
+    computeReallocated: 20,
+    impactLevel: "medium",
+    scenario: "coordinated",
+  });
+
+  for (const firm of ["baseline", "firmA", "firmB"]) {
+    assert.equal(
+      result.series.capabilityGap[firm].length,
+      result.series.years.length,
+    );
+  }
+
+  for (let index = 0; index < result.series.years.length; index += 1) {
+    assert.equal(result.series.capabilityGap.baseline[index], 0);
+    for (const firm of ["firmA", "firmB"]) {
+      assertClose(
+        result.series.capabilityGap[firm][index],
+        1 - (
+          result.series.capability[firm][index]
+          / result.series.capability.baseline[index]
+        ),
+      );
+    }
+  }
+
+  assertClose(
+    result.metrics.capabilityGap.firmA,
+    result.series.capabilityGap.firmA.at(-1),
+  );
+  assertClose(
+    result.metrics.capabilityGap.firmB,
+    result.series.capabilityGap.firmB.at(-1),
+  );
 });
 
 test("initial software-rate slowdown equals one minus the policy multiplier", () => {

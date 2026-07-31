@@ -107,6 +107,29 @@ const PLANNED_METRICS = [
   "Unilateral vs coordinated",
 ];
 
+/**
+ * Policy impact level — the brief's second dashboard parameter, independent of
+ * the compute percentage. Labels only: what Low / Medium / High mean
+ * numerically is the model's to define. The selected key reaches runModel() in
+ * the assumptions object as `policyImpactLevel`.
+ *
+ * If the model declares its own `policyImpactLevel` definition, that wins.
+ */
+const IMPACT_KEY = "policyImpactLevel";
+
+const FALLBACK_IMPACT = {
+  key: IMPACT_KEY,
+  label: "Policy impact level",
+  type: "select",
+  options: [
+    { value: "low", label: "Low" },
+    { value: "medium", label: "Medium" },
+    { value: "high", label: "High" },
+  ],
+  value: "medium",
+  suppliedByUi: true,
+};
+
 const EMPTY = "—";
 const STATE_KEY = "panelState";
 
@@ -164,7 +187,16 @@ async function restoreState() {
 
 // ── Controls ───────────────────────────────────────────────────────────
 
+function isSelect(definition) {
+  return definition.type === "select" && Array.isArray(definition.options);
+}
+
 function displayValue(definition, value) {
+  if (isSelect(definition)) {
+    return (
+      definition.options.find((o) => o.value === value)?.label ?? String(value)
+    );
+  }
   const step = Number(definition.step) || 1;
   const digits = step < 1 ? String(step).split(".")[1].length : 0;
   return `${Number(value).toFixed(digits)}${definition.suffix ?? ""}`;
@@ -205,11 +237,46 @@ function buildSlider(definition) {
   return row;
 }
 
+/**
+ * Enumerated assumptions (currently the policy impact level) render as a
+ * select. The option labels are view copy; what each level means numerically
+ * is the model's to define.
+ */
+function buildSelect(definition) {
+  const row = document.createElement("label");
+  row.className = "control control-choice";
+
+  const title = document.createElement("span");
+  title.className = "control-label";
+  title.textContent = definition.label;
+
+  const input = document.createElement("select");
+  input.setAttribute("aria-label", definition.label);
+  for (const option of definition.options) {
+    const node = document.createElement("option");
+    node.value = option.value;
+    node.textContent = option.label;
+    input.append(node);
+  }
+  input.value = state.assumptions[definition.key];
+  input.addEventListener("change", () => {
+    setAssumption(definition.key, input.value);
+  });
+
+  row.append(title, input);
+  sliders.set(definition.key, { input, output: null });
+  return row;
+}
+
+function buildControl(definition) {
+  return isSelect(definition) ? buildSelect(definition) : buildSlider(definition);
+}
+
 function mountAssumptionControls() {
   nodes.controls.replaceChildren();
   sliders.clear();
   for (const definition of state.definitions) {
-    nodes.controls.append(buildSlider(definition));
+    nodes.controls.append(buildControl(definition));
   }
   nodes.controlsEmpty.hidden = state.definitions.length > 0;
 }
@@ -217,11 +284,13 @@ function mountAssumptionControls() {
 function setAssumption(key, value) {
   state.assumptions[key] = value;
   const definition = state.definitions.find((d) => d.key === key);
-  const slider = sliders.get(key);
-  if (slider && definition) {
-    if (Number(slider.input.value) !== value) slider.input.value = value;
-    slider.output.textContent = displayValue(definition, value);
-    paintTrack(slider.input, definition, value);
+  const control = sliders.get(key);
+  if (control && definition) {
+    if (control.input.value !== String(value)) control.input.value = value;
+    if (control.output) {
+      control.output.textContent = displayValue(definition, value);
+    }
+    if (!isSelect(definition)) paintTrack(control.input, definition, value);
   }
   saveState();
   render();
@@ -230,11 +299,13 @@ function setAssumption(key, value) {
 function syncSliders() {
   for (const definition of state.definitions) {
     const value = state.assumptions[definition.key];
-    const slider = sliders.get(definition.key);
-    if (!slider) continue;
-    slider.input.value = value;
-    slider.output.textContent = displayValue(definition, value);
-    paintTrack(slider.input, definition, value);
+    const control = sliders.get(definition.key);
+    if (!control) continue;
+    control.input.value = value;
+    if (control.output) {
+      control.output.textContent = displayValue(definition, value);
+    }
+    if (!isSelect(definition)) paintTrack(control.input, definition, value);
   }
 }
 
@@ -355,7 +426,10 @@ async function render() {
 // ── Boot ───────────────────────────────────────────────────────────────
 
 function applyDefinitions(exports, restored) {
-  state.definitions = exports.assumptionDefinitions ?? [];
+  const declared = exports.assumptionDefinitions ?? [];
+  // The impact level is appended only while the model stays silent about it.
+  const impact = declared.find((d) => d.key === IMPACT_KEY) ?? FALLBACK_IMPACT;
+  state.definitions = impact.suppliedByUi ? [...declared, impact] : declared;
   state.scenarios = exports.SCENARIOS ?? FALLBACK_SCENARIOS;
 
   const defaults = Object.fromEntries(

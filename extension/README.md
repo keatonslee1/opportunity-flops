@@ -66,10 +66,17 @@ from the repository root. The choice persists.
   are labelled before values exist so the layout reads correctly while pending.
 - **Scenario** — no reallocation / one firm / both firms. Uses the model's own
   `SCENARIOS` export when it publishes one, otherwise the brief's labels.
-- **Assumptions** — one slider per entry in the model's `assumptionDefinitions`.
-  Nothing is hardcoded: if the model adds, removes or renames an assumption, the
-  panel follows. Values persist across panel opens and reset to the model's own
-  defaults.
+- **Assumptions** — one control per entry in the model's `assumptionDefinitions`:
+  a slider normally, or a select for entries declaring `type: "select"` with an
+  `options` array. Nothing is hardcoded: if the model adds, removes or renames an
+  assumption, the panel follows. Values persist across panel opens and reset to
+  the model's own defaults.
+- **Policy impact level** — the brief's second dashboard parameter. The panel
+  appends a Low / Medium / High select *only while the model stays silent about
+  it*; if the model declares its own `policyImpactLevel`, that declaration wins
+  outright. Either way the choice reaches `runModel()` in the assumptions object.
+  The labels are view copy — what each level means numerically is the model's to
+  define.
 
 ## Files
 

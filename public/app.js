@@ -1,4 +1,5 @@
 import { assumptionDefinitions, runModel } from "./model.js";
+import { buildUrl, decodeState, encodeState } from "./permalink.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -6,14 +7,27 @@ const controls = document.querySelector("#assumption-controls");
 const headline = document.querySelector("#headline-result");
 const modelError = document.querySelector("#model-error");
 const resetButton = document.querySelector("#reset-controls");
+const copyLinkButton = document.querySelector("#copy-link");
 const scenarioInputs = [...document.querySelectorAll('input[name="scenario"]')];
 
-const assumptions = Object.fromEntries(
-  assumptionDefinitions.map((definition) => [definition.key, definition.value]),
-);
+const DEFAULT_SCENARIO =
+  document.querySelector('input[name="scenario"]:checked')?.value ?? "coordinated";
+
+const permalinkConfig = {
+  definitions: assumptionDefinitions,
+  scenarioKeys: scenarioInputs.map((input) => input.value),
+  defaultScenario: DEFAULT_SCENARIO,
+};
+
+// A shared link restores the whole configuration. Values are validated against
+// the declared ranges on the way in, so a hand-edited URL cannot put a control
+// somewhere it could not otherwise go.
+const initialState = decodeState(window.location.search, permalinkConfig);
+
+const assumptions = initialState.assumptions;
 
 const controlInputs = new Map();
-let scenario = document.querySelector('input[name="scenario"]:checked')?.value ?? "coordinated";
+let scenario = initialState.scenario;
 
 const charts = {
   software: {
@@ -71,14 +85,14 @@ function createRangeControl(definition) {
   title.textContent = definition.label;
 
   const value = document.createElement("output");
-  value.textContent = formatValue(definition, definition.value);
+  value.textContent = formatValue(definition, assumptions[definition.key]);
 
   const input = document.createElement("input");
   input.type = "range";
   input.min = definition.min;
   input.max = definition.max;
   input.step = definition.step;
-  input.value = definition.value;
+  input.value = assumptions[definition.key];
   input.setAttribute("aria-label", definition.label);
   updateRangeFill(input);
 
@@ -86,6 +100,7 @@ function createRangeControl(definition) {
     assumptions[definition.key] = Number(input.value);
     value.textContent = formatValue(definition, input.value);
     updateRangeFill(input);
+    syncPermalink();
     renderResult(false);
   });
 
@@ -114,7 +129,7 @@ function createChoiceControl(definition) {
     input.type = "radio";
     input.name = definition.key;
     input.value = option.value;
-    input.checked = option.value === definition.value;
+    input.checked = option.value === assumptions[definition.key];
 
     const labelText = document.createElement("span");
     labelText.innerHTML = `<strong>${option.label}</strong><small>${option.description}</small>`;
@@ -122,6 +137,7 @@ function createChoiceControl(definition) {
     input.addEventListener("change", () => {
       if (!input.checked) return;
       assumptions[definition.key] = input.value;
+      syncPermalink();
       renderResult();
     });
 
@@ -351,10 +367,51 @@ function renderResult(shouldAnimate = true) {
   }
 }
 
+// ── Permalink ──────────────────────────────────────────────────────────
+
+/**
+ * Keeps the address bar in step with the controls. replaceState rather than
+ * pushState: dragging a slider should not bury the back button under a hundred
+ * history entries.
+ */
+function syncPermalink() {
+  const query = encodeState({ assumptions, scenario }, permalinkConfig);
+  window.history.replaceState(
+    null,
+    "",
+    query ? `${window.location.pathname}?${query}` : window.location.pathname,
+  );
+}
+
+if (copyLinkButton) {
+  const idleLabel = copyLinkButton.textContent;
+  let restoreLabel;
+
+  copyLinkButton.addEventListener("click", async () => {
+    const url = buildUrl({ assumptions, scenario }, permalinkConfig, window.location);
+
+    try {
+      await navigator.clipboard.writeText(url);
+      copyLinkButton.textContent = "Copied";
+    } catch {
+      // Clipboard access can be refused, or unavailable over plain http. Say
+      // so rather than failing silently; the URL is in the address bar anyway.
+      syncPermalink();
+      copyLinkButton.textContent = "Copy failed";
+    }
+
+    clearTimeout(restoreLabel);
+    restoreLabel = setTimeout(() => {
+      copyLinkButton.textContent = idleLabel;
+    }, 1600);
+  });
+}
+
 for (const input of scenarioInputs) {
   input.addEventListener("change", () => {
     if (!input.checked) return;
     scenario = input.value;
+    syncPermalink();
     renderResult();
   });
 }
@@ -374,10 +431,19 @@ resetButton.addEventListener("click", () => {
     }
   }
 
-  scenario = "coordinated";
-  document.querySelector('input[name="scenario"][value="coordinated"]').checked = true;
+  scenario = DEFAULT_SCENARIO;
+  document.querySelector(`input[name="scenario"][value="${DEFAULT_SCENARIO}"]`).checked = true;
+  syncPermalink();
   renderResult();
 });
 
 createControls();
+
+// Reflect a scenario restored from the URL in the participation radios.
+const restoredScenario = scenarioInputs.find((input) => input.value === scenario);
+if (restoredScenario) restoredScenario.checked = true;
+
+// Normalise the address bar on load, so a link carrying out-of-range or junk
+// parameters becomes the configuration actually being displayed.
+syncPermalink();
 renderResult();

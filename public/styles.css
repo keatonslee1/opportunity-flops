@@ -266,6 +266,29 @@ footer {
   background: var(--panel);
 }
 
+/*
+ * Two buttons no longer fit beside the heading at the rack's fixed width, so
+ * this row wraps and the actions drop below the title rather than squeezing it
+ * into a clipped two-line block.
+ */
+.rack-heading {
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  align-items: center;
+}
+
+.rack-heading > div {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rack-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
 .reset-button:focus-visible,
 .scenario-control input:focus-visible + span,
 .control input:focus-visible,

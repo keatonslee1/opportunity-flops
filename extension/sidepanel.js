@@ -6,6 +6,7 @@
  * never computes an economic quantity of its own.
  */
 
+import { renderLineChart } from "./chart.js";
 import {
   DEFAULT_ORIGIN,
   ModelBridge,
@@ -179,6 +180,8 @@ const nodes = {
   scenarioCards: document.querySelector("#scenario-cards"),
   controls: document.querySelector("#assumption-controls"),
   controlsEmpty: document.querySelector("#controls-empty"),
+  softwareChart: document.querySelector("#chart-software"),
+  capabilityChart: document.querySelector("#chart-capability"),
   settings: document.querySelector("#settings"),
   toggleSettings: document.querySelector("#toggle-settings"),
   originInput: document.querySelector("#origin-input"),
@@ -425,9 +428,57 @@ function renderResult(result, pending) {
   }
 }
 
+/**
+ * Plots the selected scenario against the counterfactual.
+ *
+ * Nothing is drawn until the model supplies a real series — an empty frame is
+ * shown instead. Sketching illustrative geometry here would put invented curves
+ * next to a headline number in a panel too small to caveat them properly.
+ */
+function renderCharts(result, pending) {
+  const scenarioKey = pending ? null : resolveScenarioKey(result, state.scenario);
+  const xValues = pending ? [] : read.years(result);
+
+  const charts = [
+    { node: nodes.softwareChart, fields: CHART_FIELDS.software, label: "Software progress index" },
+    { node: nodes.capabilityChart, fields: CHART_FIELDS.capability, label: "Capability index" },
+  ];
+
+  for (const chart of charts) {
+    renderLineChart(chart.node, {
+      xValues,
+      yLabel: chart.label,
+      placeholder: pending ? "Awaiting economic model" : "No series for this scenario",
+      series: scenarioKey
+        ? [
+            {
+              key: "baseline",
+              label: "Baseline",
+              color: "var(--ink)",
+              dashed: true,
+              values: read.values(result, scenarioKey, chart.fields.baseline),
+            },
+            {
+              key: "projection",
+              label: "Projection",
+              color: "var(--orange)",
+              values: read.values(result, scenarioKey, chart.fields.value),
+            },
+          ]
+        : [],
+    });
+  }
+}
+
+/** Single entry point for every view, so no caller can update one and not the other. */
+function paint(result, pending) {
+  renderResult(result, pending);
+  renderCharts(result, pending);
+}
+
 async function render() {
   if (!state.modelReady) {
-    renderResult({}, true);
+    paint({}, true);
     return;
   }
 
@@ -444,7 +495,7 @@ async function render() {
 
   const pending = read.isPending(result);
   nodes.banner.hidden = !pending;
-  renderResult(result ?? {}, pending);
+  paint(result ?? {}, pending);
 }
 
 // ── Boot ───────────────────────────────────────────────────────────────
@@ -490,7 +541,7 @@ async function connectModel({ announce = true } = {}) {
     nodes.banner.hidden = true;
     state.definitions = [];
     mountAssumptionControls();
-    renderResult({}, true);
+    paint({}, true);
     return;
   }
 
@@ -514,7 +565,7 @@ async function connectModel({ announce = true } = {}) {
     setSourceStatus("error", "Model failed to run");
     nodes.loadError.hidden = false;
     nodes.loadError.textContent = `The model at ${state.origin} could not be evaluated — ${error.message}`;
-    renderResult({}, true);
+    paint({}, true);
   }
 }
 
@@ -557,7 +608,7 @@ async function boot() {
 
   // Paint the empty layout immediately so the panel never flashes blank.
   mountScenarioCards();
-  renderResult({}, true);
+  paint({}, true);
 
   await connectModel();
 }

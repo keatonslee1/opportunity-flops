@@ -124,6 +124,7 @@ main {
 
 .contents li {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: var(--s3);
   border-bottom: 1px solid var(--rule);

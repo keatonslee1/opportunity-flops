@@ -132,8 +132,15 @@
 
 /* The margin keeps its full-height ivory; only the contents travel. Capped to
    the viewport with its own scroll so a short window can still reach the
-   calibration note at the bottom of the rack. */
-@media (min-width: 761px) {
+   calibration note at the bottom of the rack.
+
+   Range syntax, not min-width: 761px. The stacking rules below use
+   max-width: 760px, so a min-width of 761 left every fractional width between
+   the two — 760.4px, which Windows produces routinely at 125% and 150% display
+   scaling — matching neither. The rack rendered two-column but silently lost
+   its sticky behaviour. `width > 760px` is the exact complement of
+   `max-width: 760px`, so the two ranges are contiguous with no overlap. */
+@media (width > 760px) {
   .rack-inner {
     position: sticky;
     top: 0;
@@ -164,7 +171,7 @@
 
 .reset-button {
   min-width: 54px;
-  min-height: 34px;
+  min-height: 44px;
   padding: 0 12px;
   border: 1px solid var(--ink);
   color: var(--ink);

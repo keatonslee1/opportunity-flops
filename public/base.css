@@ -205,7 +205,6 @@ var {
    1020px, where marginalia become inline asides.
    ------------------------------------------------------------------------ */
 
-.shell,
 main {
   width: min(var(--shell), calc(100% - (var(--gutter) * 2)));
   margin-inline: auto;
@@ -286,6 +285,7 @@ h3 {
   display: inline-flex;
   align-items: baseline;
   gap: 0.3em;
+  padding-block: 8px;
   color: var(--ink);
   font-family: var(--font-display);
   font-size: 1.22rem;
@@ -311,7 +311,13 @@ h3 {
   padding-bottom: var(--s2);
 }
 
+/* Small-caps at 0.7rem gives a ~17px tap height on its own. The padding is
+   what makes these reachable on a touch screen; the negative inline margin
+   keeps the optical alignment of the row unchanged. */
 .topbar nav a {
+  display: inline-block;
+  padding: 14px 6px;
+  margin-inline: -6px;
   color: var(--muted);
   font-size: var(--t-label);
   font-weight: 600;
@@ -373,6 +379,9 @@ footer p:nth-child(2) {
 }
 
 .footer-links a {
+  display: inline-block;
+  padding: 14px 6px;
+  margin-inline: -6px;
   color: var(--muted);
   font-size: var(--t-label);
   font-variant-caps: all-small-caps;
@@ -602,13 +611,21 @@ footer p:nth-child(2) {
   }
 }
 
+/* Killing duration alone is not enough. The entrance staggers with delays of
+   up to 280ms and animation-fill-mode: both, so with duration near zero but
+   the delay intact, those elements still sat on their opening keyframe —
+   invisible and offset — for the length of the delay before snapping into
+   place. Someone who asked for no motion got a flash of blank page instead.
+   The delays have to go to zero too. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }

@@ -659,6 +659,24 @@ footer {
   color: var(--muted);
 }
 
+.chart-series-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.chart-series-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
 .chart-heading output {
   color: var(--muted);
 }

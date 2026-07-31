@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Opportunity FLOPs models how reallocating capability R&D compute to alignment changes software progress and frontier AI capability paths."
+      content="Opportunity FLOPs models how reallocating capability R&D compute to alignment changes software progress, frontier AI capability, and AI risk paths."
     />
     <title>Opportunity FLOPs — Compute tradeoff calculator</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -17,8 +17,8 @@
     <!--
       THESIS: A flight-test telemetry workspace makes policy tradeoffs inspectable and refuses the generic card-dashboard scaffold.
       OWN-WORLD: Cool-white instrument panels, midnight ink, oxidized orange and cobalt traces, tabular data, clipped corners, and fine plot rules.
-      STORY: Configure a reallocation policy, watch two trajectories diverge, then inspect the assumptions behind the comparison.
-      FIRST VIEWPORT: A compact mission header and question lead directly into a left control rack beside four synchronized model-output charts.
+      STORY: Configure a reallocation policy, inspect its capability cost and safety benefit, then audit the assumptions behind both channels.
+      FIRST VIEWPORT: A compact mission header and question lead directly into a left control rack beside six synchronized model-output charts.
       FORM: Flight-test telemetry notebook, sixth grounded direction, seed 41000c17.
       FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
     -->
@@ -43,7 +43,7 @@
           <h1 id="page-title">What does a safety commitment cost in frontier progress?</h1>
           <p>
             Compare no reallocation, unilateral action, and a coordinated policy.
-            Set the compute commitment and inspect how Katherine's reduced-form model propagates it through software progress to frontier capability.
+            Set the compute commitment and inspect how Katherine's reduced-form model propagates it through software progress, frontier capability, and AI risk.
           </p>
         </div>
         <dl class="model-readiness">
@@ -101,6 +101,7 @@
               <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.313</dd></div>
               <div><dt>Feedback · γ</dt><dd id="gamma-value">0.400</dd></div>
               <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.701</dd></div>
+              <div><dt>Alignment effectiveness · λ</dt><dd id="lambda-value">0.400</dd></div>
             </dl>
           </section>
 
@@ -109,7 +110,7 @@
               <circle cx="10" cy="10" r="8.25"></circle>
               <path d="M10 8v5M10 5.5v.5"></path>
             </svg>
-            <p>Each elasticity is calibrated from 10,000 seeded triangular draws. Low, Medium, and High select marginal P10, P50, and P90 bundles; the triangular inputs remain working assumptions.</p>
+            <p>Each sensitivity parameter is calibrated from 10,000 seeded triangular draws. Low, Medium, and High select marginal P10, P50, and P90 bundles; the triangular inputs remain working assumptions.</p>
           </div>
         </aside>
 
@@ -233,6 +234,64 @@
             </div>
           </article>
 
+          <article class="chart-block" aria-labelledby="risk-chart-title">
+            <div class="chart-heading">
+              <div>
+                <h3 id="risk-chart-title">AI risk over time</h3>
+                <p>AI risk index · <i>R</i>(<i>t</i>) · normalized baseline = 100</p>
+                <div class="chart-series-legend" aria-label="AI risk chart legend">
+                  <span><i class="legend-line baseline"></i>Baseline</span>
+                  <span><i class="legend-line firm-a"></i>Policy projection</span>
+                </div>
+              </div>
+              <output id="risk-output">Running model</output>
+            </div>
+            <div class="chart-frame">
+              <svg class="trajectory-chart" id="risk-chart" viewBox="0 0 800 300" role="img" aria-labelledby="risk-svg-title risk-svg-desc">
+                <title id="risk-svg-title">Modeled AI risk over time</title>
+                <desc id="risk-svg-desc">Modeled normalized baseline and policy-projection AI risk indices from 2026 through 2034.</desc>
+                <path class="plot-grid" id="risk-grid" aria-hidden="true"></path>
+                <g class="axis-labels" id="risk-axes" aria-hidden="true"></g>
+                <path class="gap-area" id="risk-area"></path>
+                <path class="trace trace-baseline" id="risk-baseline"></path>
+                <path class="trace trace-a" id="risk-projection"></path>
+                <path class="trace trace-b" id="risk-unused"></path>
+                <g class="sweep" id="risk-sweep" aria-hidden="true">
+                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                </g>
+              </svg>
+            </div>
+          </article>
+
+          <article class="chart-block" aria-labelledby="safety-benefit-chart-title">
+            <div class="chart-heading">
+              <div>
+                <h3 id="safety-benefit-chart-title">Safety benefit over time</h3>
+                <p><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>) / <i>R</i><sub>B</sub>(<i>t</i>) · percent</p>
+                <div class="chart-series-legend" aria-label="Safety benefit chart legend">
+                  <span><i class="legend-line baseline"></i>Baseline (0%)</span>
+                  <span><i class="legend-line firm-a"></i>Policy projection</span>
+                </div>
+              </div>
+              <output id="safety-benefit-output">Running model</output>
+            </div>
+            <div class="chart-frame">
+              <svg class="trajectory-chart" id="safety-benefit-chart" viewBox="0 0 800 300" role="img" aria-labelledby="safety-benefit-svg-title safety-benefit-svg-desc">
+                <title id="safety-benefit-svg-title">Modeled safety benefit over time</title>
+                <desc id="safety-benefit-svg-desc">Modeled baseline zero-percent and policy-projection safety benefit from 2026 through 2034.</desc>
+                <path class="plot-grid" id="safety-benefit-grid" aria-hidden="true"></path>
+                <g class="axis-labels" id="safety-benefit-axes" aria-hidden="true"></g>
+                <path class="gap-area" id="safety-benefit-area"></path>
+                <path class="trace trace-baseline" id="safety-benefit-baseline"></path>
+                <path class="trace trace-a" id="safety-benefit-projection"></path>
+                <path class="trace trace-b" id="safety-benefit-unused"></path>
+                <g class="sweep" id="safety-benefit-sweep" aria-hidden="true">
+                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                </g>
+              </svg>
+            </div>
+          </article>
+
           <div class="comparison-strip" aria-label="Scenario comparison status">
             <div data-scenario="baseline">
               <span>No reallocation</span>
@@ -263,17 +322,19 @@
             <li><strong>Propagate</strong><span>Software follows d<i>S</i>/d<i>t</i> = <i>A C</i><sub>R</sub><sup>β</sup><i>S</i><sup>γ</sup>.</span></li>
             <li><strong>Translate</strong><span>Capability follows <i>M</i> = <i>C</i><sub>T</sub><sup>α</sup><i>S</i><sup>δ</sup>, so the training-compute term cancels in the policy comparison.</span></li>
             <li><strong>Compare</strong><span>Capability gap = 1 − (<i>S</i><sub>P</sub>/<i>S</i><sub>B</sub>)<sup>δ</sup>.</span></li>
+            <li><strong>Reduce risk</strong><span><i>R</i><sub>P</sub>(<i>t</i>) = <i>R</i><sub>B</sub>(<i>t</i>) exp[−λ<sub>z</sub><i>x</i>(<i>t</i> − <i>t</i><sub>0</sub>)].</span></li>
+            <li><strong>Measure safety</strong><span><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>) / <i>R</i><sub>B</sub>(<i>t</i>).</span></li>
           </ol>
 
           <div class="preset-matrix">
             <h3>Monte Carlo parameter bundles</h3>
             <table>
               <caption>Marginal P10 / P50 / P90 bundles from 10,000 seeded triangular draws</caption>
-              <thead><tr><th><i>z</i></th><th>β</th><th>γ</th><th>δ</th></tr></thead>
+              <thead><tr><th><i>z</i></th><th>β</th><th>γ</th><th>δ</th><th>λ</th></tr></thead>
               <tbody>
-                <tr><th>Low · P10</th><td>0.223</td><td>0.290</td><td>0.589</td></tr>
-                <tr><th>Medium · P50</th><td>0.313</td><td>0.400</td><td>0.701</td></tr>
-                <tr><th>High · P90</th><td>0.416</td><td>0.511</td><td>0.810</td></tr>
+                <tr><th>Low · P10</th><td>0.223</td><td>0.290</td><td>0.589</td><td>0.288</td></tr>
+                <tr><th>Medium · P50</th><td>0.313</td><td>0.400</td><td>0.701</td><td>0.400</td></tr>
+                <tr><th>High · P90</th><td>0.416</td><td>0.511</td><td>0.810</td><td>0.509</td></tr>
               </tbody>
             </table>
 
@@ -284,6 +345,7 @@
                 <tr><th>β</th><td>0.15</td><td>0.30</td><td>0.50</td></tr>
                 <tr><th>γ</th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
                 <tr><th>δ</th><td>0.50</td><td>0.70</td><td>0.90</td></tr>
+                <tr><th>λ</th><td>0.20</td><td>0.40</td><td>0.60</td></tr>
               </tbody>
             </table>
 
@@ -295,6 +357,7 @@
             </dl>
             <p>The bundles rank-align each parameter's marginal percentile. They are sensitivity cases, not joint outcome percentiles or empirical estimates. Seeded calibration makes the same <i>z</i> selection reproduce the same parameter set on every run.</p>
             <p>Software begins at index 100. The baseline is normalized to index 200 in 2034, so the charts communicate policy divergence—not a dated forecast of absolute capability. The normalization absorbs <i>A</i>; unchanged training compute makes <i>α</i> cancel from relative outputs.</p>
+            <p>The supplied model does not specify the shape of <i>R</i><sub>B</sub>(<i>t</i>) or empirical bounds for λ. The implementation therefore holds baseline risk at a normalized index of 100 and uses λ ~ Triangular(0.20, 0.40, 0.60) as an explicit working sensitivity prior.</p>
           </div>
 
           <details class="parameter-contract">
@@ -316,6 +379,7 @@
                   <tr><th><i>C</i><sub>T</sub></th><td>Frontier training compute</td><td>Exogenous path</td><td>Equal across scenarios</td></tr>
                   <tr><th>α</th><td>Training-compute elasticity</td><td>Set by <i>z</i> / calibrated</td><td>Cancels from relative outputs</td></tr>
                   <tr><th>δ</th><td>Software-to-capability elasticity</td><td>Set by <i>z</i> / calibrated</td><td>10k triangular-draw quantile</td></tr>
+                  <tr><th>λ</th><td>Alignment effectiveness</td><td>Set by <i>z</i> / working prior</td><td>10k triangular-draw quantile</td></tr>
                   <tr data-parameter="M_B"><th><i>M</i><sub>B</sub>(<i>t</i>)</th><td>Baseline capability level</td><td>Model-generated</td><td>Baseline capability series</td></tr>
                   <tr data-parameter="M_P"><th><i>M</i><sub>P</sub>(<i>t</i>; <i>x</i>, <i>z</i>)</th><td>Policy capability level</td><td>Model-generated</td><td>Firm policy series</td></tr>
                   <tr><th><i>M</i><sub>0</sub></th><td>Initial capability level</td><td>Fixed normalization</td><td>Index 100</td></tr>
@@ -323,6 +387,10 @@
                   <tr><th>SS</th><td>Software progress-rate slowdown</td><td>Model output</td><td>Shown in software slowdown chart</td></tr>
                   <tr><th>SG</th><td>Software level gap</td><td>Model output</td><td>Returned in model contract</td></tr>
                   <tr><th>CG</th><td>Capability gap</td><td>Model output</td><td>Shown in AI capability gap chart</td></tr>
+                  <tr data-parameter="R_B"><th><i>R</i><sub>B</sub>(<i>t</i>)</th><td>Baseline AI risk</td><td>Normalized reference</td><td>Constant index 100</td></tr>
+                  <tr data-parameter="R_P"><th><i>R</i><sub>P</sub>(<i>t</i>)</th><td>Policy AI risk</td><td>Model-generated</td><td>Exponential reduction from baseline</td></tr>
+                  <tr><th><i>t</i><sub>0</sub></th><td>Policy implementation year</td><td>Fixed model boundary</td><td>2026</td></tr>
+                  <tr><th>SB</th><td>Safety benefit</td><td>Model output</td><td>Shown in safety benefit chart</td></tr>
                 </tbody>
               </table>
             </div>

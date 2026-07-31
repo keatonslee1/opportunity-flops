@@ -20,7 +20,7 @@ test("model publishes the reproducible Monte Carlo calibration contract", () => 
     sampleCount: 10_000,
     seed: 20_260_731,
     randomGenerator: "Mulberry32",
-    drawOrder: ["beta", "gamma", "delta"],
+    drawOrder: ["beta", "gamma", "delta", "lambda"],
     quantileMethod: "linear interpolation at (n - 1)q",
     parameterSampling: "independent marginal draws",
     bundleConstruction: "rank-aligned marginal quantiles",
@@ -30,31 +30,35 @@ test("model publishes the reproducible Monte Carlo calibration contract", () => 
       beta: { min: 0.15, mode: 0.3, max: 0.5 },
       gamma: { min: 0.2, mode: 0.4, max: 0.6 },
       delta: { min: 0.5, mode: 0.7, max: 0.9 },
+      lambda: { min: 0.2, mode: 0.4, max: 0.6 },
     },
   });
 });
 
-test("impact levels are seeded empirical P10, P50, and P90 parameter bundles", () => {
+test("impact levels are seeded marginal P10, P50, and P90 parameter bundles", () => {
   const expected = {
     low: {
       beta: 0.2225944032791555,
       gamma: 0.28957074404343597,
       delta: 0.5886460784649494,
+      lambda: 0.2881991767290228,
     },
     medium: {
       beta: 0.31261892100480526,
       gamma: 0.3999351351280472,
       delta: 0.7005358951277937,
+      lambda: 0.39957768833473406,
     },
     high: {
       beta: 0.4160608485069721,
       gamma: 0.510705813410008,
       delta: 0.8096371478233727,
+      lambda: 0.5093703453115629,
     },
   };
 
   for (const impactLevel of ["low", "medium", "high"]) {
-    for (const parameter of ["beta", "gamma", "delta"]) {
+    for (const parameter of ["beta", "gamma", "delta", "lambda"]) {
       assertClose(
         impactPresets[impactLevel][parameter],
         expected[impactLevel][parameter],
@@ -81,7 +85,7 @@ test("Monte Carlo bundles remain ordered and inside every triangular support", (
   assert.ok(monteCarloCalibration.distributions.gamma.max < 1);
 });
 
-test("seeded empirical bundles track their triangular target quantiles", () => {
+test("seeded marginal bundles track their triangular target quantiles", () => {
   const triangularQuantile = (probability, { min, mode, max }) => {
     const probabilityAtMode = (mode - min) / (max - min);
     return probability < probabilityAtMode
@@ -162,6 +166,7 @@ test("model returns normalized defaults and quarterly normalized series", () => 
       beta: result.calibration.beta,
       gamma: result.calibration.gamma,
       delta: result.calibration.delta,
+      lambda: result.calibration.lambda,
     },
     impactPresets.medium,
   );
@@ -233,6 +238,7 @@ test("baseline scenario keeps both firms on the baseline with zero metrics", () 
     softwareSlowdown: { firmA: 0, firmB: 0 },
     softwareLevelGap: { firmA: 0, firmB: 0 },
     capabilityGap: { firmA: 0, firmB: 0 },
+    safetyBenefit: { policy: 0 },
   });
 });
 
@@ -303,6 +309,7 @@ test("zero reallocation makes every scenario coincide with baseline", () => {
       softwareSlowdown: { firmA: 0, firmB: 0 },
       softwareLevelGap: { firmA: 0, firmB: 0 },
       capabilityGap: { firmA: 0, firmB: 0 },
+      safetyBenefit: { policy: 0 },
     });
   }
 });
@@ -389,6 +396,7 @@ test("the exact 50 percent reallocation boundary is accepted and finite", () => 
     assert.ok(Number.isFinite(result.metrics.softwareSlowdown.firmA));
     assert.ok(Number.isFinite(result.metrics.softwareLevelGap.firmA));
     assert.ok(Number.isFinite(result.metrics.capabilityGap.firmA));
+    assert.ok(Number.isFinite(result.metrics.safetyBenefit.policy));
   }
 });
 
@@ -465,15 +473,19 @@ test("model exposes rate series, metric timing, units, and calibration caveats",
     softwareSlowdown: "fractional reduction from baseline software progress rate",
     capability: "training-compute-normalized index (2026 = 100)",
     capabilityGap: "fractional reduction from baseline capability",
+    risk: "normalized AI risk index (baseline = 100)",
+    safetyBenefit: "fractional reduction from baseline AI risk",
     metrics: "fraction of baseline at 2034",
   });
-  assert.equal(result.caveats.length, 6);
+  assert.equal(result.caveats.length, 8);
   assert.match(result.caveats[0], /capability-R&D compute is fixed/i);
   assert.match(result.caveats[1], /training compute is unchanged/i);
   assert.match(result.caveats[2], /baseline is normalized/i);
   assert.match(result.caveats[3], /A is absorbed.*alpha.*cancels/i);
   assert.match(result.caveats[4], /10,000.*triangular.*working assumptions/i);
   assert.match(result.caveats[5], /rank-aligned.*P10.*P50.*P90.*not joint outcome/i);
+  assert.match(result.caveats[6], /baseline AI risk path.*normalized.*100/i);
+  assert.match(result.caveats[7], /Lambda.*triangular.*working prior/i);
 });
 
 test("model exposes software progress slowdown at every charted time", () => {
@@ -562,4 +574,36 @@ test("initial software-rate slowdown equals one minus the policy multiplier", ()
 
   assertClose(result.calibration.policyRateMultiplier, expectedMultiplier);
   assertClose(initialRateSlowdown, 1 - expectedMultiplier);
+});
+
+test("policy risk follows Part IV and safety benefit follows Part V", () => {
+  const result = runModel({
+    computeReallocated: 20,
+    impactLevel: "medium",
+    scenario: "unilateral",
+  });
+
+  for (const seriesKey of ["risk", "safetyBenefit"]) {
+    assert.equal(result.series[seriesKey].baseline.length, result.series.years.length);
+    assert.equal(result.series[seriesKey].policy.length, result.series.years.length);
+  }
+
+  for (let index = 0; index < result.series.years.length; index += 1) {
+    const elapsedYears = result.series.years[index] - result.calibration.startYear;
+    const expectedRiskRatio = Math.exp(
+      -result.calibration.lambda
+      * (result.assumptions.computeReallocated / 100)
+      * elapsedYears,
+    );
+
+    assert.equal(result.series.risk.baseline[index], 100);
+    assertClose(result.series.risk.policy[index], 100 * expectedRiskRatio);
+    assert.equal(result.series.safetyBenefit.baseline[index], 0);
+    assertClose(result.series.safetyBenefit.policy[index], 1 - expectedRiskRatio);
+  }
+
+  assertClose(
+    result.metrics.safetyBenefit.policy,
+    result.series.safetyBenefit.policy.at(-1),
+  );
 });

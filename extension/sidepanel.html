@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Opportunity FLOPs</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <img class="mark" src="icons/icon-32.png" alt="" width="20" height="20" />
+      <h1 class="wordmark">Opportunity FLOPs</h1>
+      <button
+        type="button"
+        id="toggle-settings"
+        class="icon-button"
+        aria-expanded="false"
+        aria-controls="settings"
+        title="Model source"
+      >
+        Source
+      </button>
+    </header>
+
+    <!-- Model source panel, collapsed by default. -->
+    <section id="settings" class="settings" hidden>
+      <label class="field">
+        <span class="field-label">Model source origin</span>
+        <input
+          type="url"
+          id="origin-input"
+          spellcheck="false"
+          placeholder="https://flops.keatonlee.org"
+        />
+      </label>
+      <p class="field-help">
+        The calculator loads <code>/model.js</code> from this origin and runs it
+        unmodified. Point it at <code>http://127.0.0.1:3000</code> to work
+        against a local <code>npm run dev</code> server.
+      </p>
+      <div class="field-actions">
+        <button type="button" id="reload-model" class="button">Reload model</button>
+      </div>
+    </section>
+
+    <!-- Status line: where the model came from, and whether it returned numbers. -->
+    <p id="source-status" class="source-status" role="status">
+      <span class="dot" data-state="loading"></span>
+      <span id="source-status-text">Loading model…</span>
+    </p>
+
+    <p id="model-status" class="banner" hidden>
+      The interface is wired and waiting on the economic model. Sliders are live
+      — every value fills in as soon as <code>runModel()</code> returns results.
+    </p>
+
+    <p id="load-error" class="banner banner-error" hidden></p>
+
+    <main class="panel">
+      <!-- Results -->
+      <section class="results" aria-labelledby="results-heading">
+        <div class="section-head">
+          <h2 id="results-heading" class="section-title">Result</h2>
+          <span class="head-right">
+            <span id="active-scenario-label" class="tag"></span>
+            <button
+              type="button"
+              id="copy-summary"
+              class="icon-button"
+              title="Copy the current assumptions and results"
+            >
+              Copy
+            </button>
+          </span>
+        </div>
+
+        <p id="headline-result" class="headline">—</p>
+        <p id="result-note" class="note"></p>
+
+        <dl id="metric-grid" class="metrics"></dl>
+      </section>
+
+      <!-- Trajectories -->
+      <section class="charts" aria-labelledby="charts-heading">
+        <div class="section-head">
+          <h2 id="charts-heading" class="section-title">Trajectories</h2>
+          <span class="legend">
+            <span><span class="legend-line baseline"></span>Baseline</span>
+            <span><span class="legend-line projection"></span>Projection</span>
+          </span>
+        </div>
+
+        <figure class="chart-block">
+          <figcaption class="chart-caption">Software progress index S(t)</figcaption>
+          <svg id="chart-software" class="chart"></svg>
+        </figure>
+
+        <figure class="chart-block">
+          <figcaption class="chart-caption">Frontier capability index M(t)</figcaption>
+          <svg id="chart-capability" class="chart"></svg>
+        </figure>
+      </section>
+
+      <!-- Scenario -->
+      <section class="scenarios" aria-labelledby="scenario-heading">
+        <h2 id="scenario-heading" class="section-title">Scenario</h2>
+        <div id="scenario-cards" class="scenario-cards" role="group"></div>
+      </section>
+
+      <!-- Assumptions -->
+      <section class="controls" aria-labelledby="assumptions-heading">
+        <div class="section-head">
+          <h2 id="assumptions-heading" class="section-title">Assumptions</h2>
+          <button type="button" id="reset-assumptions" class="button">Reset</button>
+        </div>
+        <div id="assumption-controls"></div>
+        <p id="controls-empty" class="note" hidden>
+          Assumptions appear once the model is loaded.
+        </p>
+      </section>
+    </main>
+
+    <!-- What the reader is looking at, so a copied summary carries its source. -->
+    <p id="page-context" class="page-context" hidden>
+      <span class="page-context-label">Reading</span>
+      <span id="page-context-title" class="page-context-title"></span>
+    </p>
+
+    <footer class="footer">
+      <a id="open-site" href="#" target="_blank" rel="noreferrer">Open full site</a>
+      <span class="disclaimer">Illustrative — not validated output.</span>
+    </footer>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>

@@ -489,9 +489,11 @@ footer p:nth-child(2) {
   letter-spacing: 0.09em;
 }
 
-/* The unimplemented channel is marked in the accent reserved for caveats, and
-   says so in words — colour alone must not carry this. */
-.channel-status[data-state="pending"] {
+/* A channel resting on a working prior rather than a supplied specification is
+   marked in the accent reserved for caveats, and says so in words — colour
+   alone must not carry this. */
+.channel-status[data-state="pending"],
+.channel-status[data-state="prior"] {
   color: var(--orange-text);
 }
 

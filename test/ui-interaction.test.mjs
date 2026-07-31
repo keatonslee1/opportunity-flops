@@ -12,12 +12,14 @@ const methodologySource = await readFile(
   "utf8",
 );
 
-test("the results bay presents the four approved chart questions in order", () => {
+test("the results bay presents the six approved chart questions in order", () => {
   const chartHeadings = [
     "Software efficiency level",
     "Software progress slowdown",
     "Frontier capability",
     "AI capability gap",
+    "AI risk over time",
+    "Safety benefit over time",
   ];
   let previousPosition = -1;
 
@@ -31,6 +33,10 @@ test("the results bay presents the four approved chart questions in order", () =
   assert.match(pageSource, /<i>SS<\/i>\(<i>t<\/i>\) = 1 − <i>Ṡ<\/i><sub>P<\/sub>.*?\/ <i>Ṡ<\/i><sub>B<\/sub>/);
   assert.match(pageSource, /Training-compute-normalized index · 2026 = 100/);
   assert.match(pageSource, /<i>CG<\/i>\(<i>t<\/i>\) = 1 − <i>M<\/i><sub>P<\/sub>.*?\/ <i>M<\/i><sub>B<\/sub>/);
+  assert.match(pageSource, /AI risk index · <i>R<\/i>\(<i>t<\/i>\)/);
+  assert.match(pageSource, /<i>SB<\/i>\(<i>t<\/i>\) = 1 − <i>R<\/i><sub>P<\/sub>.*?\/ <i>R<\/i><sub>B<\/sub>/);
+  assert.match(pageSource, /Baseline \(0%\)/);
+  assert.match(pageSource, /Policy projection/);
 });
 
 test("continuous slider input updates charts without replaying trace animation", () => {
@@ -40,26 +46,35 @@ test("continuous slider input updates charts without replaying trace animation",
   assert.match(sliderHandler[0], /renderResult\(false\)/);
 });
 
-test("the UI renders the four model-owned series in the approved order", () => {
+test("the UI renders the six model-owned series in the approved order", () => {
   assert.doesNotMatch(appSource, /illustrativeSeries/);
   for (const seriesKey of [
     "software",
     "softwareSlowdown",
     "capability",
     "capabilityGap",
+    "risk",
+    "safetyBenefit",
   ]) {
     assert.match(appSource, new RegExp(`seriesKey: "${seriesKey}"`));
   }
   assert.match(appSource, /const series = result\.series\[chart\.seriesKey\]/);
   assert.match(
     appSource,
-    /renderChart\("software".*?renderChart\("softwareSlowdown".*?renderChart\("capability".*?renderChart\("capabilityGap"/s,
+    /renderChart\("software".*?renderChart\("softwareSlowdown".*?renderChart\("capability".*?renderChart\("capabilityGap".*?renderChart\("risk".*?renderChart\("safetyBenefit"/s,
   );
   assert.match(appSource, /runModel\(\{ \.\.\.assumptions, scenario \}\)/);
 });
 
-test("all four charts expose dynamic grids, axes, and accessible descriptions", () => {
-  for (const prefix of ["software", "slowdown", "capability", "capability-gap"]) {
+test("all six charts expose dynamic grids, axes, and accessible descriptions", () => {
+  for (const prefix of [
+    "software",
+    "slowdown",
+    "capability",
+    "capability-gap",
+    "risk",
+    "safety-benefit",
+  ]) {
     assert.match(pageSource, new RegExp(`id="${prefix}-grid"`));
     assert.match(pageSource, new RegExp(`id="${prefix}-axes"`));
     assert.match(pageSource, new RegExp(`id="${prefix}-svg-desc"`));
@@ -69,8 +84,8 @@ test("all four charts expose dynamic grids, axes, and accessible descriptions", 
   assert.match(appSource, /chart\.description\.textContent/);
 });
 
-test("slowdown and capability-gap charts use zero-based percentage axes", () => {
-  for (const chartKey of ["softwareSlowdown", "capabilityGap"]) {
+test("derived-benefit charts use zero-based percentage axes", () => {
+  for (const chartKey of ["softwareSlowdown", "capabilityGap", "safetyBenefit"]) {
     assert.match(
       appSource,
       new RegExp(`${chartKey}: \\{[\\s\\S]*?domainKind: "fraction"[\\s\\S]*?areaMode: "max"`),
@@ -95,6 +110,8 @@ test("chart summaries and narration match each plotted quantity", () => {
     softwareSlowdown: ["softwareSlowdown", "softwareSlowdown"],
     capability: ["capabilityGap", "capability"],
     capabilityGap: ["capabilityGap", "capabilityGap"],
+    risk: ["safetyBenefit", "risk"],
+    safetyBenefit: ["safetyBenefit", "safetyBenefit"],
   };
 
   for (const [chartKey, [metricKey, descriptionKind]] of Object.entries(contracts)) {
@@ -111,12 +128,15 @@ test("chart summaries and narration match each plotted quantity", () => {
   assert.match(appSource, /software progress slowdown percentages/);
   assert.match(appSource, /frontier capability indices/);
   assert.match(appSource, /AI capability gap percentages/);
+  assert.match(appSource, /AI risk indices/);
+  assert.match(appSource, /safety benefit percentages/);
 });
 
 test("the calculator page keeps its calibration disclosure beside the controls", () => {
   assert.match(pageSource, /10,000 seeded triangular draws/);
   assert.match(pageSource, /P10.*P50.*P90/);
   assert.match(pageSource, /0\.701/);
+  assert.match(pageSource, /0\.400/);
   assert.match(pageSource, /not a forecast/i);
   assert.doesNotMatch(pageSource, /Working placeholder/);
 });
@@ -133,6 +153,11 @@ test("the methodology page carries the full source table and Monte Carlo status"
   assert.match(methodologySource, /0\.223/);
   assert.match(methodologySource, /0\.701/);
   assert.match(methodologySource, /0\.810/);
+  // λ joined the bundles with the risk channel; it is drawn like the other
+  // three but from a prior this implementation chose, so the page has to keep
+  // saying so rather than presenting it as supplied.
+  assert.match(methodologySource, /0\.509/);
+  assert.match(methodologySource, /working prior/);
   assert.doesNotMatch(methodologySource, /Working placeholder/);
   assert.match(methodologySource, /Source status/);
   assert.match(methodologySource, /Set by <i>z<\/i> \/ calibrated/);
@@ -147,8 +172,8 @@ test("the two pages stay linked and the methodology page stays script-free", () 
   assert.doesNotMatch(methodologySource, /app\.js/);
 });
 
-test("the active Monte Carlo bundle displays three-decimal parameters", () => {
-  for (const parameter of ["beta", "gamma", "delta"]) {
+test("the active Monte Carlo bundle displays four three-decimal parameters", () => {
+  for (const parameter of ["beta", "gamma", "delta", "lambda"]) {
     assert.match(
       appSource,
       new RegExp(`calibration\\.${parameter}\\.toFixed\\(3\\)`),

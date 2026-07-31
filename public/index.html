@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Opportunity FLOPs models how reallocating capability R&D compute to alignment changes software progress and frontier AI capability paths."
+      content="Opportunity FLOPs models how reallocating capability R&D compute to alignment changes software progress, frontier AI capability, and AI risk paths."
     />
     <title>Opportunity FLOPs — Compute tradeoff calculator</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
@@ -18,9 +18,9 @@
     <!--
       THESIS: A printed research monograph you can operate makes policy tradeoffs inspectable and refuses the generic card-dashboard scaffold.
       OWN-WORLD: Ivory stock and printer's ink, serif display and mathematics, numbered figure plates on cool-white paper, caveats hung in the margin, structure carried by rules rather than elevation.
-      STORY: Configure a reallocation policy, watch the trajectories diverge across four numbered plates, then follow the caption through to the paper at /methodology.
+      STORY: Configure a reallocation policy, inspect its capability cost and its safety benefit across six numbered plates, then follow the caption through to the paper at /methodology.
       FIRST VIEWPORT: A full-measure abstract over a run-in status rule, leading into the apparatus — an ivory margin of controls beside the plates.
-      FORM: Scientific monograph. The four plates are frozen; the page is designed around them.
+      FORM: Scientific monograph. The six plates are frozen; the page is designed around them.
       FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
     -->
     <a class="skip-link" href="#top">Skip to content</a>
@@ -41,7 +41,7 @@
           <h1 id="page-title">What does a safety commitment cost in frontier progress?</h1>
           <p>
             Compare no reallocation, unilateral action, and a coordinated policy.
-            Set the compute commitment and inspect how Katherine's reduced-form model propagates it through software progress to frontier capability.
+            Set the compute commitment and inspect how Katherine's reduced-form model propagates it through software progress, frontier capability, and AI risk.
           </p>
         </div>
         <dl class="model-readiness">
@@ -63,7 +63,7 @@
       <section class="calculator" id="calculator" aria-label="Compute tradeoff calculator">
         <aside class="control-rack" aria-labelledby="assumptions-title">
           <!--
-            The inner wrapper is what sticks. Four plates make the results
+            The inner wrapper is what sticks. Six plates make the results
             column far taller than the controls, so without this you would have
             to scroll back up to change an assumption you are looking at.
           -->
@@ -105,6 +105,7 @@
                 <div><dt>Compute elasticity · β</dt><dd id="beta-value">0.313</dd></div>
                 <div><dt>Feedback · γ</dt><dd id="gamma-value">0.400</dd></div>
                 <div><dt>Capability elasticity · δ</dt><dd id="delta-value">0.701</dd></div>
+                <div><dt>Alignment effectiveness · λ</dt><dd id="lambda-value">0.400</dd></div>
               </dl>
             </section>
 
@@ -113,16 +114,16 @@
                 <circle cx="10" cy="10" r="8.25"></circle>
                 <path d="M10 8v5M10 5.5v.5"></path>
               </svg>
-              <p>Each elasticity is calibrated from 10,000 seeded triangular draws. Low, Medium, and High select marginal P10, P50, and P90 bundles; the triangular inputs remain working assumptions.</p>
+              <p>Each sensitivity parameter is calibrated from 10,000 seeded triangular draws. Low, Medium, and High select marginal P10, P50, and P90 bundles; the triangular inputs remain working assumptions.</p>
             </div>
           </div>
         </aside>
 
         <!--
           The live region is the headline alone. It used to wrap this whole
-          section — headline, legend, all four plates and the comparison strip —
+          section — headline, legend, all six plates and the comparison strip —
           while the slider re-renders on every input event, so dragging it
-          queued the entire results bay for announcement on each tick. The four
+          queued the entire results bay for announcement on each tick. The six
           plate outputs are implicitly role="status" as well, which nested a
           second layer of live regions inside the first.
         -->
@@ -250,6 +251,66 @@
             </figcaption>
           </figure>
 
+          <figure class="plate" aria-labelledby="risk-chart-title">
+            <div class="plate-readout">
+              <div class="chart-series-legend" aria-label="AI risk chart legend">
+                <span><i class="legend-line baseline"></i>Baseline</span>
+                <span><i class="legend-line firm-a"></i>Policy projection</span>
+              </div>
+              <output id="risk-output" aria-live="off">Running model</output>
+            </div>
+            <div class="chart-frame">
+              <svg class="trajectory-chart" id="risk-chart" viewBox="0 0 800 300" role="img" aria-labelledby="risk-svg-title risk-svg-desc">
+                <title id="risk-svg-title">Modeled AI risk over time</title>
+                <desc id="risk-svg-desc">Modeled normalized baseline and policy-projection AI risk indices from 2026 through 2034.</desc>
+                <path class="plot-grid" id="risk-grid" aria-hidden="true"></path>
+                <g class="axis-labels" id="risk-axes" aria-hidden="true"></g>
+                <path class="gap-area" id="risk-area"></path>
+                <path class="trace trace-baseline" id="risk-baseline"></path>
+                <path class="trace trace-a" id="risk-projection"></path>
+                <path class="trace trace-b" id="risk-unused"></path>
+                <g class="sweep" id="risk-sweep" aria-hidden="true">
+                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                </g>
+              </svg>
+            </div>
+            <figcaption>
+              <p class="fig-no">Fig. 5</p>
+              <h3 id="risk-chart-title">AI risk over time</h3>
+              <p class="fig-sub">AI risk index · <i>R</i>(<i>t</i>) · normalized baseline = 100</p>
+            </figcaption>
+          </figure>
+
+          <figure class="plate" aria-labelledby="safety-benefit-chart-title">
+            <div class="plate-readout">
+              <div class="chart-series-legend" aria-label="Safety benefit chart legend">
+                <span><i class="legend-line baseline"></i>Baseline (0%)</span>
+                <span><i class="legend-line firm-a"></i>Policy projection</span>
+              </div>
+              <output id="safety-benefit-output" aria-live="off">Running model</output>
+            </div>
+            <div class="chart-frame">
+              <svg class="trajectory-chart" id="safety-benefit-chart" viewBox="0 0 800 300" role="img" aria-labelledby="safety-benefit-svg-title safety-benefit-svg-desc">
+                <title id="safety-benefit-svg-title">Modeled safety benefit over time</title>
+                <desc id="safety-benefit-svg-desc">Modeled baseline zero-percent and policy-projection safety benefit from 2026 through 2034.</desc>
+                <path class="plot-grid" id="safety-benefit-grid" aria-hidden="true"></path>
+                <g class="axis-labels" id="safety-benefit-axes" aria-hidden="true"></g>
+                <path class="gap-area" id="safety-benefit-area"></path>
+                <path class="trace trace-baseline" id="safety-benefit-baseline"></path>
+                <path class="trace trace-a" id="safety-benefit-projection"></path>
+                <path class="trace trace-b" id="safety-benefit-unused"></path>
+                <g class="sweep" id="safety-benefit-sweep" aria-hidden="true">
+                  <path d="M68 34V244"></path><circle cx="68" cy="158" r="4"></circle>
+                </g>
+              </svg>
+            </div>
+            <figcaption>
+              <p class="fig-no">Fig. 6</p>
+              <h3 id="safety-benefit-chart-title">Safety benefit over time</h3>
+              <p class="fig-sub"><i>SB</i>(<i>t</i>) = 1 − <i>R</i><sub>P</sub>(<i>t</i>) / <i>R</i><sub>B</sub>(<i>t</i>) · percent</p>
+            </figcaption>
+          </figure>
+
           <div class="comparison-strip" aria-label="Scenario comparison status">
             <div data-scenario="baseline">
               <span>No reallocation</span>
@@ -273,7 +334,8 @@
           <h2 id="channels-title">Reallocation runs down two channels</h2>
           <p>
             Moving R&amp;D compute to alignment does two things at once: it slows capability, and it buys safety.
-            The plates above model the capability channel only. The safety channel is specified but not yet implemented, so nothing on this page estimates it — reading a cost here without its matching benefit will overstate what a commitment costs.
+            Both channels are now modelled — the cost in Fig. 1–4, the benefit in Fig. 5–6 — so the tradeoff can be read in one place rather than inferred from half of it.
+            The two rest on different footing, though: the safety channel holds baseline risk at a normalized 100 and draws λ from a working prior, because the specification supplies neither a shape for <i>R</i><sub>B</sub>(<i>t</i>) nor empirical bounds for λ.
             <a href="/methodology">Read the methodology</a>.
           </p>
         </div>
@@ -297,7 +359,7 @@
                 <li>More alignment progress</li>
                 <li>Lower AI risk</li>
               </ol>
-              <p class="channel-status" data-state="pending">Specified · not yet implemented</p>
+              <p class="channel-status" data-state="prior">Implemented · Fig. 5–6 · working prior</p>
             </div>
           </div>
         </figure>

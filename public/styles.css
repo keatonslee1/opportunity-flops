@@ -4,7 +4,7 @@
    masthead and the colophon. This file owns everything inside <main> on the
    calculator page and nothing else.
 
-   THE FOUR CHART PLATES ARE FROZEN. Every rule under "Chart plates — frozen"
+   THE SIX CHART PLATES ARE FROZEN. Every rule under "Chart plates — frozen"
    below is reproduced verbatim from the pre-redesign stylesheet, and the
    tokens those rules read (--ink, --orange, --blue, --orange-soft, --panel,
    --rule-strong) keep their exact legacy values in base.css. Do not retune
@@ -602,13 +602,38 @@
 
 .plate-readout {
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
   padding-bottom: 6px;
   border-bottom: 1px solid var(--rule);
 }
 
 .plate-readout output {
   color: var(--muted);
+  margin-left: auto;
+}
+
+/* Plates whose two series are not Firm A and Firm B name them here. These are
+   descriptive labels rather than values, so they set in Barlow small-caps like
+   the shared legend — monospace stays on the readouts. */
+.chart-series-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.09em;
+}
+
+.chart-series-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 }
 
 .chart-frame {
@@ -656,7 +681,7 @@
 /* ==========================================================================
    Chart plates — frozen
    Reproduced verbatim. Do not edit, retune or "tidy" anything below this
-   line; the four plates must render identically to the pre-redesign build.
+   line; the six plates must render identically to the pre-redesign build.
    ========================================================================== */
 
 .trajectory-chart {

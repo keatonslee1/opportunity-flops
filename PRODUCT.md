@@ -8,7 +8,7 @@ web
 
 ## Users
 
-Policy researchers, technical governance researchers, and adjacent decision-makers who need to explore how reallocating frontier AI R&D compute to alignment could affect software progress and frontier capability timelines.
+Policy researchers, technical governance researchers, and adjacent decision-makers who need to explore how reallocating frontier AI R&D compute to alignment could affect software progress, frontier capability, and AI risk timelines.
 
 ## Product Purpose
 
@@ -28,12 +28,13 @@ The tool is used during policy analysis, research discussion, presentations, and
 
 - The existing application is a dependency-light static web interface served by Node.
 - Katherine's reduced-form model is implemented behind the `runModel(assumptions)` boundary in `public/model.js`.
-- The model holds capability-oriented R&D compute fixed, applies the policy share to that compute, propagates the change through software progress, and translates software into a capability index while holding training compute equal.
+- The model holds capability-oriented R&D compute fixed, applies the policy share to that compute, propagates the change through software progress, translates software into a capability index while holding training compute equal, and applies the Part IV exponential AI-risk reduction channel.
 - The interface supports no-reallocation, one-firm, and two-firm comparisons using the same model equations.
-- The results bay shows four synchronized time series: software efficiency level, software progress slowdown, frontier capability, and AI capability gap.
-- The source parameter table defines roles and statuses for `A`, `β`, `γ`, `α`, and `δ`. The impact control now maps Low, Medium, and High to seeded marginal P10, P50, and P90 bundles derived from 10,000 triangular draws per parameter.
-- The triangular inputs (`β`: 0.15/0.30/0.50, `γ`: 0.20/0.40/0.60, `δ`: 0.50/0.70/0.90), percentile mapping, independence assumption, and seed are working modeling choices rather than Katherine-supplied empirical estimates.
+- The results bay shows six synchronized time series: software efficiency level, software progress slowdown, frontier capability, AI capability gap, AI risk, and safety benefit.
+- The source parameter table defines roles and statuses for `A`, `β`, `γ`, `α`, `δ`, and `λ`. The impact control maps Low, Medium, and High to seeded marginal P10, P50, and P90 bundles derived from 10,000 triangular draws per parameter.
+- The triangular inputs (`β`: 0.15/0.30/0.50, `γ`: 0.20/0.40/0.60, `δ`: 0.50/0.70/0.90, `λ`: 0.20/0.40/0.60), percentile mapping, independence assumption, and seed are working modeling choices rather than Katherine-supplied empirical estimates.
 - The baseline software path is normalized from index 100 in 2026 to 200 in 2034. Outputs describe policy divergence from that reference path, not a forecast of absolute progress.
+- Because the supplied Parts IV–V do not specify a baseline risk trajectory, `R_B(t)` is normalized to a constant index of 100; the risk chart is a relative sensitivity path, not an absolute risk forecast.
 - Model assumptions, equations, uncertainty, and sensitivity must remain inspectable as the model matures.
 
 ## Brand Commitments

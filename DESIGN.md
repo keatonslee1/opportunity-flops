@@ -102,7 +102,7 @@ elevation to separate its parts has not earned the separation typographically.
 - A warm ivory ground with cool-white plate stock inset into it. The two
   surfaces must stay visibly distinct; the pre-redesign pair differed by about
   two percent lightness and read as washed out.
-- Four numbered plates, captioned below in the printed convention.
+- Six numbered plates, captioned below in the printed convention.
 - Controls that travel with the reader, because the results column is roughly
   three times their height.
 
@@ -131,7 +131,7 @@ colors and a darker orange reserved for text.
 
 **The Frozen Plate Rule.** `--ink`, `--panel`, `--rule`, `--rule-strong`,
 `--orange`, `--orange-soft` and `--blue` are read directly by the chart rules.
-They keep their exact legacy values so the four plots render unchanged.
+They keep their exact legacy values so the six plots render unchanged.
 Retuning any of them silently alters the plots. If a surface needs a new
 value, add a token — do not edit these.
 
@@ -217,7 +217,7 @@ for the sweep marker.
 
 ### Range Controls
 - **Style:** 3px cobalt progress track with a narrow rectangular thumb.
-- **Behavior:** Value output is uppercase monospace; fill and all four plates
+- **Behavior:** Value output is uppercase monospace; fill and all six plates
   update from the same input event.
 
 ### Figure Plates

@@ -106,6 +106,46 @@ const charts = {
     sweep: document.querySelector("#capability-gap-sweep"),
     output: document.querySelector("#capability-gap-series-output"),
   },
+  risk: {
+    seriesKey: "risk",
+    domainKind: "risk",
+    areaMode: "min",
+    metricKey: "safetyBenefit",
+    descriptionKind: "risk",
+    zeroLabel: "lower risk",
+    resultLabel: "lower risk",
+    projectionOnly: true,
+    svg: document.querySelector("#risk-chart"),
+    axes: document.querySelector("#risk-axes"),
+    grid: document.querySelector("#risk-grid"),
+    description: document.querySelector("#risk-svg-desc"),
+    baseline: document.querySelector("#risk-baseline"),
+    firmA: document.querySelector("#risk-projection"),
+    firmB: document.querySelector("#risk-unused"),
+    area: document.querySelector("#risk-area"),
+    sweep: document.querySelector("#risk-sweep"),
+    output: document.querySelector("#risk-output"),
+  },
+  safetyBenefit: {
+    seriesKey: "safetyBenefit",
+    domainKind: "fraction",
+    areaMode: "max",
+    metricKey: "safetyBenefit",
+    descriptionKind: "safetyBenefit",
+    zeroLabel: "safety benefit",
+    resultLabel: "safety benefit",
+    projectionOnly: true,
+    svg: document.querySelector("#safety-benefit-chart"),
+    axes: document.querySelector("#safety-benefit-axes"),
+    grid: document.querySelector("#safety-benefit-grid"),
+    description: document.querySelector("#safety-benefit-svg-desc"),
+    baseline: document.querySelector("#safety-benefit-baseline"),
+    firmA: document.querySelector("#safety-benefit-projection"),
+    firmB: document.querySelector("#safety-benefit-unused"),
+    area: document.querySelector("#safety-benefit-area"),
+    sweep: document.querySelector("#safety-benefit-sweep"),
+    output: document.querySelector("#safety-benefit-output"),
+  },
 };
 
 const plot = {
@@ -224,7 +264,10 @@ function yPosition(value, domain) {
 }
 
 function chartDomain(series, chart) {
-  const maximum = Math.max(...series.baseline, ...series.firmA, ...series.firmB);
+  const comparisonSeries = chart.projectionOnly
+    ? [series.baseline, series.policy]
+    : [series.baseline, series.firmA, series.firmB];
+  const maximum = Math.max(...comparisonSeries.flat());
 
   if (chart.domainKind === "fraction") {
     const fallbackMaximum = 0.03;
@@ -233,6 +276,14 @@ function chartDomain(series, chart) {
       Math.ceil((maximum * 100) / 3) * 3 / 100,
     );
     return { min: 0, max: niceMaximum };
+  }
+
+  if (chart.domainKind === "risk") {
+    const minimum = Math.min(...comparisonSeries.flat());
+    return {
+      min: Math.max(0, Math.floor((minimum - 5) / 10) * 10),
+      max: 100,
+    };
   }
 
   const niceMaximum = Math.max(110, Math.ceil((maximum + 4) / 10) * 10);
@@ -340,7 +391,23 @@ function animateChart(chart) {
 function chartDescription(chart, result, metric) {
   const startYear = Math.round(result.series.years[0]);
   const endYear = Math.round(result.series.years.at(-1));
-  const endValue = formatPercent(metric.firmA);
+  const endValue = formatPercent(
+    chart.projectionOnly ? metric.policy : metric.firmA,
+  );
+
+  if (chart.descriptionKind === "risk") {
+    const scenarioDescription = scenario === "baseline"
+      ? "The policy projection coincides with the normalized baseline."
+      : `The policy projection ends ${endValue} below the normalized baseline in ${endYear}.`;
+    return `Modeled AI risk indices from ${startYear} through ${endYear}. ${scenarioDescription}`;
+  }
+
+  if (chart.descriptionKind === "safetyBenefit") {
+    const scenarioDescription = scenario === "baseline"
+      ? "The policy projection remains at zero safety benefit."
+      : `The policy projection reaches ${endValue} safety benefit in ${endYear}.`;
+    return `Modeled safety benefit percentages from ${startYear} through ${endYear}. ${scenarioDescription}`;
+  }
 
   if (chart.descriptionKind === "softwareLevel") {
     const scenarioDescription = scenario === "baseline"
@@ -385,30 +452,45 @@ function renderChart(kind, result, shouldAnimate = true) {
   if (!shouldAnimate) stopChartAnimation(chart);
 
   renderAxes(chart, result.series.years, domain);
-  chart.baseline.setAttribute("d", pathFromSeries(series.baseline, domain));
-  chart.firmA.setAttribute("d", pathFromSeries(series.firmA, domain));
-  chart.firmB.setAttribute("d", pathFromSeries(series.firmB, domain));
+  const firmASeries = chart.projectionOnly ? series.policy : series.firmA;
+  const firmBSeries = chart.projectionOnly ? series.policy : series.firmB;
 
-  const comparisonSeries = series.firmA.map((value, index) => (
-    chart.areaMode === "max"
-      ? Math.max(value, series.firmB[index])
-      : Math.min(value, series.firmB[index])
-  ));
+  chart.baseline.setAttribute("d", pathFromSeries(series.baseline, domain));
+  chart.firmA.setAttribute("d", pathFromSeries(firmASeries, domain));
+  chart.firmB.setAttribute(
+    "d",
+    chart.projectionOnly ? "" : pathFromSeries(firmBSeries, domain),
+  );
+
+  const comparisonSeries = chart.projectionOnly
+    ? firmASeries
+    : firmASeries.map((value, index) => (
+      chart.areaMode === "max"
+        ? Math.max(value, firmBSeries[index])
+        : Math.min(value, firmBSeries[index])
+    ));
   const areaUpper = chart.areaMode === "max" ? comparisonSeries : series.baseline;
   const areaLower = chart.areaMode === "max" ? series.baseline : comparisonSeries;
   chart.area.setAttribute("d", areaBetween(areaUpper, areaLower, domain));
 
   chart.firmA.style.opacity = scenario === "baseline" ? "0" : "1";
-  chart.firmB.style.opacity = scenario === "coordinated" ? "1" : "0";
-  chart.firmB.classList.toggle("is-overlapping", scenario === "coordinated");
+  chart.firmB.style.opacity = chart.projectionOnly
+    ? "0"
+    : scenario === "coordinated" ? "1" : "0";
+  chart.firmB.classList.toggle(
+    "is-overlapping",
+    !chart.projectionOnly && scenario === "coordinated",
+  );
   chart.area.style.opacity = scenario === "baseline" ? "0" : "0.42";
 
   const metric = result.metrics[chart.metricKey];
   chart.output.textContent = scenario === "baseline"
     ? `0.0% ${chart.zeroLabel}`
-    : scenario === "unilateral"
-      ? `Firm A · ${formatPercent(metric.firmA)} ${chart.resultLabel}`
-      : `Both firms · ${formatPercent(metric.firmA)} ${chart.resultLabel}`;
+    : chart.projectionOnly
+      ? `${formatPercent(metric.policy)} ${chart.resultLabel}`
+      : scenario === "unilateral"
+        ? `Firm A · ${formatPercent(metric.firmA)} ${chart.resultLabel}`
+        : `Both firms · ${formatPercent(metric.firmA)} ${chart.resultLabel}`;
 
   chart.description.textContent = chartDescription(chart, result, metric);
 
@@ -421,6 +503,7 @@ function updateCalibrationReadout(calibration) {
   document.querySelector("#beta-value").textContent = calibration.beta.toFixed(3);
   document.querySelector("#gamma-value").textContent = calibration.gamma.toFixed(3);
   document.querySelector("#delta-value").textContent = calibration.delta.toFixed(3);
+  document.querySelector("#lambda-value").textContent = calibration.lambda.toFixed(3);
   document.querySelector("#preset-name").textContent = calibration.label;
 }
 
@@ -456,6 +539,8 @@ function renderResult(shouldAnimate = true) {
     renderChart("softwareSlowdown", result, shouldAnimate);
     renderChart("capability", result, shouldAnimate);
     renderChart("capabilityGap", result, shouldAnimate);
+    renderChart("risk", result, shouldAnimate);
+    renderChart("safetyBenefit", result, shouldAnimate);
     updateComparisonStrip(result);
   } catch (error) {
     modelError.textContent = `The model could not run: ${error.message}. Reset the assumptions and try again.`;

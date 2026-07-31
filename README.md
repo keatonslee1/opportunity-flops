@@ -1,7 +1,7 @@
 # Opportunity FLOPs
 
 A small policy calculator for exploring how reallocating capability-oriented AI
-R&D compute to alignment changes modeled software progress and frontier capability.
+R&D compute to alignment changes modeled software progress, frontier capability, and AI risk.
 
 ## Local development
 
@@ -11,9 +11,9 @@ npm run dev
 
 The site has no runtime dependencies. Katherine's reduced-form model lives in
 `public/model.js` and exposes a single `runModel(assumptions)` function. Its
-assumption definitions drive the controls, and its output series drive four charts:
-software efficiency level, software progress slowdown, frontier capability, and
-AI capability gap.
+assumption definitions drive the controls, and its output series drive six charts:
+software efficiency level, software progress slowdown, frontier capability, AI
+capability gap, AI risk, and safety benefit.
 
 The equations and full parameter contract are implemented. The policy-impact
 control uses a deterministic assumed-prior Monte Carlo calibration: 10,000

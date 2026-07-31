@@ -82,8 +82,37 @@ const CHART_SERIES = {
   capability: { field: "capabilityIndex", baselineField: "capabilityIndexBaseline" },
 };
 
+/**
+ * Policy impact level — the brief's second dashboard parameter, independent of
+ * the compute percentage. These are labels only: what Low / Medium / High mean
+ * numerically is the model's to define, and the selected key is passed straight
+ * through in the assumptions object as `policyImpactLevel`.
+ *
+ * If the model declares its own `policyImpactLevel` assumption (a definition
+ * with `type: "select"` and an `options` array), that declaration wins.
+ */
+const IMPACT_LEVEL_KEY = "policyImpactLevel";
+
+const FALLBACK_IMPACT_LEVELS = [
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+];
+
+const impactDefinition = (model.assumptionDefinitions ?? []).find(
+  (d) => d.key === IMPACT_LEVEL_KEY,
+) ?? {
+  key: IMPACT_LEVEL_KEY,
+  label: "Policy impact level",
+  help: "Severity of the policy scenario. Interpreted by the model.",
+  type: "select",
+  options: FALLBACK_IMPACT_LEVELS,
+  value: "medium",
+  declaredByModel: false,
+};
+
 /** The two parameters the brief puts alongside the charts. */
-const DASHBOARD_SLIDER_KEYS = ["computeReallocated", "durationMonths"];
+const DASHBOARD_PARAMETER_KEYS = ["computeReallocated", IMPACT_LEVEL_KEY];
 
 const GROUP_LABELS = {
   policy: "Policy",
@@ -109,26 +138,50 @@ const EMPTY = "—";
 
 const definitions = model.assumptionDefinitions ?? [];
 
+/**
+ * Everything the UI treats as a user input. The impact level is appended when
+ * the model has not declared it, so it always reaches `runModel()`.
+ */
+const inputs = impactDefinition.declaredByModel === false
+  ? [...definitions, impactDefinition]
+  : definitions;
+
 const state = {
-  assumptions: Object.fromEntries(definitions.map((d) => [d.key, d.value])),
+  assumptions: Object.fromEntries(inputs.map((d) => [d.key, d.value])),
   scenario: scenarios[scenarios.length - 1]?.key ?? "coordinated",
   dashboardScenario: scenarios[scenarios.length - 1]?.key ?? "coordinated",
 };
 
-/** Every slider rendered for a given assumption key (main panel + dashboard). */
-const sliders = new Map();
+/** Every control rendered for a given key (main panel + dashboard mirror). */
+const controls = new Map();
 
-function registerSlider(key, input, output) {
-  if (!sliders.has(key)) sliders.set(key, []);
-  sliders.get(key).push({ input, output });
+function registerControl(key, input, output) {
+  if (!controls.has(key)) controls.set(key, []);
+  controls.get(key).push({ input, output });
 }
 
 // ── Controls ───────────────────────────────────────────────────────────
 
+function isSelect(definition) {
+  return definition.type === "select" && Array.isArray(definition.options);
+}
+
+function optionLabel(definition, value) {
+  return definition.options?.find((o) => o.value === value)?.label ?? String(value);
+}
+
 function displayValue(definition, value) {
+  if (isSelect(definition)) return optionLabel(definition, value);
   const step = Number(definition.step) || 1;
   const digits = step < 1 ? String(step).split(".")[1].length : 0;
   return `${Number(value).toFixed(digits)}${definition.suffix ?? ""}`;
+}
+
+/** Dispatches on the declared control type. Slider unless told otherwise. */
+function buildControl(definition, options = {}) {
+  return isSelect(definition)
+    ? buildSelect(definition, options)
+    : buildSlider(definition, options);
 }
 
 function buildSlider(definition, { showHelp = true } = {}) {
@@ -154,16 +207,45 @@ function buildSlider(definition, { showHelp = true } = {}) {
   });
 
   row.append(title, output, input);
-
-  if (showHelp && definition.help) {
-    const help = document.createElement("span");
-    help.className = "control-help";
-    help.textContent = definition.help;
-    row.append(help);
-  }
-
-  registerSlider(definition.key, input, output);
+  appendHelp(row, definition, showHelp);
+  registerControl(definition.key, input, output);
   return row;
+}
+
+function buildSelect(definition, { showHelp = true } = {}) {
+  const row = document.createElement("label");
+  row.className = "control is-select";
+
+  const title = document.createElement("span");
+  title.className = "control-label";
+  title.textContent = definition.label;
+
+  const select = document.createElement("select");
+  select.setAttribute("aria-label", definition.label);
+  for (const option of definition.options) {
+    const node = document.createElement("option");
+    node.value = option.value;
+    node.textContent = option.label;
+    select.append(node);
+  }
+  select.value = state.assumptions[definition.key];
+  select.addEventListener("change", () => {
+    setAssumption(definition.key, select.value);
+  });
+
+  row.append(title, select);
+  appendHelp(row, definition, showHelp);
+  // Selects carry their own label, so there is no separate output node.
+  registerControl(definition.key, select, null);
+  return row;
+}
+
+function appendHelp(row, definition, showHelp) {
+  if (!showHelp || !definition.help) return;
+  const help = document.createElement("span");
+  help.className = "control-help";
+  help.textContent = definition.help;
+  row.append(help);
 }
 
 /** Groups sliders when the model tags them, otherwise renders one flat list. */
@@ -171,7 +253,7 @@ function mountAssumptionControls(container) {
   container.replaceChildren();
 
   const groups = [];
-  for (const definition of definitions) {
+  for (const definition of inputs) {
     const key = definition.group ?? null;
     let bucket = groups.find((g) => g.key === key);
     if (!bucket) {
@@ -190,27 +272,27 @@ function mountAssumptionControls(container) {
       legend.textContent = group.label;
       section.append(legend);
     }
-    for (const definition of group.items) section.append(buildSlider(definition));
+    for (const definition of group.items) section.append(buildControl(definition));
     container.append(section);
   }
 }
 
 function setAssumption(key, value) {
   state.assumptions[key] = value;
-  const definition = definitions.find((d) => d.key === key);
-  for (const { input, output } of sliders.get(key) ?? []) {
-    if (Number(input.value) !== value) input.value = value;
-    if (definition) output.textContent = displayValue(definition, value);
+  const definition = inputs.find((d) => d.key === key);
+  for (const { input, output } of controls.get(key) ?? []) {
+    if (input.value !== String(value)) input.value = value;
+    if (definition && output) output.textContent = displayValue(definition, value);
   }
   render();
 }
 
-function syncSliders() {
-  for (const definition of definitions) {
+function syncControls() {
+  for (const definition of inputs) {
     const value = state.assumptions[definition.key];
-    for (const { input, output } of sliders.get(definition.key) ?? []) {
+    for (const { input, output } of controls.get(definition.key) ?? []) {
       input.value = value;
-      output.textContent = displayValue(definition, value);
+      if (output) output.textContent = displayValue(definition, value);
     }
   }
 }
@@ -373,8 +455,8 @@ function renderDashboard(result, pending) {
 
   // Readout mirrors the current inputs; model-derived rows fill in later.
   nodes.readout.replaceChildren();
-  const rows = definitions
-    .filter((d) => DASHBOARD_SLIDER_KEYS.includes(d.key))
+  const rows = DASHBOARD_PARAMETER_KEYS.map((k) => inputs.find((d) => d.key === k))
+    .filter(Boolean)
     .map((d) => [d.label, displayValue(d, state.assumptions[d.key])]);
 
   const summary = pending ? null : read.scenarioSummary(result, key);
@@ -411,58 +493,12 @@ function render() {
 // ── Dashboard sidebar ──────────────────────────────────────────────────
 
 /**
- * Low / Medium / High presets. If the model publishes `POLICY_PRESETS` those
- * win; otherwise each level is a fraction of the slider's own declared range,
- * which is a UI convenience and implies no economics.
+ * The dashboard sidebar carries the brief's two parameters — compute
+ * reallocated and policy impact level — plus the scenario selector. They are
+ * independent of each other: changing the impact level does not move the
+ * compute slider.
  */
-const FALLBACK_PRESET_LEVELS = [
-  { key: "low", label: "Low", fraction: 0.15 },
-  { key: "medium", label: "Medium", fraction: 0.4 },
-  { key: "high", label: "High", fraction: 0.8 },
-];
-
-function presetValues(preset) {
-  if (model.POLICY_PRESETS) return preset;
-  const values = {};
-  for (const key of DASHBOARD_SLIDER_KEYS) {
-    const definition = definitions.find((d) => d.key === key);
-    if (!definition) continue;
-    const raw = definition.min + (definition.max - definition.min) * preset.fraction;
-    const step = Number(definition.step) || 1;
-    values[key] = Math.min(
-      definition.max,
-      Math.max(definition.min, Math.round(raw / step) * step),
-    );
-  }
-  return values;
-}
-
 function mountDashboardControls() {
-  const presets = model.POLICY_PRESETS ?? FALLBACK_PRESET_LEVELS;
-
-  const presetSelect = document.querySelector("#preset-select");
-  presetSelect.replaceChildren();
-  const custom = document.createElement("option");
-  custom.value = "custom";
-  custom.textContent = "Custom";
-  presetSelect.append(custom);
-  for (const preset of presets) {
-    const option = document.createElement("option");
-    option.value = preset.key;
-    option.textContent = preset.label;
-    presetSelect.append(option);
-  }
-  presetSelect.value = "custom";
-  presetSelect.addEventListener("change", () => {
-    const preset = presets.find((p) => p.key === presetSelect.value);
-    if (!preset) return;
-    for (const [key, value] of Object.entries(presetValues(preset))) {
-      if (key in state.assumptions) state.assumptions[key] = value;
-    }
-    syncSliders();
-    render();
-  });
-
   const scenarioSelect = document.querySelector("#dashboard-scenario");
   scenarioSelect.replaceChildren();
   for (const scenario of scenarios) {
@@ -479,9 +515,9 @@ function mountDashboardControls() {
 
   const container = document.querySelector("#dashboard-controls");
   container.replaceChildren();
-  for (const key of DASHBOARD_SLIDER_KEYS) {
-    const definition = definitions.find((d) => d.key === key);
-    if (definition) container.append(buildSlider(definition, { showHelp: false }));
+  for (const key of DASHBOARD_PARAMETER_KEYS) {
+    const definition = inputs.find((d) => d.key === key);
+    if (definition) container.append(buildControl(definition, { showHelp: false }));
   }
 }
 
@@ -509,11 +545,10 @@ mountDashboardControls();
 mountTabs();
 
 document.querySelector("#reset-assumptions").addEventListener("click", () => {
-  for (const definition of definitions) {
+  for (const definition of inputs) {
     state.assumptions[definition.key] = definition.value;
   }
-  document.querySelector("#preset-select").value = "custom";
-  syncSliders();
+  syncControls();
   render();
 });
 

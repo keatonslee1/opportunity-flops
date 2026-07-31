@@ -132,16 +132,18 @@
   letter-spacing: var(--track-caps);
 }
 
-/* The one place fluoro appears on this page: the plate's own device. It is
-   art, it carries no value, and at 2.7:1 it could not carry one. */
+/* The plate ordinal is typographic apparatus, so it sets in ink like every
+   other piece of structure. It was a solid fluoro swatch with the numeral
+   reversed out of it — a CSS background, not drawn vector, which put the one
+   loud ink in the system on the least important element on screen and left the
+   page numbering its plates in two different colours. Fluoro's appearance on
+   this plate is the caret in the drawing below, where it belongs. */
 .plate-device {
   margin-left: 0.35em;
-  padding: 0 0.4em;
-  background: var(--fluoro);
   color: var(--ink);
   font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 1.05rem;
+  font-weight: 400;
   letter-spacing: 0;
 }
 
@@ -165,7 +167,7 @@
 .compute-screen {
   position: absolute;
   inset: 0;
-  background-color: var(--ink);
+  background-color: var(--rule-strong);
   -webkit-mask-image: var(--screen-10);
   mask-image: var(--screen-10);
   -webkit-mask-size: 8px 8px;
@@ -183,9 +185,17 @@
 /* Each unit carries both drawings and shows one. Swapping visibility rather
    than repainting a single rect means the two states are separately
    describable — and it is what lets the alignment mark be a different *shape*
-   rather than the same shape in a different ink. */
+   rather than the same shape in a different ink.
+
+   Capability R&D is INK, not orange. Orange means capability *cost* — the
+   model's output, plotted in Fig. 1–4 — and compute-spent-on-capability is an
+   input. Keying the masthead's marks to orange taught the reader a mapping
+   that every trace below it then contradicted, which is the exact failure the
+   Semantic Ink Rule exists to prevent, on the first thing anyone sees. Ink is
+   the honest colour for the stock being divided, and it makes the flip into
+   verdigris read harder. */
 .mark-capability {
-  fill: var(--orange);
+  fill: var(--ink);
   stroke: none;
 }
 
@@ -205,6 +215,13 @@
 
 .unit[data-role="alignment"] .mark-capability {
   display: none;
+}
+
+/* Fluoro's one appearance on this page, and it is drawn vector inside the
+   plate: a caret marking where the commitment ends. Art, live, carrying no
+   value a reader has to read off it — at 2.7:1 it could not carry one. */
+.commitment-caret {
+  fill: var(--fluoro);
 }
 
 .compute-plate figcaption {
@@ -247,7 +264,7 @@
 }
 
 .key-capability {
-  background: var(--orange);
+  background: var(--ink);
 }
 
 .key-alignment {
@@ -1163,7 +1180,14 @@
    caption stop being two-up rows once there is no width to sit side by side. */
 @media (max-width: 560px) {
   .compute-plate-head,
-  .compute-plate figcaption {
+  /* Fluoro's one appearance on this page, and it is drawn vector inside the
+   plate: a caret marking where the commitment ends. Art, live, carrying no
+   value a reader has to read off it — at 2.7:1 it could not carry one. */
+.commitment-caret {
+  fill: var(--fluoro);
+}
+
+.compute-plate figcaption {
     flex-direction: column;
     align-items: flex-start;
   }

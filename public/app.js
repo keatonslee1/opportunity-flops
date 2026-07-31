@@ -614,6 +614,7 @@ const NARROW_LAYOUT = { columns: 20, width: 22, height: 20, pitchX: 37.5, pitchY
 const narrowBank = window.matchMedia("(max-width: 560px)");
 
 const computeMarks = [];
+let commitmentCaret = null;
 
 function buildComputeBank() {
   if (!computeMarksSvg) return;
@@ -653,6 +654,33 @@ function buildComputeBank() {
   }
 
   computeMarksSvg.append(fragment);
+
+  // Appended last so it draws over the marks. Fluoro, drawn, and the only
+  // place the loud ink appears on this page.
+  commitmentCaret = svgElement("path", { class: "commitment-caret" });
+  computeMarksSvg.append(commitmentCaret);
+}
+
+// Marks where the commitment ends — the boundary between the last alignment
+// mark and the first capability mark. Positioned from the same layout the
+// marks are drawn from, so it lands correctly in either arrangement.
+function renderCommitmentCaret(reallocated) {
+  if (!commitmentCaret) return;
+
+  if (reallocated <= 0 || reallocated >= COMPUTE_UNITS) {
+    commitmentCaret.setAttribute("d", "");
+    return;
+  }
+
+  const layout = narrowBank.matches ? NARROW_LAYOUT : WIDE_LAYOUT;
+  const last = reallocated - 1;
+  const x = layout.originX + (last % layout.columns) * layout.pitchX + layout.width;
+  const y = layout.originY + Math.floor(last / layout.columns) * layout.pitchY + layout.height;
+  const w = 4;
+  commitmentCaret.setAttribute(
+    "d",
+    `M${(x - w).toFixed(1)} ${(y + 2).toFixed(1)}H${(x + w).toFixed(1)}L${x.toFixed(1)} ${(y + 7).toFixed(1)}Z`,
+  );
 }
 
 // Rebuild on the breakpoint itself, not on every resize event: crossing 560px
@@ -675,6 +703,8 @@ function renderComputeBank() {
   for (const [index, unit] of computeMarks.entries()) {
     unit.dataset.role = index < reallocated ? "alignment" : "capability";
   }
+
+  renderCommitmentCaret(reallocated);
 
   computePlateReadout.textContent = reallocated === 0
     ? "Frontier R&D compute · 100 units to capability"

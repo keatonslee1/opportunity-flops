@@ -1,5 +1,6 @@
 import { assumptionDefinitions, runModel } from "./model.js";
 import { buildUrl, decodeState, encodeState } from "./permalink.js";
+import { chartDomain, formatTickValue } from "./scale.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -289,33 +290,6 @@ function yPosition(value, domain) {
   return plot.bottom - ((clamped - domain.min) / (domain.max - domain.min)) * (plot.bottom - plot.top);
 }
 
-function chartDomain(series, chart) {
-  const comparisonSeries = chart.projectionOnly
-    ? [series.baseline, series.policy]
-    : [series.baseline, series.firmA, series.firmB];
-  const maximum = Math.max(...comparisonSeries.flat());
-
-  if (chart.domainKind === "fraction") {
-    const fallbackMaximum = 0.03;
-    const niceMaximum = Math.max(
-      fallbackMaximum,
-      Math.ceil((maximum * 100) / 3) * 3 / 100,
-    );
-    return { min: 0, max: niceMaximum };
-  }
-
-  if (chart.domainKind === "risk") {
-    const minimum = Math.min(...comparisonSeries.flat());
-    return {
-      min: Math.max(0, Math.floor((minimum - 5) / 10) * 10),
-      max: 100,
-    };
-  }
-
-  const niceMaximum = Math.max(110, Math.ceil((maximum + 4) / 10) * 10);
-  return { min: 100, max: niceMaximum };
-}
-
 function pathFromSeries(series, domain) {
   return series
     .map((value, index) => `${index === 0 ? "M" : "L"}${xPosition(index, series.length).toFixed(1)} ${yPosition(value, domain).toFixed(1)}`)
@@ -344,13 +318,13 @@ function renderAxes(chart, years, domain) {
 
   const horizontalLines = [];
   const verticalLines = [];
-  const yTickCount = 4;
   const xIndices = [0, Math.round((years.length - 1) * 0.25), Math.round((years.length - 1) * 0.5), Math.round((years.length - 1) * 0.75), years.length - 1];
 
-  for (let index = 0; index < yTickCount; index += 1) {
-    const ratio = index / (yTickCount - 1);
-    const value = domain.max - (domain.max - domain.min) * ratio;
-    const y = plot.top + (plot.bottom - plot.top) * ratio;
+  // Gridlines sit on the nice values the domain chose, not on four equal
+  // divisions of whatever the range happened to be. That is what stops a level
+  // axis reading 210 / 173 / 137 / 100.
+  for (const value of domain.ticks) {
+    const y = yPosition(value, domain);
     horizontalLines.push(`M${plot.left} ${y.toFixed(1)}H${plot.right}`);
 
     const label = svgElement("text", {
@@ -358,9 +332,7 @@ function renderAxes(chart, years, domain) {
       y: (y + 5).toFixed(1),
       "text-anchor": "end",
     });
-    label.textContent = chart.domainKind === "fraction"
-      ? `${(value * 100).toFixed(0)}%`
-      : Math.round(value);
+    label.textContent = formatTickValue(value, chart, domain.step);
     chart.axes.append(label);
   }
 

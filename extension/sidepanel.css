@@ -373,8 +373,12 @@ input {
   border-top-style: dashed;
 }
 
-.legend-line.projection {
+.legend-line.firm-a {
   border-color: var(--orange);
+}
+
+.legend-line.firm-b {
+  border-color: var(--blue);
 }
 
 .chart-block {
@@ -414,6 +418,43 @@ input {
 .chart-placeholder {
   fill: var(--rule-strong);
   text-transform: uppercase;
+}
+
+.chart-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.chart-note:empty {
+  display: none;
+}
+
+.metrics-unit {
+  margin: 8px 0 0;
+  color: var(--rule-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+/* Caveats carry the model's hedging — muted, but never hidden away. */
+.caveats {
+  margin: 0;
+  padding-left: 16px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.caveats li + li {
+  margin-top: 6px;
+}
+
+#calibration-note {
+  color: var(--orange-text);
 }
 
 /* ── Scenarios ───────────────────────────────────────────────────────── */

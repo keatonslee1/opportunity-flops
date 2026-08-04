@@ -78,16 +78,15 @@
         <p id="result-note" class="note"></p>
 
         <dl id="metric-grid" class="metrics"></dl>
+        <p id="metrics-unit" class="metrics-unit" hidden></p>
       </section>
 
       <!-- Trajectories -->
       <section class="charts" aria-labelledby="charts-heading">
         <div class="section-head">
           <h2 id="charts-heading" class="section-title">Trajectories</h2>
-          <span class="legend">
-            <span><span class="legend-line baseline"></span>Baseline</span>
-            <span><span class="legend-line projection"></span>Projection</span>
-          </span>
+          <!-- Built at render time so it always matches the traces drawn. -->
+          <span class="legend" id="chart-legend"></span>
         </div>
 
         <figure class="chart-block">
@@ -99,6 +98,8 @@
           <figcaption class="chart-caption">Frontier capability index M(t)</figcaption>
           <svg id="chart-capability" class="chart"></svg>
         </figure>
+
+        <p id="chart-note" class="chart-note"></p>
       </section>
 
       <!-- Scenario -->
@@ -117,6 +118,15 @@
         <p id="controls-empty" class="note" hidden>
           Assumptions appear once the model is loaded.
         </p>
+      </section>
+
+      <!-- The model's own hedging, shown verbatim. -->
+      <section id="caveats-block" class="caveats-block" aria-labelledby="caveats-heading" hidden>
+        <div class="section-head">
+          <h2 id="caveats-heading" class="section-title">Model caveats</h2>
+          <span id="calibration-note" class="tag" hidden></span>
+        </div>
+        <ul id="caveats" class="caveats"></ul>
       </section>
     </main>
 

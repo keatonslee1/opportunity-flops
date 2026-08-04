@@ -17,83 +17,97 @@ import {
 
 // ── Model adapter ──────────────────────────────────────────────────────
 //
-// The ONLY place in the panel that knows the shape of `runModel()`'s result,
-// kept deliberately identical to the site's own adapter in `public/app.js` so
-// both light up from the same model change. Each reader returns null / [] when
-// the model has not supplied a field, which renders as an empty state.
+// The ONLY place in the panel that knows the shape of `runModel()`'s result.
+//
+// Written against the model in `public/model.js`, which returns:
+//
+//   { status, assumptions, calibration, units, caveats,
+//     series:  { years: [], software|softwareRate|capability:
+//                  { baseline: [], firmA: [], firmB: [] } },
+//     metrics: { evaluatedAtYear,
+//                softwareSlowdown|softwareLevelGap|capabilityGap:
+//                  { firmA, firmB } } }
+//
+// The scenario is an INPUT: it travels in the assumptions object, and the
+// model returns firm A / firm B paths for whichever scenario was requested.
+//
+// Every reader returns null / [] when a field is absent, so a model that drops
+// or renames something degrades to an empty state instead of throwing.
 
 const read = {
-  /** Has the model been connected at all? */
-  isPending: (result) => !result || result.status === "pending-model",
+  /** True until the model returns real output. */
+  isPending: (result) =>
+    !result || result.status === "pending-model" || !result.series,
 
-  /** Big number at the top of the calculator, as a preformatted string. */
-  headline: (result) =>
-    result.headline ??
-    (typeof result.cumulativeLoss === "string" ? result.cumulativeLoss : null),
-
-  /** Sentence under the headline. */
-  explanation: (result) => result.explanation ?? null,
-
-  /** [{ label, value, sub }] for the metric list. */
-  metrics: (result) => result.metrics ?? [],
-
-  /** Per-scenario summary for the scenario rows. */
-  scenarioSummary: (result, key) => result.scenarios?.[key] ?? null,
-
-  /** Raw time-series rows. */
-  rows: (result) => (Array.isArray(result?.series) ? result.series : []),
-
-  /** X axis, taken from whichever field the model uses for time. */
+  /** Shared x axis for every chart. */
   years: (result) =>
-    read.rows(result)
-      .map((row) => row.year ?? row.t)
-      .filter(Number.isFinite),
+    Array.isArray(result?.series?.years)
+      ? result.series.years.filter(Number.isFinite)
+      : [],
 
   /**
-   * Pulls one numeric field from every row for a scenario, optionally per firm.
-   * Returns [] the moment a row is missing the field, so a partial series never
-   * renders as a complete trace.
+   * One numeric path: `family` is software / softwareRate / capability,
+   * `track` is baseline / firmA / firmB.
    */
-  values: (result, scenarioKey, field, firm) => {
-    const out = [];
-    for (const row of read.rows(result)) {
-      const scoped = row[scenarioKey];
-      if (!scoped) return [];
-      const source = firm ? scoped[firm] : scoped;
-      const value = source?.[field];
-      if (!Number.isFinite(value)) return [];
-      out.push(value);
-    }
-    return out;
+  path: (result, family, track) => {
+    const values = result?.series?.[family]?.[track];
+    if (!Array.isArray(values)) return [];
+    return values.every(Number.isFinite) ? values : [];
   },
-};
 
-/** Chart id -> the model fields it plots. */
-const CHART_FIELDS = {
-  software: { value: "softwareIndex", baseline: "softwareIndexBaseline" },
-  capability: { value: "capabilityIndex", baseline: "capabilityIndexBaseline" },
+  /** A single metric for one firm, as a raw fraction. */
+  metric: (result, key, firm) => {
+    const value = result?.metrics?.[key]?.[firm];
+    return Number.isFinite(value) ? value : null;
+  },
+
+  /** The year the metrics are evaluated at. */
+  evaluatedAtYear: (result) => result?.metrics?.evaluatedAtYear ?? null,
+
+  /** Model-supplied unit strings, used verbatim for labels. */
+  unit: (result, key) => result?.units?.[key] ?? null,
+
+  /** The model's own hedging. Shown, never summarised. */
+  caveats: (result) =>
+    Array.isArray(result?.caveats) ? result.caveats.filter(Boolean) : [],
+
+  /** Calibration block — horizon, preset label, whether it is empirical. */
+  calibration: (result) => result?.calibration ?? null,
 };
 
 /**
- * The scenario rows use the brief's keys; a model is likelier to call the
- * counterfactual `none` than `baseline`. Accept either rather than forcing a
- * convention on the model owner.
+ * Metric rows, in the order the panel shows them. Labels are view copy; every
+ * value and unit comes from the model.
  */
-function resolveScenarioKey(result, uiScenario) {
-  const rows = read.rows(result);
-  if (!rows.length) return null;
-  const candidates =
-    uiScenario === "none" ? ["none", "baseline"] : [uiScenario];
-  return candidates.find((key) => rows[0][key]) ?? null;
+const METRIC_ROWS = [
+  { key: "softwareSlowdown", label: "Software progress slowdown" },
+  { key: "softwareLevelGap", label: "Software level gap" },
+  { key: "capabilityGap", label: "Capability gap" },
+];
+
+/** Chart id -> which series family it plots, and its caption. */
+const CHART_FAMILIES = [
+  { node: "softwareChart", family: "software", label: "Software progress S(t)" },
+  { node: "capabilityChart", family: "capability", label: "Capability M(t)" },
+];
+
+/**
+ * Formats a model fraction as a percentage. Presentation only — the number is
+ * the model's, this just chooses how many digits to show.
+ */
+function asPercent(fraction, digits = 1) {
+  return `${(fraction * 100).toFixed(digits)}%`;
 }
 
 /**
- * Scenario labels come from the project brief. These are view copy — if the
- * model publishes its own `SCENARIOS`, that wins.
+ * Scenario labels. The keys are the model's vocabulary — `runModel()` branches
+ * on `assumptions.scenario`, treating "baseline" as the counterfactual and
+ * "coordinated" as both firms reallocating; anything else is one firm acting
+ * alone. The labels and descriptions are view copy.
  */
 const FALLBACK_SCENARIOS = [
   {
-    key: "none",
+    key: "baseline",
     label: "No reallocation",
     short: "Baseline",
     description: "Neither firm diverts compute. The counterfactual.",
@@ -111,40 +125,6 @@ const FALLBACK_SCENARIOS = [
     description: "Both firms reallocate under a common policy or commitment.",
   },
 ];
-
-/**
- * Row labels the calculator reserves for the model's summary metrics. Purely
- * captions — values arrive via `read.metrics()`.
- */
-const PLANNED_METRICS = [
-  "Software progress slowdown",
-  "Capability lag",
-  "Delay in productivity gains",
-  "Unilateral vs coordinated",
-];
-
-/**
- * Policy impact level — the brief's second dashboard parameter, independent of
- * the compute percentage. Labels only: what Low / Medium / High mean
- * numerically is the model's to define. The selected key reaches runModel() in
- * the assumptions object as `policyImpactLevel`.
- *
- * If the model declares its own `policyImpactLevel` definition, that wins.
- */
-const IMPACT_KEY = "policyImpactLevel";
-
-const FALLBACK_IMPACT = {
-  key: IMPACT_KEY,
-  label: "Policy impact level",
-  type: "select",
-  options: [
-    { value: "low", label: "Low" },
-    { value: "medium", label: "Medium" },
-    { value: "high", label: "High" },
-  ],
-  value: "medium",
-  suppliedByUi: true,
-};
 
 const EMPTY = "—";
 const STATE_KEY = "panelState";
@@ -203,6 +183,12 @@ const nodes = {
   reset: document.querySelector("#reset-assumptions"),
   openSite: document.querySelector("#open-site"),
   copySummary: document.querySelector("#copy-summary"),
+  metricsUnit: document.querySelector("#metrics-unit"),
+  caveatsBlock: document.querySelector("#caveats-block"),
+  caveats: document.querySelector("#caveats"),
+  calibration: document.querySelector("#calibration-note"),
+  chartLegend: document.querySelector("#chart-legend"),
+  chartNote: document.querySelector("#chart-note"),
   pageContext: document.querySelector("#page-context"),
   pageContextTitle: document.querySelector("#page-context-title"),
 };
@@ -222,12 +208,19 @@ async function restoreState() {
 
 // ── Controls ───────────────────────────────────────────────────────────
 
-function isSelect(definition) {
-  return definition.type === "select" && Array.isArray(definition.options);
+/**
+ * The model declares enumerated assumptions as `type: "choice"`; "select" is
+ * accepted too so an older or differently-worded definition still renders.
+ */
+function isChoice(definition) {
+  return (
+    (definition.type === "choice" || definition.type === "select")
+    && Array.isArray(definition.options)
+  );
 }
 
 function displayValue(definition, value) {
-  if (isSelect(definition)) {
+  if (isChoice(definition)) {
     return (
       definition.options.find((o) => o.value === value)?.label ?? String(value)
     );
@@ -304,7 +297,7 @@ function buildSelect(definition) {
 }
 
 function buildControl(definition) {
-  return isSelect(definition) ? buildSelect(definition) : buildSlider(definition);
+  return isChoice(definition) ? buildSelect(definition) : buildSlider(definition);
 }
 
 function mountAssumptionControls() {
@@ -325,7 +318,7 @@ function setAssumption(key, value) {
     if (control.output) {
       control.output.textContent = displayValue(definition, value);
     }
-    if (!isSelect(definition)) paintTrack(control.input, definition, value);
+    if (!isChoice(definition)) paintTrack(control.input, definition, value);
   }
   saveState();
   render();
@@ -340,7 +333,7 @@ function syncSliders() {
     if (control.output) {
       control.output.textContent = displayValue(definition, value);
     }
-    if (!isSelect(definition)) paintTrack(control.input, definition, value);
+    if (!isChoice(definition)) paintTrack(control.input, definition, value);
   }
 }
 
@@ -402,89 +395,179 @@ function renderResult(result, pending) {
   const scenario = state.scenarios.find((s) => s.key === state.scenario);
   nodes.scenarioLabel.textContent = scenario?.short ?? scenario?.label ?? "";
 
-  nodes.headline.textContent = pending ? EMPTY : (read.headline(result) ?? EMPTY);
-  nodes.note.textContent = pending ? "" : (read.explanation(result) ?? "");
+  // The model publishes no headline string, so the panel promotes the metric
+  // that answers the brief's question: how far behind the frontier firm ends up.
+  const headline = pending ? null : read.metric(result, "capabilityGap", "firmA");
+  nodes.headline.textContent = headline === null ? EMPTY : asPercent(headline);
 
-  const metrics = pending ? [] : read.metrics(result);
+  const year = read.evaluatedAtYear(result);
+  nodes.note.textContent =
+    pending || headline === null
+      ? ""
+      : `Frontier-firm capability shortfall against baseline${year ? ` at ${year}` : ""}.`;
+
+  // Metric rows: firm A and firm B side by side.
   nodes.metrics.replaceChildren();
+  for (const row of METRIC_ROWS) {
+    const a = pending ? null : read.metric(result, row.key, "firmA");
+    const b = pending ? null : read.metric(result, row.key, "firmB");
 
-  if (!metrics.length) {
-    // Show the labelled rows the model is expected to fill, so the layout
-    // reads correctly before the numbers exist.
-    for (const label of PLANNED_METRICS) {
-      const dt = document.createElement("dt");
-      dt.textContent = label;
-      const dd = document.createElement("dd");
+    const dt = document.createElement("dt");
+    dt.textContent = row.label;
+
+    const dd = document.createElement("dd");
+    if (a === null && b === null) {
       dd.className = "is-empty";
       dd.textContent = EMPTY;
-      nodes.metrics.append(dt, dd);
-    }
-  } else {
-    for (const metric of metrics) {
-      const dt = document.createElement("dt");
-      dt.textContent = metric.label;
-      const dd = document.createElement("dd");
+    } else {
       const strong = document.createElement("strong");
-      strong.textContent = metric.value;
+      strong.textContent = a === null ? EMPTY : asPercent(a);
       dd.append(strong);
-      if (metric.sub) {
+      // Only worth showing firm B separately when the two actually differ.
+      if (b !== null && a !== null && Math.abs(a - b) > 1e-9) {
         const span = document.createElement("span");
-        span.textContent = metric.sub;
+        span.textContent = `firm B ${asPercent(b)}`;
         dd.append(span);
       }
-      nodes.metrics.append(dt, dd);
     }
+    nodes.metrics.append(dt, dd);
   }
+
+  const unit = read.unit(result, "metrics");
+  nodes.metricsUnit.textContent = pending || !unit ? "" : unit;
+  nodes.metricsUnit.hidden = pending || !unit;
 
   for (const card of nodes.scenarioCards.children) {
     const key = card.dataset.scenario;
     card.setAttribute("aria-pressed", String(state.scenario === key));
-    const summary = pending ? null : read.scenarioSummary(result, key);
+    // The model answers for one scenario at a time, so per-row figures would
+    // mean three extra runs; the row shows its description instead.
     card.querySelector('[data-role="metric"]').textContent =
-      summary?.headline ?? EMPTY;
+      state.scenario === key && !pending && headline !== null
+        ? asPercent(headline)
+        : "";
   }
+
+  renderCaveats(result, pending);
 }
 
 /**
- * Plots the selected scenario against the counterfactual.
+ * The model ships its own hedging — that the baseline is normalised rather
+ * than forecast, that the presets are working assumptions. Showing its numbers
+ * without them would overstate what the panel knows.
+ */
+function renderCaveats(result, pending) {
+  const caveats = pending ? [] : read.caveats(result);
+  nodes.caveats.replaceChildren();
+  nodes.caveatsBlock.hidden = caveats.length === 0;
+
+  for (const caveat of caveats) {
+    const li = document.createElement("li");
+    li.textContent = caveat;
+    nodes.caveats.append(li);
+  }
+
+  const calibration = pending ? null : read.calibration(result);
+  if (calibration) {
+    const bits = [];
+    if (calibration.label) bits.push(calibration.label);
+    if (calibration.presetEmpirical === false) bits.push("working placeholder values");
+    nodes.calibration.textContent = bits.join(" · ");
+    nodes.calibration.hidden = bits.length === 0;
+  } else {
+    nodes.calibration.hidden = true;
+  }
+}
+
+/** Do two paths coincide? Used to avoid drawing a line twice. */
+function samePath(a, b) {
+  return (
+    a.length > 0
+    && a.length === b.length
+    && a.every((value, i) => Math.abs(value - b[i]) < 1e-9)
+  );
+}
+
+/**
+ * Decides which traces a chart actually needs, from the numbers rather than
+ * from the scenario's name.
  *
- * Nothing is drawn until the model supplies a real series — an empty frame is
- * shown instead. Sketching illustrative geometry here would put invented curves
- * next to a headline number in a panel too small to caveat them properly.
+ * The model collapses firms depending on the scenario — under the
+ * counterfactual both track the baseline, under coordination both take the
+ * same path. Drawing a line per firm regardless would put two identical
+ * strokes on top of each other and imply a difference that is not there.
+ */
+function tracksFor(baseline, firmA, firmB) {
+  const tracks = [
+    { key: "baseline", label: "Baseline", color: "var(--ink)", dashed: true, values: baseline },
+  ];
+  if (!firmA.length) return tracks;
+
+  const aIsBaseline = samePath(firmA, baseline);
+  const bIsBaseline = samePath(firmB, baseline);
+
+  if (samePath(firmA, firmB)) {
+    // Both firms on one path: draw it once, named for what it represents.
+    if (!aIsBaseline) {
+      tracks.push({ key: "both", label: "Both firms", color: "var(--orange)", values: firmA });
+    }
+    return tracks;
+  }
+
+  if (!aIsBaseline) {
+    tracks.push({ key: "firmA", label: "Firm A", color: "var(--orange)", values: firmA });
+  }
+  if (firmB.length && !bIsBaseline) {
+    tracks.push({ key: "firmB", label: "Firm B", color: "var(--blue)", values: firmB });
+  }
+  return tracks;
+}
+
+/**
+ * Plots the selected scenario against the baseline. The model returns
+ * baseline / firm A / firm B paths for whichever scenario it was asked about.
  */
 function renderCharts(result, pending) {
-  const scenarioKey = pending ? null : resolveScenarioKey(result, state.scenario);
   const xValues = pending ? [] : read.years(result);
+  let legendTracks = [];
 
-  const charts = [
-    { node: nodes.softwareChart, fields: CHART_FIELDS.software, label: "Software progress index" },
-    { node: nodes.capabilityChart, fields: CHART_FIELDS.capability, label: "Capability index" },
-  ];
+  for (const chart of CHART_FAMILIES) {
+    const unit = read.unit(result, chart.family);
+    const tracks = pending
+      ? [{ key: "baseline", label: "Baseline", color: "var(--ink)", dashed: true, values: [] }]
+      : tracksFor(
+          read.path(result, chart.family, "baseline"),
+          read.path(result, chart.family, "firmA"),
+          read.path(result, chart.family, "firmB"),
+        );
+    if (tracks.length > legendTracks.length) legendTracks = tracks;
 
-  for (const chart of charts) {
-    renderLineChart(chart.node, {
+    renderLineChart(nodes[chart.node], {
       xValues,
-      yLabel: chart.label,
+      yLabel: unit ? `${chart.label} — ${unit}` : chart.label,
       placeholder: pending ? "Awaiting economic model" : "No series for this scenario",
-      series: scenarioKey
-        ? [
-            {
-              key: "baseline",
-              label: "Baseline",
-              color: "var(--ink)",
-              dashed: true,
-              values: read.values(result, scenarioKey, chart.fields.baseline),
-            },
-            {
-              key: "projection",
-              label: "Projection",
-              color: "var(--orange)",
-              values: read.values(result, scenarioKey, chart.fields.value),
-            },
-          ]
-        : [],
+      series: tracks,
     });
   }
+
+  // Legend mirrors exactly what got drawn.
+  nodes.chartLegend.replaceChildren();
+  for (const track of legendTracks) {
+    const item = document.createElement("span");
+    const line = document.createElement("span");
+    line.className = `legend-line${track.dashed ? " baseline" : ""}`;
+    if (!track.dashed) line.style.borderColor = track.color;
+    item.append(line, document.createTextNode(track.label));
+    nodes.chartLegend.append(item);
+  }
+
+  const scenario = state.scenarios.find((s) => s.key === state.scenario);
+  const onlyBaseline = !pending && legendTracks.length === 1;
+  nodes.chartNote.textContent = pending
+    ? ""
+    : onlyBaseline
+      ? "Both firms track the baseline under this scenario."
+      : (scenario?.description ?? "");
 }
 
 /** Single entry point for every view, so no caller can update one and not the other. */
@@ -509,23 +592,36 @@ function summaryText() {
   lines.push(
     pending
       ? "Result: awaiting economic model (runModel() has not returned results)"
-      : `Result: ${read.headline(result) ?? EMPTY}`,
+      : `Capability gap, firm A: ${
+          read.metric(result, "capabilityGap", "firmA") === null
+            ? EMPTY
+            : asPercent(read.metric(result, "capabilityGap", "firmA"))
+        }${read.evaluatedAtYear(result) ? ` at ${read.evaluatedAtYear(result)}` : ""}`,
   );
-  const explanation = pending ? null : read.explanation(result);
-  if (explanation) lines.push(explanation);
 
   lines.push("", "Assumptions");
   for (const definition of state.definitions) {
-    const value = displayValue(definition, state.assumptions[definition.key]);
-    const suffix = definition.suppliedByUi ? "  (supplied by the interface)" : "";
-    lines.push(`- ${definition.label}: ${value}${suffix}`);
+    lines.push(`- ${definition.label}: ${displayValue(definition, state.assumptions[definition.key])}`);
   }
+  lines.push(`- Scenario: ${scenario?.label ?? state.scenario}`);
 
-  const metrics = pending ? [] : read.metrics(result);
-  if (metrics.length) {
-    lines.push("", "Metrics");
-    for (const metric of metrics) {
-      lines.push(`- ${metric.label}: ${metric.value}${metric.sub ? ` (${metric.sub})` : ""}`);
+  if (!pending) {
+    const unit = read.unit(result, "metrics");
+    lines.push("", `Metrics${unit ? ` (${unit})` : ""}`);
+    for (const row of METRIC_ROWS) {
+      const a = read.metric(result, row.key, "firmA");
+      const b = read.metric(result, row.key, "firmB");
+      if (a === null && b === null) continue;
+      const parts = [`firm A ${a === null ? EMPTY : asPercent(a)}`];
+      if (b !== null) parts.push(`firm B ${asPercent(b)}`);
+      lines.push(`- ${row.label}: ${parts.join(", ")}`);
+    }
+
+    // A pasted summary carries the model's hedging with it.
+    const caveats = read.caveats(result);
+    if (caveats.length) {
+      lines.push("", "Model caveats");
+      for (const caveat of caveats) lines.push(`- ${caveat}`);
     }
   }
 
@@ -602,7 +698,8 @@ async function render() {
   const token = ++runToken;
   let result;
   try {
-    result = await bridge.run(state.assumptions);
+    // The scenario is an input, not a view filter — the model branches on it.
+    result = await bridge.run({ ...state.assumptions, scenario: state.scenario });
   } catch (error) {
     console.error("runModel failed", error);
     result = null;
@@ -618,10 +715,8 @@ async function render() {
 // ── Boot ───────────────────────────────────────────────────────────────
 
 function applyDefinitions(exports, restored) {
-  const declared = exports.assumptionDefinitions ?? [];
-  // The impact level is appended only while the model stays silent about it.
-  const impact = declared.find((d) => d.key === IMPACT_KEY) ?? FALLBACK_IMPACT;
-  state.definitions = impact.suppliedByUi ? [...declared, impact] : declared;
+  // The model owns its assumptions outright — the panel appends nothing.
+  state.definitions = exports.assumptionDefinitions ?? [];
   state.scenarios = exports.SCENARIOS ?? FALLBACK_SCENARIOS;
 
   const defaults = Object.fromEntries(

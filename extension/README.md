@@ -58,10 +58,11 @@ Consequences worth knowing:
   would reject it as-is. Publishing it would mean vendoring `model.js` at
   release time — a packaging decision for whoever owns the release, not
   something this extension should do behind the model owner's back.
-- **The model is still a stub.** `runModel()` currently returns
-  `status: "pending-model"`, so the panel shows its empty state with the sliders
-  live. It fills in on its own once the real model lands — no change needed
-  here.
+- **The model is live.** `runModel()` returns real output, and the panel is
+  written against that contract: `series` in columnar form
+  (`{years, software|softwareRate|capability: {baseline, firmA, firmB}}`) and
+  `metrics` keyed by firm. The scenario is an **input** — it travels inside the
+  assumptions object, and the model returns the firm paths for it.
 
 ### Pointing at a local server
 
@@ -71,21 +72,25 @@ from the repository root. The choice persists.
 
 ## What the panel shows
 
-- **Result** — the model's headline figure, explanation and metric rows. Rows
-  are labelled before values exist so the layout reads correctly while pending.
+- **Result** — the model publishes no headline string, so the panel promotes
+  the capability gap for the frontier firm and shows the model's own
+  `units.metrics` beneath the rows. Each row shows firm A, plus firm B whenever
+  the two differ.
 - **Scenario** — no reallocation / one firm / both firms. Uses the model's own
   `SCENARIOS` export when it publishes one, otherwise the brief's labels.
 - **Assumptions** — one control per entry in the model's `assumptionDefinitions`:
-  a slider normally, or a select for entries declaring `type: "select"` with an
-  `options` array. Nothing is hardcoded: if the model adds, removes or renames an
+  a slider for `type: "range"`, a select for `type: "choice"` (or `"select"`)
+  with an `options` array. Nothing is hardcoded: if the model adds, removes or renames an
   assumption, the panel follows. Values persist across panel opens and reset to
   the model's own defaults.
-- **Policy impact level** — the brief's second dashboard parameter. The panel
-  appends a Low / Medium / High select *only while the model stays silent about
-  it*; if the model declares its own `policyImpactLevel`, that declaration wins
-  outright. Either way the choice reaches `runModel()` in the assumptions object.
-  The labels are view copy — what each level means numerically is the model's to
-  define.
+- **Model caveats** — shown verbatim, never summarised, alongside the
+  calibration label and a flag when the presets are the model's own working
+  placeholders rather than empirical values. Showing its numbers without its
+  hedging would overstate what the panel knows.
+- **Trajectories** — traces are chosen from the numbers, not from the
+  scenario's name. When two firms share a path the chart draws it once, labelled
+  "Both firms"; when a firm sits on the baseline its trace is dropped. The
+  legend is built from whatever actually got drawn.
 
 - **Copy** — puts the current scenario, result, assumptions and metrics on the
   clipboard as plain text, for pasting into notes next to whatever you are
@@ -151,10 +156,9 @@ Deliberately not included:
 
 Genuinely open:
 
-- **Firm A / firm B traces.** The adapter's `values()` reader already accepts a
-  `firm` argument, matching the shape PR #5 documents, but the panel plots only
-  baseline against projection. Splitting the two firms needs a call on whether
-  two more traces are legible at this width.
-- **The model is still a stub.** `runModel()` returns
-  `status: "pending-model"`, so every number here is an empty state today. The
-  panel fills in on its own once the real model lands — no change needed here.
+- **Monte Carlo uncertainty.** The model exports `monteCarloCalibration`
+  (10,000 seeded draws) and its Low/Medium/High presets are rank-aligned
+  P10/P50/P90 bundles. Nothing yet surfaces that spread.
+- **Permalinks.** `public/permalink.js` gives every configuration a citable
+  URL. "Open full site" should carry the current configuration rather than
+  landing on defaults, and the copied summary should include the link.
